@@ -191,7 +191,7 @@ const CHECKLIST=[
  {id:"topdown", label:"Top-down bias aligned", desc:"Monthly/weekly direction confirms daily setup direction."},
 ];
 const SETUPS=[
- {symbol:"ABCL",company:"AbCellera Biologics",price:7.39,chg:10.81,vol:"15.6M",mcap:"$2.03B",capSize:"Small",
+ {symbol:"ABCL",company:"AbCellera Biologics",price:7.60,chg:-1.17,vol:"8.0M",mcap:"$2.03B",capSize:"Small",
  direction:"call",phase:"MANAGING",tier:"Tier 1",isActive:true,
  contract:"$5 Call · Jul 17 · Both",entryPremium:0.27,strike:5,expiryDate:"2026-07-17",
  earningsDate:"2026-08-06",earningsLabel:"Aug 6",accountFit:["IRA ($200)","Individual ($3-5)"],
@@ -203,12 +203,12 @@ const SETUPS=[
  entryNote:"$5 call intrinsic ~$1.66 at $6.66. Monitor Monday open. If holds above $6.66 with C3 CISD body close, IRA continues. Body close below $6.66 = exit IRA same day.",
  nestedFib:"OB: $6.86 (last down-close before Jun 27 expansion). Anchor Fib from OB body high to swing low. Mean Threshold = 50% of OB body. -1 extension = next target.",
  invalidation:"Daily body close below $6.66 (Order Block / protected swing violated)",
- logEntry:{ts:"Jun 28, 2026",note:"Market closed Sunday. Last close Jun 27 at $7.39 (52-wk high). AH pullback to $6.66 — exactly the 50% Fib / OB level...."},
+ logEntry:{ts:"Jul 1, 2026",note:"$7.60 close Jul 1, holding above $6.66 OB/protected swing. IRA position active. ABCL635 Phase 2 data expected Q3 2026 = primary catalyst. Earnings Aug 6. Body close below $6.66 = exit signal."},
  keyLevels:[{p:"$7.44",l:"52-wk high / swing high watch",c:T.gold},{p:"$7.39",l:"Prior close",c:T.teal},{p:"$6.86",l:"OB / Fib anchor · Mean Threshold $6.76",c:T.gold},{p:"$6.66",l:"Order Block / Protected Swing — body close below = exit IRA",c:T.rose},{p:"$5.00",l:"Strike",c:T.textDim}],
  catalysts:["Record volume 52-wk high close","ABCL635 Phase 2 data Q3 2026","Jazz Pharma TCE partnership","Cantor Fitz OW + $7 PT","EPS beat · Revenue 2x YoY","⚠ Earnings Aug 6 — after expiry, consider rolling"],
  mtf:[["12M","bull","Basing"],["6M","bull","Exp."],["3M","bull","Momentum"],["Monthly","bull","Breakout"],["Weekly","bull","Fractal exp."],["Daily","bull","Above levels"]],
  },
- {symbol:"ATAI",company:"AtaiBeckley Inc.",price:5.23,chg:1.36,vol:"3.5M",mcap:"$1.94B",capSize:"Small",
+ {symbol:"ATAI",company:"AtaiBeckley Inc.",price:4.88,chg:-6.24,vol:"8.2M",mcap:"$1.94B",capSize:"Small",
  direction:"call",phase:"MANAGING",tier:"Tier 1",isActive:true,
  contract:"Call · Jul 17 · IRA",entryPremium:0.27,strike:3,expiryDate:"2026-07-17",
  earningsDate:"2026-08-12",earningsLabel:"Aug 12",accountFit:["IRA ($200)"],
@@ -220,29 +220,29 @@ const SETUPS=[
  entryNote:"No new entries. If retrace to $4.00–$4.30 holds and C2/C3 develops, confirms next leg. Protected swing = $3.78 (C2 low). Body close below $3.78 = full invalidation.",
  nestedFib:"OB: ~$4.00 (last down-close before Jun 22 expansion). Anchor nested Fib from $5.31 to swing low on retrace. Mean Threshold = 50% of OB body. -1 = next target.",
  invalidation:"Daily body close below $3.78 (protected swing / OB violated)",
- logEntry:{ts:"Jun 28, 2026",note:"ATAI +15.94% on 63M volume — Russell 2000 + 3000 add TOMORROW Jun 29. IRA deep ITM. Watch for Mon gap-up then retrace..."},
+ logEntry:{ts:"Jul 1, 2026",note:"$4.88 Jul 1 — retracing from $5.36 peak. Russell add completed Jun 29. Watch $4.00–$4.30 OB zone for C2 failure swing. Body close below $3.78 = exit IRA."},
  keyLevels:[{p:"$6.75",l:"52-wk high / macro target",c:T.sage},{p:"$5.31",l:"Current / expansion close",c:T.teal},{p:"$4.30",l:"Prior OB / support",c:T.gold},{p:"$4.00",l:"OB range floor · Mean Threshold ~$4.08",c:T.gold},{p:"$3.78",l:"Protected Swing / C2 low — body close below = full invalidation",c:T.rose}],
  catalysts:["Russell 2000 + 3000 add Jun 29","BPL-003 Phase 3 · VLS-01 Phase 2b Q4","White House EO tailwind","Q1 EPS beat · Rev 4x · $209.9M runway","⚠ Earnings Aug 12 — after expiry, consider rolling"],
  mtf:[["12M","bear","Down"],["6M","neut","Basing"],["3M","bull","Recov."],["Monthly","bull","Breakout"],["Weekly","bull","Conf."],["Daily","bull","Above levels"]],
  },
- {symbol:"SMCI",company:"Super Micro Computer",price:30.63,chg:-3.31,vol:"48.5M",mcap:"$20.5B",capSize:"Large",
- direction:"call",phase:"READY",tier:"Tier 1",isActive:false,contract:null,
+ {symbol:"SMCI",company:"Super Micro Computer",price:27.65,chg:-9.19,vol:"52.0M",mcap:"$20.5B",capSize:"Large",
+ direction:"call",phase:"WATCH_REVERSAL",tier:"Tier 1",isActive:false,contract:null,
  entryPremium:null,strike:null,expiryDate:null,
  earningsDate:"2026-08-11",earningsLabel:"Aug 11",accountFit:["IRA ($200)"],
- autoChecks:["fib50","topdown","budget"],retailTrap:true,
- narrative:"🔴 Bearish — class action lawsuits, AI oversupply, cash flow. C1 = bearish leg $51→$27.",
- structure:"🟢 Bullish — Jun 22 +11% IS the C2 closure through $31.64 OB. Retracement to $30.59 = middle phase. Holding above $29.38 (50% Fib) = retracement intact.",
+ autoChecks:["budget"],retailTrap:true,
+ narrative:"🔴 Bearish — class action lawsuits, AI oversupply, cash flow. NEW: Taiwan offices raided Jun 29 (Nvidia chip smuggling allegations). C1 = bearish leg $51→$27.",
+ structure:"🔴 Bearish — Prior call setup INVALIDATED. $27.65 is a body close below $29.38 protected swing. Taiwan raid catalyst Jun 29 = new bearish C2 forming. Watch for dead-cat bounce to $29-$31 Bearish OB before put entry.",
  divergence:"AMD: Accumulation below $27. Manipulation = $27.13 wick Jun 15 stopping out retail shorts. Distribution = Jun 22 expansion + pending C3 confirmation. Retail still selling = your call entry liquidity.",
- phaseNote:"READY — In 0–50% zone ($29.38–$31.64). 9:30 binary: above $30.50 = continuation. 4pm BODY close above $31.64 = C3 CISD = entry. Wick close does NOT count.",
+ phaseNote:"WATCH REVERSAL — Call setup INVALIDATED at $29.38 (body close below = violated). Taiwan office raids Jun 29 created a new bearish catalyst. Watch for bounce to $29–$31 (prior OB). If C2 failure swing forms and C3 CISD body close below = put entry thesis begins. Earnings Aug 11 = risk event.",
  entryNote:"Entry: 4pm BODY close above $31.64 OB. Anchor nested Fib $43.80→C2 low. Mean Threshold of OB = $30.51. -1 = first target. Protected swing = C2 body low. Delta 0.35–0.45, Aug/Sep DTE.",
  nestedFib:"OB = $31.64 (last resistance before expansion). Mean Threshold = $30.51. Fib from $43.80 to C2 low. -1 ext = first target. Protected swing = C2 wick low — body close below = exit.",
  invalidation:"Daily body close below $29.38 (OB / protected swing violated — wick through does NOT count)",
- logEntry:{ts:"Jun 28, 2026",note:"Bearish leg $51→$27 fully reclaimed Jun 22 on +11% massive volume. Now in 0–50% Fib retracement zone. C2 swing low fo..."},
+ logEntry:{ts:"Jul 1, 2026",note:"INVALIDATED — $27.65 body close below $29.38 protected swing. Taiwan offices raided Jun 29 (alleged Nvidia chip smuggling) — new bearish catalyst. Prior call thesis canceled. Watch for dead-cat bounce to $29-$31 OB for potential put setup."},
  keyLevels:[{p:"$56.00",l:"-2 ext (weekly target)",c:T.sage},{p:"$43.80",l:"-1 ext / first target",c:T.sage},{p:"$31.64",l:"Bullish OB / C2 trigger · Mean Threshold $30.51",c:T.gold},{p:"$30.59",l:"Current — in 0–50% zone",c:T.teal},{p:"$29.38",l:"50% Fib / Protected Swing — body close below = invalidation",c:T.rose}],
  catalysts:["Earnings Aug 11","GF Securities Buy @ $48 PT","Nvidia Vera Rubin partnership Jun 22","36% EPS beat"],
  mtf:[["12M","bear","Decline"],["6M","bear","Down"],["3M","neut","Basing"],["Monthly","bull","Reclaim"],["Weekly","bull","Exp."],["Daily","bull","Entry zone"]],
  },
- {symbol:"SPCX",company:"Space Exploration Tech",price:153.23,chg:0.15,vol:"65.4M",mcap:"$2.0T",capSize:"Mega",
+ {symbol:"SPCX",company:"Space Exploration Tech",price:157.54,chg:2.94,vol:"65.4M",mcap:"$2.0T",capSize:"Mega",
  direction:"put",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,contract:null,
  entryPremium:null,strike:null,expiryDate:null,
  earningsDate:"2026-08-06",earningsLabel:"Aug 6",accountFit:["IRA ($200)"],
@@ -409,7 +409,7 @@ const COMMODITIES=[
  },
 ];
 const INDICES=[
- {symbol:"SPY",name:"S&P 500 ETF",price:660.26,chg:-0.52,vol:"Very High",cap:"Mega",phase:"WATCH_REVERSAL",dir:"put",
+ {symbol:"SPY",name:"S&P 500 ETF",price:751.00,chg:0.85,vol:"Very High",cap:"Mega",phase:"WATCH_REVERSAL",dir:"put",
  narrative:"🟢 Bullish (consensus) — soft landing, AI earnings, Fed pivot narrative. C1 = the prior expansion from $618 to $668 ATH. Retail and institutional consensus is bullish.",
  structure:"🔴 Watch Reversal — -1.74% today after parabolic ATH run. Potential C2 expansion beginning. Bearish Order Block = $651 (today's open / prior expansion candle origin). If today's body closes below $651, C2 bearish expansion is confirmed.",
  divergence:"AMD watch: Accumulation of institutional shorts may be occurring at ATH. Manipulation = today's gap down open trapping retail bulls. Distribution = potential continuation lower. Key: if retail buys this dip (consensus bullish) and price fails to recover $651, those buyers are the exit liquidity for smart money shorts. SMT: SPY vs QQQ — QQQ down -2.38% vs SPY -1.74% = QQQ is the weaker instrument = QQQ puts are the primary vehicle per TTrades SMT.",
@@ -419,11 +419,11 @@ const INDICES=[
  levels:[{p:"$668",l:"Prior ATH",c:"#3D8B6E"},{p:"$651",l:"Today's open / watch level",c:"#C9A84C"},{p:"$647.72",l:"Current",c:"#2A8B7A"},{p:"$632",l:"50% Fib of recent expansion",c:"#C0445A"},{p:"$618",l:"Major support",c:"#C0445A"}],
  cats:["Nasdaq -2.38% led decline","Semiconductor weakness","Small/microcaps outperforming large caps (rotation signal)","Fed rate policy hawkish"],
  },
- {symbol:"QQQ",name:"Nasdaq 100 ETF",price:528.76,chg:-0.77,vol:"Very High",cap:"Mega",phase:"EXPANSION",dir:"put",
+ {symbol:"QQQ",name:"Nasdaq 100 ETF",price:736.40,chg:1.73,vol:"Very High",cap:"Mega",phase:"CONSOLIDATION",dir:"watch",
  narrative:"🟢 Bullish — AI capex supercycle, Mag 7 earnings, tech dominance. C1 = prior expansion from $505 to $558 ATH. Maximum bullish narrative at the highs.",
  structure:"🔴 Bearish C2 expansion today — -2.38%, largest index decline. Bearish Order Block = $553 (today's candle open). C2 body closing below $540 confirms bearish expansion underway.",
  divergence:"SMT: QQQ -2.38% vs SPY -1.74% = QQQ is the weaker instrument = primary put vehicle. AMD: Short accumulation at $558 ATH. Manipulation = ATH spike. Distribution = C2 expansion. Retail AI dip buyers = exit liquidity.",
- phaseNote:"EXPANSION — C2 today. Bearish OB = $553. Bounce to $550–$555, C2 wick above OB, C3 body close below $550 = put entry. Seek & Destroy: wick above $555 then C3 close down.",
+ phaseNote:"CONSOLIDATION — Prior put thesis from June lows fully invalidated. QQQ rallied from $505 lows all the way to $736+. Now watch for range boundaries to form. Major recovery in progress — wait for new structure before re-entering any directional setup.",
  entryNote:"Wait for bounce to $550–$555 (Bearish OB). C2 failure swing: wick above, C3 CISD body close below $550 = put entry. Protected swing = C2 bounce wick high. Anchor Fib from $558 ATH to today's low for extension targets. Delta 0.35–0.45, DTE 21–35.",
  invalidation:"Daily body close above $558 (Bearish OB / ATH violated — not just a wick)",
  levels:[{p:"$558",l:"Today's open / range ceiling",c:"#C9A84C"},{p:"$540.18",l:"Current / expansion low",c:"#2A8B7A"},{p:"$520",l:"-1 extension target",c:"#3D8B6E"},{p:"$505",l:"-1.5 extension",c:"#3D8B6E"}],
@@ -450,7 +450,7 @@ const INDICES=[
  cats:["Small/microcap outperformance signal Jun 27","ATAI Russell 2000 addition Jun 29 — passive inflows","Years of underperformance vs large caps — rotation catalyst","Healthcare and REITs attracting buyers"],
  },
 ];
-const AS_OF = "June 30, 2026";
+const AS_OF = "Jul 1, 2026";
 const PHASE_ORDER = ["READY","RETRACEMENT","CONSOLIDATION","EXPANSION","MANAGING","WATCH_REVERSAL"];
 const TL_STEPS = ["EXPANSION","CONSOLIDATION","RETRACEMENT","READY","MANAGING"];
 export default function OptionsScanner() {
@@ -487,6 +487,14 @@ export default function OptionsScanner() {
  setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
  })();
  }, []);
+
+ // Auto-refresh every 15 minutes
+ useEffect(() => {
+ const interval = setInterval(() => {
+ doRefresh();
+ }, 15 * 60 * 1000);
+ return () => clearInterval(interval);
+ }, [doRefresh]);
  const toggleFav = useCallback((sym) => {
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
  }, []);
@@ -500,7 +508,9 @@ export default function OptionsScanner() {
  const clearChecks = useCallback((sym) => {
  setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
  }, []);
- const WORKER = window.location.hostname === "localhost" ? "/worker" : "https://market.electronmailbag.workers.dev";
+ const WORKER = window.location.hostname === "localhost"
+   ? "/worker"
+   : "https://market.electronmailbag.workers.dev";
 
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
@@ -599,6 +609,32 @@ export default function OptionsScanner() {
  const altData=altMap[view]||[];
  const ASSET_MAP={"options":SETUPS,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
  const everythingData=evAsset==="all"?[...SETUPS,...CRYPTO,...COMMODITIES,...INDICES]:ASSET_MAP[evAsset]||[];
+
+ // ── Alignment score: ranks setups by actionability using real framework
+ // fields only — phase, checklist completion, invalidation state, and
+ // proximity to a key level. Higher = closer to actionable entry.
+ const alignmentScore = (s) => {
+  const hist = memoryData[s.symbol]||[];
+  const last = hist[hist.length-1];
+  // Invalidated setups sink to the bottom regardless of anything else
+  if (last && last.invalidated) return -100;
+  const phaseRank = {READY:50,RETRACEMENT:35,EXPANSION:25,WATCH_REVERSAL:15,MANAGING:10,CONSOLIDATION:5}[s.phase]||0;
+  // Checklist: manual checks + auto checks, each worth 4 pts
+  const ck = new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])]);
+  const ckScore = ck.size * 4;
+  // Key-level proximity: if live price is within 3% of any key level, +15
+  const ld = liveData[s.symbol];
+  const p = ld?.price || s.price;
+  let proxScore = 0;
+  if (s.keyLevels && p) {
+   for (const lvl of s.keyLevels) {
+    const lp = parseFloat(String(lvl.p||"").replace(/[$,]/g,""));
+    if (lp && Math.abs((p-lp)/lp) < 0.03) { proxScore = 15; break; }
+   }
+  }
+  return phaseRank + ckScore + proxScore;
+ };
+
  const visible = isEverything ? everythingData.filter(s=>{
  if(evPhase!=="all"&&s.phase!==evPhase)return false;
  const d=s.direction||s.dir;
@@ -609,6 +645,7 @@ export default function OptionsScanner() {
  if(evSort==="phase") return PHASE_ORDER.indexOf(a.phase)-PHASE_ORDER.indexOf(b.phase);
  if(evSort==="chg") return Math.abs(b.chg||0)-Math.abs(a.chg||0);
  if(evSort==="symbol") return (a.symbol||"").localeCompare(b.symbol||"");
+ if(evSort==="align") return alignmentScore(b)-alignmentScore(a);
  if(evSort==="asset"){
  const rank=s=>SETUPS.includes(s)?0:CRYPTO.includes(s)?1:COMMODITIES.includes(s)?2:3;
  return rank(a)-rank(b);
@@ -627,7 +664,7 @@ export default function OptionsScanner() {
  if (cap!=="all" && s.capSize.toLowerCase()!==cap) return false;
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
- }).sort((a,b)=>phase!=="all"?0:PHASE_ORDER.indexOf(a.phase)-PHASE_ORDER.indexOf(b.phase));
+ }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
  const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
@@ -749,6 +786,34 @@ export default function OptionsScanner() {
  ))}
  </div>
  )}
+ {(()=>{
+ // ── Market Regime Header: SPY + QQQ + IWM live trend → risk read ──
+ const spy = liveData["SPY"]?.chg ?? INDICES.find(x=>x.symbol==="SPY")?.chg ?? 0;
+ const qqq = liveData["QQQ"]?.chg ?? INDICES.find(x=>x.symbol==="QQQ")?.chg ?? 0;
+ const iwm = liveData["IWM"]?.chg ?? INDICES.find(x=>x.symbol==="IWM")?.chg ?? 0;
+ const avg = (spy+qqq+iwm)/3;
+ const regime = avg>0.5?{l:"RISK-ON",c:T.sage}:avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
+ const smallCapLead = iwm - ((spy+qqq)/2);
+ const chip=(lbl,v)=>(
+ <span style={{fontSize:9,fontFamily:FD,color:v>0?T.sage:v<0?T.rose:T.textSec}}>
+ {lbl} {v>0?"+":""}{(v||0).toFixed(2)}%
+ </span>
+ );
+ return (
+ <div style={{position:"sticky",top:0,zIndex:50,background:"#050a14",borderBottom:"1px solid "+T.border,padding:"6px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+ <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:3,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
+ {chip("SPY",spy)}
+ {chip("QQQ",qqq)}
+ {chip("IWM",iwm)}
+ {Math.abs(smallCapLead)>0.75&&(
+ <span style={{fontSize:9,color:smallCapLead>0?T.teal:T.amber}}>
+ {smallCapLead>0?"↑ Small-caps leading (rotation)":"↓ Small-caps lagging (mega-cap led)"}
+ </span>
+ )}
+ <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
+ </div>
+ );
+ })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.surface,overflowX:"auto"}}>
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
@@ -765,7 +830,7 @@ export default function OptionsScanner() {
  ["Phase",evPhase,setEvPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"],["MANAGING","Managing"]]],
  ["Asset Class",evAsset,setEvAsset,[["all","All"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]]],
  ["Direction",evDir,setEvDir,[["all","All"],["bull","Bullish / Call"],["bear","Bearish / Put"]]],
- ["Sort By",evSort,setEvSort,[["phase","Phase"],["chg","% Move"],["symbol","Symbol A–Z"],["asset","Asset Class"]]],
+ ["Sort By",evSort,setEvSort,[["align","⚡ Alignment"],["phase","Phase"],["chg","% Move"],["symbol","Symbol A–Z"],["asset","Asset Class"]]],
  ].map(([label,val,setter,opts])=>(
  <div key={label}>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>{label}</div>
@@ -844,7 +909,7 @@ export default function OptionsScanner() {
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
- <span style={{fontFamily:FD,fontSize:16,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</span>
  </div>
  <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0,flexWrap:"wrap"}}>
@@ -964,8 +1029,7 @@ export default function OptionsScanner() {
  )}
  {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
- {visible.map((s)=>{
- const ai=aiUpdates[s.symbol]||{};
+ {visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
  const invAlert=getInvalidationAlert(memHistory);
@@ -995,7 +1059,7 @@ export default function OptionsScanner() {
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
- <span style={{fontFamily:FD,fontSize:16,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  {s.isActive&&<span style={pill(T.teal)}>● Active</span>}
  </div>
@@ -1015,6 +1079,7 @@ export default function OptionsScanner() {
  </div>
  </div>
  <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:8}}>
+ {vIdx===0&&!invAlert&&!s.isActive&&view!=="managing"&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
  <span style={pill(CAP_COLORS[s.capSize]||T.slate)}>{s.capSize} · {s.mcap}</span>

@@ -3,7 +3,7 @@ name: Daily Screener
 on:
   # Runs at 9:00 AM ET (13:00 UTC) — pre-market, right before open
   schedule:
-    - cron: "0 13 * * 1-5"   # Mon–Fri only
+    - cron: "30 21 * * 1-5"   # Mon–Fri only
 
   # Also lets you trigger manually from the GitHub Actions tab
   workflow_dispatch:

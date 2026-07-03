@@ -537,31 +537,6 @@ export default function OptionsScanner() {
  setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
  })();
  }, []);
-
- // Auto-refresh every 15 minutes
- useEffect(() => {
- const interval = setInterval(() => {
- doRefresh();
- }, 15 * 60 * 1000);
- return () => clearInterval(interval);
- }, [doRefresh]);
- const toggleFav = useCallback((sym) => {
- setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
- }, []);
- const toggleCheck = useCallback((sym, id) => {
- setChecks(p => {
- const sc=p[sym]||[];
- const n={...p,[sym]:sc.includes(id)?sc.filter(i=>i!==id):[...sc,id]};
- ss("of_checks",n); return n;
- });
- }, []);
- const clearChecks = useCallback((sym) => {
- setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
- }, []);
- const WORKER = window.location.hostname === "localhost"
-   ? "/worker"
-   : "https://market.electronmailbag.workers.dev";
-
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
  const key = todayKey();
@@ -649,6 +624,32 @@ export default function OptionsScanner() {
   setHint(true);
   setTimeout(()=>setHint(false),4000);
  }, [updateMarketMemory]);
+
+ // Auto-refresh every 15 minutes
+ useEffect(() => {
+ const interval = setInterval(() => {
+ doRefresh();
+ }, 15 * 60 * 1000);
+ return () => clearInterval(interval);
+ }, [doRefresh]);
+ const toggleFav = useCallback((sym) => {
+ setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
+ }, []);
+ const toggleCheck = useCallback((sym, id) => {
+ setChecks(p => {
+ const sc=p[sym]||[];
+ const n={...p,[sym]:sc.includes(id)?sc.filter(i=>i!==id):[...sc,id]};
+ ss("of_checks",n); return n;
+ });
+ }, []);
+ const clearChecks = useCallback((sym) => {
+ setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
+ }, []);
+ const WORKER = window.location.hostname === "localhost"
+   ? "/worker"
+   : "https://market.electronmailbag.workers.dev";
+
+
  const tog = (sym) => setOpen(p=>({...p,[sym]:!p[sym]}));
  const setTab = (sym,t) => setTabs(p=>({...p,[sym]:t}));
  const getTab = (sym) => tabs[sym]||"narrative";

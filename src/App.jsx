@@ -534,10 +534,12 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [closedTrades, setClosedTrades] = useState([]);
+ const [closeModal, setCloseModal] = useState(null);
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
+ const [f,c,t,ai,mem,ct] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(ct||[]);
  })();
  }, []);
  useEffect(()=>{
@@ -587,24 +589,16 @@ export default function OptionsScanner() {
   let allErrors = [];
   const totalChunks = equityChunks.length + 1;
 
-// Fetch crypto directly from CoinGecko (free, no key needed)
-setRefreshStatus(`Fetching crypto (1/${totalChunks})...`);
-try {
-  const cgResp = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,litecoin&vs_currencies=usd&include_24hr_change=true"
-  );
-  const cgJson = await cgResp.json();
-  const cryptoPrices = {
-    BTC: { price: cgJson.bitcoin?.usd, chg: cgJson.bitcoin?.usd_24h_change ?? 0, marketState: "REGULAR" },
-    ETH: { price: cgJson.ethereum?.usd, chg: cgJson.ethereum?.usd_24h_change ?? 0, marketState: "REGULAR" },
-    SOL: { price: cgJson.solana?.usd, chg: cgJson.solana?.usd_24h_change ?? 0, marketState: "REGULAR" },
-    LTC: { price: cgJson.litecoin?.usd, chg: cgJson.litecoin?.usd_24h_change ?? 0, marketState: "REGULAR" },
-  };
-  allPrices = {...allPrices, ...cryptoPrices};
-  setLiveData(prev => ({...prev, ...cryptoPrices}));
-} catch(e) {
-  allErrors.push("crypto: " + e.message);
-}
+  setRefreshStatus(`Fetching crypto (1/${totalChunks})...`);
+  try {
+    const resp = await fetch(`${WORKER}?symbols=${CRYPTO_SYMS.join(",")}`, {headers:{Accept:"application/json"}});
+    const json = await resp.json();
+    if (json.prices) allPrices = {...allPrices, ...json.prices};
+    if (json.errors) allErrors = [...allErrors, ...json.errors];
+    setLiveData(prev => ({...prev, ...json.prices}));
+  } catch(e) {
+    allErrors.push("crypto chunk: " + e.message);
+  }
 
   for (let i = 0; i < equityChunks.length; i++) {
     setRefreshStatus(`Fetching equities (${i+2}/${totalChunks})...`);
@@ -742,9 +736,177 @@ try {
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
+ const [exitPrice, setExitPrice] = useState("");
+ const [exitReason, setExitReason] = useState("TARGET_HIT");
+ const [exitNotes, setExitNotes] = useState("");
+
+ const submitClose = () => {
+  if (!closeModal || !exitPrice) return;
+  const s = closeModal.setup;
+  const ep = parseFloat(exitPrice);
+  const entry = s.entryPremium || 0;
+  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
+  const trade = {
+   id: s.symbol + "_" + Date.now(),
+   ticker: s.symbol,
+   company: s.company,
+   direction: s.direction,
+   contract: s.contract,
+   entryPremium: entry,
+   exitPrice: ep,
+   entryDate: s.logEntry?.ts || AS_OF,
+   exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
+   exitReason,
+   pnlPct,
+   phase: s.phase,
+   notes: exitNotes,
+   closedAt: Date.now(),
+  };
+  const next = [...closedTrades, trade];
+  setClosedTrades(next);
+  ss("of_closed_trades", next);
+  setCloseModal(null);
+  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
+ };
+
  const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
+const [exitPrice, setExitPrice] = useState("");
+const [exitReason, setExitReason] = useState("TARGET_HIT");
+const [exitNotes, setExitNotes] = useState("");
+
+const submitClose = () => {
+  if (!closeModal || !exitPrice) return;
+  const s = closeModal.setup;
+  const ep = parseFloat(exitPrice);
+  const entry = s.entryPremium || 0;
+  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
+  
+  const trade = {
+    id: s.symbol + "_" + Date.now(),
+    ticker: s.symbol,
+    company: s.company,
+    direction: s.direction,
+    contract: s.contract,
+    entryPremium: entry,
+    exitPrice: ep,
+    entryDate: s.logEntry?.ts || AS_OF,
+    exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
+    exitReason,
+    pnlPct,
+    phase: s.phase,
+    notes: exitNotes,
+    closedAt: Date.now(),
+  };
+
+  const next = [...closedTrades, trade];
+  setClosedTrades(next);
+  ss("of_closed_trades", next);
+  setCloseModal(null);
+  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
+};
+
+{closeModal && (
+  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+    <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
+      <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:4}}>Close Trade · {closeModal.symbol}</div>
+      <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
+
+      <div style={{marginBottom:12}}>
+        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
+        <input
+          type="number" step="0.01" placeholder="e.g. 0.85"
+          value={exitPrice} onChange={e=>setExitPrice(e.target.value)}
+          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}}
+        />
+        {exitPrice && closeModal.setup.entryPremium && (
+          <div style={{fontSize:10,marginTop:4,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose,fontFamily:FD}}>
+            {((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
+          </div>
+        )}
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
+        <select value={exitReason} onChange={e=>setExitReason(e.target.value)}
+          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
+          <option value="TARGET_HIT">Target Hit</option>
+          <option value="STOP_HIT">Stop Hit</option>
+          <option value="MANUAL_EXIT">Manual Exit</option>
+          <option value="INVALIDATED">Invalidated</option>
+          <option value="EXPIRY">Expiry</option>
+        </select>
+      </div>
+
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
+        <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)}
+          placeholder="What worked or didn't..."
+          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}}
+        />
+      </div>
+
+      <div style={{display:"flex",gap:8}}>
+        <button onClick={()=>setCloseModal(null)}
+          style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>
+          Cancel
+        </button>
+        <button onClick={submitClose} disabled={!exitPrice}
+          style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>
+          ✓ Close Trade
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+ {closeModal && (
+  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+   <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
+    <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:4}}>Close Trade · {closeModal.symbol}</div>
+    <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
+     <input type="number" step="0.01" placeholder="e.g. 0.85"
+      value={exitPrice} onChange={e=>setExitPrice(e.target.value)}
+      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}}/>
+     {exitPrice && closeModal.setup.entryPremium && (
+      <div style={{fontSize:10,marginTop:4,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose,fontFamily:FD}}>
+       {((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
+      </div>
+     )}
+    </div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
+     <select value={exitReason} onChange={e=>setExitReason(e.target.value)}
+      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
+      <option value="TARGET_HIT">Target Hit</option>
+      <option value="STOP_HIT">Stop Hit</option>
+      <option value="MANUAL_EXIT">Manual Exit</option>
+      <option value="INVALIDATED">Invalidated</option>
+      <option value="EXPIRY">Expiry</option>
+     </select>
+    </div>
+    <div style={{marginBottom:16}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
+     <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)}
+      placeholder="What worked or didn't..."
+      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}}/>
+    </div>
+    <div style={{display:"flex",gap:8}}>
+     <button onClick={()=>setCloseModal(null)}
+      style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>
+      Cancel
+     </button>
+     <button onClick={submitClose} disabled={!exitPrice}
+      style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>
+      ✓ Close Trade
+     </button>
+    </div>
+   </div>
+  </div>
+ )}
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:"linear-gradient(160deg,#0A1423,#0D1B31)",borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
@@ -793,12 +955,17 @@ try {
  <div style={{height:"100%",borderRadius:2,background:pl.pct>=0?T.teal:T.rose,width:Math.min(100,Math.max(0,pl.pct))+"%"}}/>
  </div>
  <div style={{fontSize:9,color:T.textDim,marginTop:3}}>Intrinsic ${pl.intrinsic.toFixed(2)}</div>
- </div>
+ 
+</div>
  )}
  <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
  {dtD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:(dtD<=7?T.rose:T.border2)+"18",border:"1px solid "+(dtD<=7?T.rose:T.border2)+"44",borderRadius:3,color:dtD<=7?T.rose:T.textDim}}>Exp {dtD}d</span>}
  {earnD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:earnC+"18",border:"1px solid "+earnC+"44",borderRadius:3,color:earnC}}>Earnings {s.earningsLabel} · {earnD}d</span>}
  </div>
+ <button onClick={()=>setCloseModal({symbol:s.symbol,setup:s})}
+  style={{marginTop:8,width:"100%",padding:"6px",background:"transparent",border:"1px solid "+T.rose+"44",borderRadius:3,color:T.rose,fontSize:9,cursor:"pointer",fontFamily:FM,letterSpacing:"0.05em"}}>
+  ✕ Close Position
+ </button>
  </div>
  );
  })}
@@ -895,7 +1062,7 @@ try {
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["closed","Closed"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1536,6 +1703,50 @@ try {
  </div>
  );
  })()}
+
+ {view==="closed"&&(
+  <div style={{padding:"16px 20px"}}>
+   <div style={{fontSize:8,color:T.textDim,fontFamily:FD,letterSpacing:"0.08em",marginBottom:14}}>
+    CLOSED TRADES · {closedTrades.length} total
+   </div>
+   {closedTrades.length>=3&&(()=>{
+    const wins=closedTrades.filter(t=>t.pnlPct>0);
+    const wr=(wins.length/closedTrades.length*100).toFixed(0);
+    const avgR=(closedTrades.reduce((s,t)=>s+(t.pnlPct||0),0)/closedTrades.length).toFixed(1);
+    const best=closedTrades.reduce((a,b)=>(b.pnlPct||0)>(a.pnlPct||0)?b:a);
+    return(
+     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
+      {[["Win Rate",wr+"%",parseInt(wr)>=50?T.sage:T.rose],["Avg Return",(avgR>0?"+":"")+avgR+"%",parseFloat(avgR)>=0?T.sage:T.rose],["Best Trade",best.ticker+" "+(best.pnlPct>0?"+":"")+best.pnlPct?.toFixed(0)+"%",T.teal]].map(([l,v,c])=>(
+       <div key={l} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px",textAlign:"center"}}>
+        <div style={{fontSize:8,color:T.textDim,marginBottom:4,letterSpacing:"0.08em"}}>{l.toUpperCase()}</div>
+        <div style={{fontFamily:FD,fontSize:14,fontWeight:700,color:c}}>{v}</div>
+       </div>
+      ))}
+     </div>
+    );
+   })()}
+   {closedTrades.length===0?(
+    <div style={{fontSize:11,color:T.textDim,textAlign:"center",padding:"40px 0"}}>
+     No closed trades yet. Use "✕ Close Position" in the Positions panel.
+    </div>
+   ):[...closedTrades].reverse().map(t=>(
+    <div key={t.id} style={{marginBottom:8,padding:"11px 13px",background:T.surface,borderRadius:5,border:"1px solid "+T.border,borderLeft:"2px solid "+(t.pnlPct>=0?T.sage:T.rose)}}>
+     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:3}}>
+      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{t.ticker}</span>
+      <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:t.pnlPct>=0?T.sage:T.rose}}>
+       {t.pnlPct!=null?((t.pnlPct>=0?"+":"")+t.pnlPct.toFixed(1)+"%"):"--"}
+      </span>
+     </div>
+     <div style={{fontSize:9,color:T.textDim,marginBottom:5}}>{t.contract} · {t.exitReason.replace(/_/g," ")}</div>
+     <div style={{display:"flex",gap:8,fontSize:9,color:T.textSec,flexWrap:"wrap"}}>
+      <span>Entry ${t.entryPremium?.toFixed(2)} → Exit ${t.exitPrice?.toFixed(2)}</span>
+      <span style={{color:T.textDim}}>Closed {t.exitDate}</span>
+     </div>
+     {t.notes&&<div style={{fontSize:9,color:T.textSec,marginTop:5,borderTop:"1px solid "+T.border,paddingTop:5}}>{t.notes}</div>}
+    </div>
+   ))}
+  </div>
+ )}
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>

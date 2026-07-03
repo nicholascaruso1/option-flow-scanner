@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 const T = {
  bg:"#080E1C", surface:"#0F1B2E", border:"#1A2C45", border2:"#243850",
  textPri:"#E8EEF8", textSec:"#7A92B0", textDim:"#3A5270",
  gold:"#C9A84C", goldDim:"#6B5520", blue:"#4A90D9", rose:"#C0445A",
- sage:"#3D8B6E", amber:"#B87333", slate:"#5A7A9A", teal:"#2A8B7A", purple:"#8B5CF6",
+ sage:"#3D8B6E", green:"#3DBF7A", amber:"#B87333", slate:"#5A7A9A", teal:"#2A8B7A", purple:"#8B5CF6",
 };
 const FM = "-apple-system,Segoe UI,sans-serif";
 const FD = "SF Mono,Fira Code,monospace";
@@ -534,17 +534,10 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
- const [scrSort, setScrSort] = useState("score");
- const [scrBias, setScrBias] = useState("all");
- const [closedTrades, setClosedTrades] = useState([]);
- const [closeModal, setCloseModal] = useState(null);
- const [exitPrice, setExitPrice] = useState("");
- const [exitReason, setExitReason] = useState("TARGET_HIT");
- const [exitNotes, setExitNotes] = useState("");
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,ct] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(ct||[]);
+ const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
  })();
  }, []);
  useEffect(()=>{
@@ -641,21 +634,12 @@ export default function OptionsScanner() {
   setTimeout(()=>setHint(false),4000);
  }, [updateMarketMemory]);
 
-// Keep ref to latest doRefresh to avoid stale closure on mount
- const doRefreshRef = useRef();
- doRefreshRef.current = doRefresh;
-
- // Fetch immediately once on mount
- useEffect(() => {
-  doRefreshRef.current();
- }, []);
-
  // Auto-refresh every 15 minutes
  useEffect(() => {
-  const interval = setInterval(() => {
-   doRefresh();
-  }, 15 * 60 * 1000);
-  return () => clearInterval(interval);
+ const interval = setInterval(() => {
+ doRefresh();
+ }, 15 * 60 * 1000);
+ return () => clearInterval(interval);
  }, [doRefresh]);
  const toggleFav = useCallback((sym) => {
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
@@ -670,35 +654,6 @@ export default function OptionsScanner() {
  const clearChecks = useCallback((sym) => {
  setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
  }, []);
- const submitClose = () => {
-  if (!closeModal || !exitPrice) return;
-  const s = closeModal.setup;
-  const ep = parseFloat(exitPrice);
-  const entry = s.entryPremium || 0;
-  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
-  const trade = {
-   id: s.symbol + "_" + Date.now(),
-   ticker: s.symbol,
-   company: s.company,
-   direction: s.direction,
-   contract: s.contract,
-   entryPremium: entry,
-   exitPrice: ep,
-   entryDate: s.logEntry?.ts || "—",
-   exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
-   exitReason,
-   pnlPct,
-   phase: s.phase,
-   notes: exitNotes,
-   closedAt: Date.now(),
-  };
-  const next = [...closedTrades, trade];
-  setClosedTrades(next);
-  ss("of_closed_trades", next);
-  setCloseModal(null);
-  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
- };
-
  const WORKER = window.location.hostname === "localhost"
    ? "/worker"
    : "https://market.electronmailbag.workers.dev";
@@ -770,11 +725,9 @@ export default function OptionsScanner() {
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
-
  const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
-
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:"linear-gradient(160deg,#0A1423,#0D1B31)",borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
@@ -823,17 +776,12 @@ export default function OptionsScanner() {
  <div style={{height:"100%",borderRadius:2,background:pl.pct>=0?T.teal:T.rose,width:Math.min(100,Math.max(0,pl.pct))+"%"}}/>
  </div>
  <div style={{fontSize:9,color:T.textDim,marginTop:3}}>Intrinsic ${pl.intrinsic.toFixed(2)}</div>
- 
-</div>
+ </div>
  )}
  <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
  {dtD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:(dtD<=7?T.rose:T.border2)+"18",border:"1px solid "+(dtD<=7?T.rose:T.border2)+"44",borderRadius:3,color:dtD<=7?T.rose:T.textDim}}>Exp {dtD}d</span>}
  {earnD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:earnC+"18",border:"1px solid "+earnC+"44",borderRadius:3,color:earnC}}>Earnings {s.earningsLabel} · {earnD}d</span>}
  </div>
- <button onClick={()=>setCloseModal({symbol:s.symbol,setup:s})}
-  style={{marginTop:8,width:"100%",padding:"6px",background:"transparent",border:"1px solid "+T.rose+"44",borderRadius:3,color:T.rose,fontSize:9,cursor:"pointer",fontFamily:FM,letterSpacing:"0.05em"}}>
-  ✕ Close Position
- </button>
  </div>
  );
  })}
@@ -930,7 +878,7 @@ export default function OptionsScanner() {
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["closed","Closed"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1139,7 +1087,7 @@ export default function OptionsScanner() {
  })}
  </div>
  )}
- {!isAltView&&!isEverything&&view!=="budget"&&(
+ {!isAltView&&!isEverything&&view!=="budget"&&view!=="screener"&&(
  <div style={{padding:"10px 20px"}}>
  {visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
@@ -1164,7 +1112,6 @@ export default function OptionsScanner() {
  const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[])])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
- const alScore=alignmentScore(s);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
@@ -1200,7 +1147,6 @@ export default function OptionsScanner() {
  {earnD!=null&&<span style={pill(earnC)}>Earnings {s.earningsLabel} · {earnD}d</span>}
  {dteD!=null&&<span style={pill(dteD<=7?T.rose:T.border2)}>Exp {dteD}d</span>}
  {allCk.length>0&&<span style={pill(T.sage)}>✓ {allCk.length}/{CHECKLIST.length}</span>}
- {alScore>0&&!invAlert&&<span style={pill(alScore>=70?T.sage:alScore>=35?T.gold:T.textDim)} title="Alignment score: phase + checklist + key-level proximity">Align {alScore}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
@@ -1222,7 +1168,6 @@ export default function OptionsScanner() {
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
- {s.isActive&&<button onClick={()=>setCloseModal({symbol:s.symbol,setup:s})} style={{marginLeft:"auto",padding:"3px 10px",fontSize:9,background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:3,color:T.rose,cursor:"pointer",fontFamily:FM}}>✕ Close Trade</button>}
  </div>
  </div>
  {ai.alert&&(
@@ -1497,84 +1442,77 @@ export default function OptionsScanner() {
  })}
  {view==="screener"&&(()=>{
  const setupSymbols=new Set(SETUPS.map(s=>s.symbol));
+ const newHits=screenerHits.filter(h=>!setupSymbols.has(h.ticker));
+ const trackedHits=screenerHits.filter(h=>setupSymbols.has(h.ticker));
  const condKeys=["topdown_bias","expansion","in_zone","vol_confirm","liquid"];
- const condLabels={"topdown_bias":"Top-Down Bias","expansion":"Expansion","in_zone":"0–50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
- const biasColor=b=>b==="BULL"?T.sage:T.rose;
+ const condLabels={"topdown_bias":"Top-Down","expansion":"Expansion","in_zone":"0-50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
+ const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
+ const biasColor=b=>b==="BULL"?T.green:T.rose;
  const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
-
- const generateSignalLine=(h)=>{
- const parts=[];
- if(h.conditions.topdown_bias) parts.push("top-down bias aligned");
- if(h.conditions.expansion) parts.push("expansion candle confirmed");
- if(h.conditions.in_zone) parts.push(`in 0–50% retracement zone (${h.details.retr_pct}%)`);
- if(h.conditions.vol_confirm) parts.push("expansion-day volume confirmed");
- if(!h.conditions.in_zone&&h.met>=3) parts.push("awaiting zone entry");
- if(parts.length===0) return null;
- const bias=h.bias==="BULL"?"Bullish":"Bearish";
- return `${bias} setup: ${parts.slice(0,3).join(", ")}.`;
- };
-
- const sortFn=(a,b)=>{
- if(scrSort==="score") return b.met-a.met;
- if(scrSort==="retr") return parseFloat(a.details.retr_pct)-parseFloat(b.details.retr_pct);
- if(scrSort==="ticker") return a.ticker.localeCompare(b.ticker);
- return b.met-a.met;
- };
- const biasFn=(h)=>scrBias==="all"||h.bias===scrBias;
-
- const allFiltered=screenerHits.filter(biasFn).sort(sortFn);
- const newHits=allFiltered.filter(h=>!setupSymbols.has(h.ticker));
- const trackedHits=allFiltered.filter(h=>setupSymbols.has(h.ticker));
-
- const renderCard=(h)=>{
+ const renderRow=(h)=>{
+ const setup=SETUPS.find(s=>s.symbol===h.ticker)||null;
+ const ph=setup?PHASES[setup.phase]:null;
+ const memHist=setup?(memoryData[setup.symbol]||[]):[];
+ const invAlert=setup?getInvalidationAlert(memHist):null;
+ const ck=setup?new Set([...(checks[setup.symbol]||[]),...(setup.autoChecks||[])]):new Set();
+ const ckPct=setup?Math.round((ck.size/CHECKLIST.length)*100):null;
+ const ai=setup?(aiUpdates[setup.symbol]||{}):null;
  const bc=biasColor(h.bias);
- const retrFill=Math.min(100,Math.max(0,parseFloat(h.details.retr_pct)*2));
- const signalLine=generateSignalLine(h);
- const memHist=memoryData[h.ticker]||[];
- const lastSnap=memHist[memHist.length-1];
  return(
- <div key={h.ticker} style={{padding:"12px 14px",borderBottom:"1px solid "+T.border,background:h.met===5?bc+"06":"transparent"}}>
- <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:7}}>
- <div style={{minWidth:56}}>
- <div style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>${h.price.toFixed(2)}</div>
+ <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
+ <div style={{padding:"10px 14px",display:"flex",alignItems:"flex-start",gap:10,flexWrap:"wrap"}}>
+ <div style={{minWidth:52,flexShrink:0}}>
+ <div style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:-0.3}}>{h.ticker}</div>
+ <div style={{fontSize:10,color:T.textDim,fontFamily:FD,marginTop:1}}>${h.price.toFixed(2)}</div>
  </div>
- <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
- {h.met===5&&<div style={{fontSize:8,padding:"2px 6px",background:T.sage+"22",border:"1px solid "+T.sage+"50",borderRadius:3,color:T.sage,letterSpacing:"0.07em",fontWeight:700}}>5/5 ✓</div>}
- {setupSymbols.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginLeft:"auto",fontWeight:600}}>★ Tracked</div>}
+ <div style={{flex:1,minWidth:0}}>
+ <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:6}}>
+ <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
+ {ph&&<div style={{background:ph.color+"18",color:ph.color,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+ph.color+"35",fontFamily:FM}}>{ph.icon} {ph.label}</div>}
+ {invAlert&&<div style={{background:T.rose+"18",color:T.rose,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+T.rose+"40",fontWeight:700}}>INVALIDATED</div>}
+ <div style={{display:"flex",alignItems:"center",gap:2,marginLeft:2}}>
+ {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
+ <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:3,fontFamily:FD}}>{h.met}/5</span>
  </div>
- <div style={{display:"flex",gap:3,marginBottom:7}} title="Each segment = one condition met">
- {condKeys.map(k=>(
- <div key={k} title={condLabels[k]} style={{flex:1,height:4,borderRadius:2,background:h.conditions[k]?bc:T.border2,transition:"background 0.2s"}}/>
- ))}
+ <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</div>
+ <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</div>
+ {ckPct!==null&&<div style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.textDim,fontFamily:FD,marginLeft:"auto"}}>Checklist {ckPct}%</div>}
  </div>
- <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:signalLine?7:0}}>
- <div style={{flex:1}}>
- <div style={{fontSize:7,color:T.textDim,fontFamily:FD,marginBottom:3,display:"flex",justifyContent:"space-between"}}>
- <span>0%</span><span>Retr {h.details.retr_pct}% into zone</span><span>50%</span>
- </div>
- <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",borderRadius:2,background:bc,width:retrFill+"%"}}/>
- </div>
- </div>
- <span style={{fontSize:9,color:h.met===5?T.sage:T.textSec,fontWeight:h.met===5?700:400,fontFamily:FD,flexShrink:0}}>{h.met}/5</span>
- <span style={{fontSize:8,color:T.textDim,fontFamily:FD,flexShrink:0}}>Exp {h.details.exp_date}</span>
- </div>
- {signalLine&&(
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.5,padding:"5px 8px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
- → {signalLine}
+ {invAlert&&(
+ <div style={{padding:"5px 8px",background:T.rose+"12",border:"1px solid "+T.rose+"40",borderRadius:4,fontSize:9,color:T.rose,marginBottom:5}}>
+ {invAlert}
  </div>
  )}
- {memHist.length>=2&&setupSymbols.has(h.ticker)&&lastSnap&&(
- <div style={{marginTop:5,fontSize:8,color:T.teal,fontFamily:FM}}>
- 📅 {memHist.length} sessions tracked · {lastSnap.phase||"—"} phase
+ {setup&&(
+ <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:4}}>
+ <div style={{background:T.bg,borderRadius:3,padding:"6px 8px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Narrative</div>
+ <div style={{fontSize:9,color:T.textSec,lineHeight:1.5}}>{setup.narrative}</div>
+ </div>
+ <div style={{background:T.bg,borderRadius:3,padding:"6px 8px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Structure</div>
+ <div style={{fontSize:9,color:T.textSec,lineHeight:1.5}}>{setup.structure}</div>
+ </div>
  </div>
  )}
+ {setup&&setup.divergence&&(
+ <div style={{marginTop:6,padding:"5px 8px",background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:3}}>
+ <div style={{fontSize:7,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Divergence Edge</div>
+ <div style={{fontSize:9,color:T.purple,lineHeight:1.5}}>{setup.divergence}</div>
+ </div>
+ )}
+ {ai&&ai.alert&&(
+ <div style={{marginTop:5,padding:"4px 8px",background:ai.alertLevel==="critical"?T.rose+"15":ai.alertLevel==="warning"?T.gold+"15":T.teal+"15",border:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40",borderRadius:3}}>
+ <span style={{fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal}}>
+ {ai.alertLevel==="critical"?"⚠ ":ai.alertLevel==="warning"?"⚡ ":"→ "}{ai.alert}
+ </span>
+ </div>
+ )}
+ </div>
+ </div>
  </div>
  );
  };
-
- const selS={background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"4px 8px",fontSize:9,borderRadius:3,fontFamily:FM,outline:"none",cursor:"pointer"};
  return(
  <div style={{padding:16}}>
  {screenerLoading&&<div style={{textAlign:"center",padding:32,color:T.textDim,fontSize:12,fontFamily:FM}}>Loading screener data...</div>}
@@ -1587,42 +1525,23 @@ export default function OptionsScanner() {
  )}
  {!screenerLoading&&screenerHits.length>0&&(
  <>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+ <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
  <div>
- <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
+ <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
  <div style={{fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
  {screenerMeta.universe_size} stocks / {screenerHits.length} candidates / {screenerMeta.generated_at?new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):""}
  </div>
  </div>
  <button onClick={doReload} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Refresh</button>
  </div>
- <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:5}}>
- <div style={{display:"flex",alignItems:"center",gap:5}}>
- <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
- <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={selS}>
- <option value="score">Score ↓</option>
- <option value="retr">Retracement %</option>
- <option value="ticker">Ticker A–Z</option>
- </select>
- </div>
- <div style={{display:"flex",alignItems:"center",gap:5}}>
- <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
- <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={selS}>
- <option value="all">All</option>
- <option value="BULL">Calls ▲</option>
- <option value="BEAR">Puts ▼</option>
- </select>
- </div>
- <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{allFiltered.length} shown</span>
- </div>
  {newHits.length>0&&(
  <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
  <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
- <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
- <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+ <div style={{width:6,height:6,borderRadius:"50%",background:T.green,flexShrink:0}}/>
+ <span style={{fontSize:9,fontWeight:700,color:T.green,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
  <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
  </div>
- {newHits.map(renderCard)}
+ {newHits.sort((a,b)=>b.met-a.met).map(renderRow)}
  </div>
  )}
  {trackedHits.length>0&&(
@@ -1632,14 +1551,13 @@ export default function OptionsScanner() {
  <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
  <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
  </div>
- {trackedHits.map(renderCard)}
+ {trackedHits.map(renderRow)}
  </div>
  )}
- <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border,alignItems:"center"}}>
- <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Conditions:</span>
+ <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border}}>
  {condKeys.map(k=>(
- <div key={k} style={{display:"flex",alignItems:"center",gap:3}}>
- <div style={{width:8,height:4,borderRadius:2,background:T.sage}}/>
+ <div key={k} style={{display:"flex",alignItems:"center",gap:4}}>
+ {dot(true)}
  <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>{condLabels[k]}</span>
  </div>
  ))}
@@ -1649,50 +1567,6 @@ export default function OptionsScanner() {
  </div>
  );
  })()}
-
- {view==="closed"&&(
-  <div style={{padding:"16px 20px"}}>
-   <div style={{fontSize:8,color:T.textDim,fontFamily:FD,letterSpacing:"0.08em",marginBottom:14}}>
-    CLOSED TRADES · {closedTrades.length} total
-   </div>
-   {closedTrades.length>=3&&(()=>{
-    const wins=closedTrades.filter(t=>t.pnlPct>0);
-    const wr=(wins.length/closedTrades.length*100).toFixed(0);
-    const avgR=(closedTrades.reduce((s,t)=>s+(t.pnlPct||0),0)/closedTrades.length).toFixed(1);
-    const best=closedTrades.reduce((a,b)=>(b.pnlPct||0)>(a.pnlPct||0)?b:a);
-    return(
-     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
-      {[["Win Rate",wr+"%",parseInt(wr)>=50?T.sage:T.rose],["Avg Return",(avgR>0?"+":"")+avgR+"%",parseFloat(avgR)>=0?T.sage:T.rose],["Best Trade",best.ticker+" "+(best.pnlPct>0?"+":"")+best.pnlPct?.toFixed(0)+"%",T.teal]].map(([l,v,c])=>(
-       <div key={l} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px",textAlign:"center"}}>
-        <div style={{fontSize:8,color:T.textDim,marginBottom:4,letterSpacing:"0.08em"}}>{l.toUpperCase()}</div>
-        <div style={{fontFamily:FD,fontSize:14,fontWeight:700,color:c}}>{v}</div>
-       </div>
-      ))}
-     </div>
-    );
-   })()}
-   {closedTrades.length===0?(
-    <div style={{fontSize:11,color:T.textDim,textAlign:"center",padding:"40px 0"}}>
-     No closed trades yet. Use "✕ Close Position" in the Positions panel.
-    </div>
-   ):[...closedTrades].reverse().map(t=>(
-    <div key={t.id} style={{marginBottom:8,padding:"11px 13px",background:T.surface,borderRadius:5,border:"1px solid "+T.border,borderLeft:"2px solid "+(t.pnlPct>=0?T.sage:T.rose)}}>
-     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:3}}>
-      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{t.ticker}</span>
-      <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:t.pnlPct>=0?T.sage:T.rose}}>
-       {t.pnlPct!=null?((t.pnlPct>=0?"+":"")+t.pnlPct.toFixed(1)+"%"):"--"}
-      </span>
-     </div>
-     <div style={{fontSize:9,color:T.textDim,marginBottom:5}}>{t.contract} · {t.exitReason.replace(/_/g," ")}</div>
-     <div style={{display:"flex",gap:8,fontSize:9,color:T.textSec,flexWrap:"wrap"}}>
-      <span>Entry ${t.entryPremium?.toFixed(2)} → Exit ${t.exitPrice?.toFixed(2)}</span>
-      <span style={{color:T.textDim}}>Closed {t.exitDate}</span>
-     </div>
-     {t.notes&&<div style={{fontSize:9,color:T.textSec,marginTop:5,borderTop:"1px solid "+T.border,paddingTop:5}}>{t.notes}</div>}
-    </div>
-   ))}
-  </div>
- )}
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
@@ -1713,41 +1587,6 @@ export default function OptionsScanner() {
  )}
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
- )}
- {closeModal&&(
-  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-   <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
-    <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:2}}>Close Trade · {closeModal.symbol}</div>
-    <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
-    <div style={{marginBottom:12}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
-     <input type="number" step="0.01" placeholder="e.g. 0.85" value={exitPrice} onChange={e=>setExitPrice(e.target.value)} style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}} />
-     {exitPrice&&closeModal.setup.entryPremium&&(
-      <div style={{fontSize:10,marginTop:4,fontFamily:FD,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose}}>
-       {(((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium)*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
-      </div>
-     )}
-    </div>
-    <div style={{marginBottom:12}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
-     <select value={exitReason} onChange={e=>setExitReason(e.target.value)} style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
-      <option value="TARGET_HIT">Target Hit</option>
-      <option value="STOP_HIT">Stop Hit</option>
-      <option value="MANUAL_EXIT">Manual Exit</option>
-      <option value="INVALIDATED">Invalidated</option>
-      <option value="EXPIRY">Expiry</option>
-     </select>
-    </div>
-    <div style={{marginBottom:16}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
-     <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)} placeholder="What worked or didn't..." style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}} />
-    </div>
-    <div style={{display:"flex",gap:8}}>
-     <button onClick={()=>setCloseModal(null)} style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>Cancel</button>
-     <button onClick={submitClose} disabled={!exitPrice} style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>✓ Close Trade</button>
-    </div>
-   </div>
-  </div>
  )}
  <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
  </div>

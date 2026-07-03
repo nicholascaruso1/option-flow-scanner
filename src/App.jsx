@@ -636,6 +636,7 @@ export default function OptionsScanner() {
 
  // Auto-refresh every 15 minutes
  useEffect(() => {
+ doRefresh(); // fetch prices immediately on mount
  const interval = setInterval(() => {
  doRefresh();
  }, 15 * 60 * 1000);

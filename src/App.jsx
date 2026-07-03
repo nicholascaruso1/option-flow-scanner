@@ -531,12 +531,21 @@ export default function OptionsScanner() {
  const [evDir, setEvDir] = useState("all");
  const [evSort, setEvSort] = useState("phase");
  const [memoryData, setMemoryData] = useState({});
+ const [screenerHits, setScreenerHits] = useState([]);
+ const [screenerMeta, setScreenerMeta] = useState({});
+ const [screenerLoading, setScreenerLoading] = useState(true);
  useEffect(() => {
  (async () => {
  const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
  setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
  })();
  }, []);
+ useEffect(()=>{
+ fetch("./data/stocks.json?_="+Date.now())
+ .then(r=>r.json())
+ .then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);})
+ .catch(()=>setScreenerLoading(false));
+ },[]);
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
  const key = todayKey();
@@ -869,7 +878,7 @@ export default function OptionsScanner() {
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1431,6 +1440,85 @@ export default function OptionsScanner() {
  </div>
  );
  })}
+ {view==="screener"&&(()=>{
+ const setupSymbols=new Set(SETUPS.map(s=>s.symbol));
+ const newHits=screenerHits.filter(h=>!setupSymbols.has(h.ticker));
+ const trackedHits=screenerHits.filter(h=>setupSymbols.has(h.ticker));
+ const condKeys=["topdown_bias","expansion","in_zone","vol_confirm","liquid"];
+ const condLabels={"topdown_bias":"Top-Down","expansion":"Expansion","in_zone":"0-50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
+ const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
+ const biasColor=b=>b==="BULL"?T.green:T.rose;
+ const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
+ const renderRow=(h)=>(
+ <div key={h.ticker} style={{padding:"10px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+ <div style={{minWidth:52}}>
+ <div style={{fontSize:13,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
+ <div style={{fontSize:10,color:T.textDim,fontFamily:FD}}>${h.price.toFixed(2)}</div>
+ </div>
+ <div style={{background:biasColor(h.bias)+"22",color:biasColor(h.bias),fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,border:"1px solid "+biasColor(h.bias)+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
+ <div style={{display:"flex",alignItems:"center",gap:2}}>
+ {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
+ <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:4,fontFamily:FD}}>{h.met}/5</span>
+ </div>
+ <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</div>
+ <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</div>
+ {setupSymbols.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginLeft:"auto"}}>* In Scanner</div>}
+ </div>
+ );
+ return(
+ <div style={{padding:16}}>
+ {screenerLoading&&<div style={{textAlign:"center",padding:32,color:T.textDim,fontSize:12,fontFamily:FM}}>Loading screener data...</div>}
+ {!screenerLoading&&screenerHits.length===0&&(
+ <div style={{textAlign:"center",padding:32,color:T.textDim}}>
+ <div style={{fontSize:12,fontFamily:FM}}>No screener data found</div>
+ <div style={{fontSize:10,color:T.border2,marginTop:4,fontFamily:FD}}>Trigger CI workflow manually from GitHub Actions</div>
+ <button onClick={doReload} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Retry</button>
+ </div>
+ )}
+ {!screenerLoading&&screenerHits.length>0&&(
+ <>
+ <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+ <div>
+ <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
+ <div style={{fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
+ {screenerMeta.universe_size} stocks / {screenerHits.length} candidates / {screenerMeta.generated_at?new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):""}
+ </div>
+ </div>
+ <button onClick={doReload} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Refresh</button>
+ </div>
+ {newHits.length>0&&(
+ <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+ <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
+ <div style={{width:6,height:6,borderRadius:"50%",background:T.green,flexShrink:0}}/>
+ <span style={{fontSize:9,fontWeight:700,color:T.green,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+ <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
+ </div>
+ {newHits.sort((a,b)=>b.met-a.met).map(renderRow)}
+ </div>
+ )}
+ {trackedHits.length>0&&(
+ <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+ <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
+ <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
+ <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
+ <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
+ </div>
+ {trackedHits.map(renderRow)}
+ </div>
+ )}
+ <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border}}>
+ {condKeys.map(k=>(
+ <div key={k} style={{display:"flex",alignItems:"center",gap:4}}>
+ {dot(true)}
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>{condLabels[k]}</span>
+ </div>
+ ))}
+ </div>
+ </>
+ )}
+ </div>
+ );
+ })()}
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>

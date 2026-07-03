@@ -11,7 +11,7 @@ on:
       sp500:
         description: "Scan full S&P 500 instead of default universe"
         required: false
-        default: "false"
+        default: "true"
       min_met:
         description: "Minimum conditions met (default 4)"
         required: false
@@ -40,16 +40,16 @@ jobs:
       - name: Run screener
         env:
           # Use manual inputs if triggered via workflow_dispatch, else defaults
-          SCREENER_SP500:  ${{ github.event.inputs.sp500 || 'false' }}
+          SCREENER_SP500:  ${{ github.event.inputs.sp500 || 'true' }}
           SCREENER_MIN_MET: ${{ github.event.inputs.min_met || '4' }}
-          SCREENER_OUT:    data/stocks.json
+          SCREENER_OUT:    public/data/stocks.json
         run: python3 screener_ci.py
 
       - name: Commit results
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/stocks.json
+          git add public/data/stocks.json
           # Only commit if the file actually changed
           git diff --staged --quiet || git commit -m "screener: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push

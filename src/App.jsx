@@ -534,6 +534,8 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [scrSort, setScrSort] = useState("score");
+ const [scrBias, setScrBias] = useState("all");
  const [closedTrades, setClosedTrades] = useState([]);
  const [closeModal, setCloseModal] = useState(null);
  const [exitPrice, setExitPrice] = useState("");
@@ -1162,6 +1164,7 @@ export default function OptionsScanner() {
  const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[])])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+ const alScore=alignmentScore(s);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
@@ -1197,6 +1200,7 @@ export default function OptionsScanner() {
  {earnD!=null&&<span style={pill(earnC)}>Earnings {s.earningsLabel} · {earnD}d</span>}
  {dteD!=null&&<span style={pill(dteD<=7?T.rose:T.border2)}>Exp {dteD}d</span>}
  {allCk.length>0&&<span style={pill(T.sage)}>✓ {allCk.length}/{CHECKLIST.length}</span>}
+ {alScore>0&&!invAlert&&<span style={pill(alScore>=70?T.sage:alScore>=35?T.gold:T.textDim)} title="Alignment score: phase + checklist + key-level proximity">Align {alScore}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
@@ -1493,29 +1497,84 @@ export default function OptionsScanner() {
  })}
  {view==="screener"&&(()=>{
  const setupSymbols=new Set(SETUPS.map(s=>s.symbol));
- const newHits=screenerHits.filter(h=>!setupSymbols.has(h.ticker));
- const trackedHits=screenerHits.filter(h=>setupSymbols.has(h.ticker));
  const condKeys=["topdown_bias","expansion","in_zone","vol_confirm","liquid"];
- const condLabels={"topdown_bias":"Top-Down","expansion":"Expansion","in_zone":"0-50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
- const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
- const biasColor=b=>b==="BULL"?T.green:T.rose;
+ const condLabels={"topdown_bias":"Top-Down Bias","expansion":"Expansion","in_zone":"0–50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
+ const biasColor=b=>b==="BULL"?T.sage:T.rose;
  const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
- const renderRow=(h)=>(
- <div key={h.ticker} style={{padding:"10px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
- <div style={{minWidth:52}}>
- <div style={{fontSize:13,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
- <div style={{fontSize:10,color:T.textDim,fontFamily:FD}}>${h.price.toFixed(2)}</div>
+
+ const generateSignalLine=(h)=>{
+ const parts=[];
+ if(h.conditions.topdown_bias) parts.push("top-down bias aligned");
+ if(h.conditions.expansion) parts.push("expansion candle confirmed");
+ if(h.conditions.in_zone) parts.push(`in 0–50% retracement zone (${h.details.retr_pct}%)`);
+ if(h.conditions.vol_confirm) parts.push("expansion-day volume confirmed");
+ if(!h.conditions.in_zone&&h.met>=3) parts.push("awaiting zone entry");
+ if(parts.length===0) return null;
+ const bias=h.bias==="BULL"?"Bullish":"Bearish";
+ return `${bias} setup: ${parts.slice(0,3).join(", ")}.`;
+ };
+
+ const sortFn=(a,b)=>{
+ if(scrSort==="score") return b.met-a.met;
+ if(scrSort==="retr") return parseFloat(a.details.retr_pct)-parseFloat(b.details.retr_pct);
+ if(scrSort==="ticker") return a.ticker.localeCompare(b.ticker);
+ return b.met-a.met;
+ };
+ const biasFn=(h)=>scrBias==="all"||h.bias===scrBias;
+
+ const allFiltered=screenerHits.filter(biasFn).sort(sortFn);
+ const newHits=allFiltered.filter(h=>!setupSymbols.has(h.ticker));
+ const trackedHits=allFiltered.filter(h=>setupSymbols.has(h.ticker));
+
+ const renderCard=(h)=>{
+ const bc=biasColor(h.bias);
+ const retrFill=Math.min(100,Math.max(0,parseFloat(h.details.retr_pct)*2));
+ const signalLine=generateSignalLine(h);
+ const memHist=memoryData[h.ticker]||[];
+ const lastSnap=memHist[memHist.length-1];
+ return(
+ <div key={h.ticker} style={{padding:"12px 14px",borderBottom:"1px solid "+T.border,background:h.met===5?bc+"06":"transparent"}}>
+ <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:7}}>
+ <div style={{minWidth:56}}>
+ <div style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
+ <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>${h.price.toFixed(2)}</div>
  </div>
- <div style={{background:biasColor(h.bias)+"22",color:biasColor(h.bias),fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,border:"1px solid "+biasColor(h.bias)+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
- <div style={{display:"flex",alignItems:"center",gap:2}}>
- {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
- <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:4,fontFamily:FD}}>{h.met}/5</span>
+ <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+ {h.met===5&&<div style={{fontSize:8,padding:"2px 6px",background:T.sage+"22",border:"1px solid "+T.sage+"50",borderRadius:3,color:T.sage,letterSpacing:"0.07em",fontWeight:700}}>5/5 ✓</div>}
+ {setupSymbols.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginLeft:"auto",fontWeight:600}}>★ Tracked</div>}
  </div>
- <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</div>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</div>
- {setupSymbols.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginLeft:"auto"}}>* In Scanner</div>}
+ <div style={{display:"flex",gap:3,marginBottom:7}} title="Each segment = one condition met">
+ {condKeys.map(k=>(
+ <div key={k} title={condLabels[k]} style={{flex:1,height:4,borderRadius:2,background:h.conditions[k]?bc:T.border2,transition:"background 0.2s"}}/>
+ ))}
+ </div>
+ <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:signalLine?7:0}}>
+ <div style={{flex:1}}>
+ <div style={{fontSize:7,color:T.textDim,fontFamily:FD,marginBottom:3,display:"flex",justifyContent:"space-between"}}>
+ <span>0%</span><span>Retr {h.details.retr_pct}% into zone</span><span>50%</span>
+ </div>
+ <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
+ <div style={{height:"100%",borderRadius:2,background:bc,width:retrFill+"%"}}/>
+ </div>
+ </div>
+ <span style={{fontSize:9,color:h.met===5?T.sage:T.textSec,fontWeight:h.met===5?700:400,fontFamily:FD,flexShrink:0}}>{h.met}/5</span>
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FD,flexShrink:0}}>Exp {h.details.exp_date}</span>
+ </div>
+ {signalLine&&(
+ <div style={{fontSize:9,color:T.textSec,lineHeight:1.5,padding:"5px 8px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
+ → {signalLine}
+ </div>
+ )}
+ {memHist.length>=2&&setupSymbols.has(h.ticker)&&lastSnap&&(
+ <div style={{marginTop:5,fontSize:8,color:T.teal,fontFamily:FM}}>
+ 📅 {memHist.length} sessions tracked · {lastSnap.phase||"—"} phase
+ </div>
+ )}
  </div>
  );
+ };
+
+ const selS={background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"4px 8px",fontSize:9,borderRadius:3,fontFamily:FM,outline:"none",cursor:"pointer"};
  return(
  <div style={{padding:16}}>
  {screenerLoading&&<div style={{textAlign:"center",padding:32,color:T.textDim,fontSize:12,fontFamily:FM}}>Loading screener data...</div>}
@@ -1528,23 +1587,42 @@ export default function OptionsScanner() {
  )}
  {!screenerLoading&&screenerHits.length>0&&(
  <>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+ <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
  <div>
- <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
+ <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
  <div style={{fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
  {screenerMeta.universe_size} stocks / {screenerHits.length} candidates / {screenerMeta.generated_at?new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):""}
  </div>
  </div>
  <button onClick={doReload} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Refresh</button>
  </div>
+ <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:5}}>
+ <div style={{display:"flex",alignItems:"center",gap:5}}>
+ <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
+ <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={selS}>
+ <option value="score">Score ↓</option>
+ <option value="retr">Retracement %</option>
+ <option value="ticker">Ticker A–Z</option>
+ </select>
+ </div>
+ <div style={{display:"flex",alignItems:"center",gap:5}}>
+ <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
+ <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={selS}>
+ <option value="all">All</option>
+ <option value="BULL">Calls ▲</option>
+ <option value="BEAR">Puts ▼</option>
+ </select>
+ </div>
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{allFiltered.length} shown</span>
+ </div>
  {newHits.length>0&&(
  <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
  <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
- <div style={{width:6,height:6,borderRadius:"50%",background:T.green,flexShrink:0}}/>
- <span style={{fontSize:9,fontWeight:700,color:T.green,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+ <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
+ <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
  <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
  </div>
- {newHits.sort((a,b)=>b.met-a.met).map(renderRow)}
+ {newHits.map(renderCard)}
  </div>
  )}
  {trackedHits.length>0&&(
@@ -1554,13 +1632,14 @@ export default function OptionsScanner() {
  <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
  <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
  </div>
- {trackedHits.map(renderRow)}
+ {trackedHits.map(renderCard)}
  </div>
  )}
- <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border}}>
+ <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border,alignItems:"center"}}>
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Conditions:</span>
  {condKeys.map(k=>(
- <div key={k} style={{display:"flex",alignItems:"center",gap:4}}>
- {dot(true)}
+ <div key={k} style={{display:"flex",alignItems:"center",gap:3}}>
+ <div style={{width:8,height:4,borderRadius:2,background:T.sage}}/>
  <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>{condLabels[k]}</span>
  </div>
  ))}

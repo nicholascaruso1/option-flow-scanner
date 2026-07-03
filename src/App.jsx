@@ -634,13 +634,21 @@ export default function OptionsScanner() {
   setTimeout(()=>setHint(false),4000);
  }, [updateMarketMemory]);
 
+// Keep ref to latest doRefresh to avoid stale closure on mount
+ const doRefreshRef = useRef();
+ doRefreshRef.current = doRefresh;
+
+ // Fetch immediately once on mount
+ useEffect(() => {
+  doRefreshRef.current();
+ }, []);
+
  // Auto-refresh every 15 minutes
  useEffect(() => {
- doRefresh(); // fetch prices immediately on mount
- const interval = setInterval(() => {
- doRefresh();
- }, 15 * 60 * 1000);
- return () => clearInterval(interval);
+  const interval = setInterval(() => {
+   doRefresh();
+  }, 15 * 60 * 1000);
+  return () => clearInterval(interval);
  }, [doRefresh]);
  const toggleFav = useCallback((sym) => {
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 const T = {
  bg:"#080E1C", surface:"#0F1B2E", border:"#1A2C45", border2:"#243850",
  textPri:"#E8EEF8", textSec:"#7A92B0", textDim:"#3A5270",
@@ -534,6 +534,7 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [openScreenerRows, setOpenScreenerRows] = useState({});
  useEffect(() => {
  (async () => {
  const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
@@ -641,6 +642,10 @@ export default function OptionsScanner() {
  }, 15 * 60 * 1000);
  return () => clearInterval(interval);
  }, [doRefresh]);
+ // Fire live data refresh once on mount (useRef avoids infinite-loop from dep array)
+ const _doRefreshRef = useRef(null);
+ useEffect(() => { _doRefreshRef.current = doRefresh; }, [doRefresh]);
+ useEffect(() => { _doRefreshRef.current?.(); }, []);
  const toggleFav = useCallback((sym) => {
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
  }, []);
@@ -1449,6 +1454,7 @@ export default function OptionsScanner() {
  const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
  const biasColor=b=>b==="BULL"?T.green:T.rose;
  const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
+ const toggleScreenerRow=(ticker)=>setOpenScreenerRows(p=>({...p,[ticker]:!p[ticker]}));
  const renderRow=(h)=>{
  const setup=SETUPS.find(s=>s.symbol===h.ticker)||null;
  const ph=setup?PHASES[setup.phase]:null;
@@ -1458,58 +1464,126 @@ export default function OptionsScanner() {
  const ckPct=setup?Math.round((ck.size/CHECKLIST.length)*100):null;
  const ai=setup?(aiUpdates[setup.symbol]||{}):null;
  const bc=biasColor(h.bias);
+ const isRowOpen=openScreenerRows[h.ticker]||false;
+ const ac=ph?ph.color:bc;
  return(
- <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
- <div style={{padding:"10px 14px",display:"flex",alignItems:"flex-start",gap:10,flexWrap:"wrap"}}>
+ <div key={h.ticker} style={{borderBottom:"1px solid "+T.border,borderTop:"2px solid "+ac+"60",marginBottom:2,borderRadius:4,overflow:"hidden",background:T.surface}}>
+ <div style={{padding:"10px 14px",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
  <div style={{minWidth:52,flexShrink:0}}>
  <div style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:-0.3}}>{h.ticker}</div>
  <div style={{fontSize:10,color:T.textDim,fontFamily:FD,marginTop:1}}>${h.price.toFixed(2)}</div>
  </div>
- <div style={{flex:1,minWidth:0}}>
- <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:6}}>
+ <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",flex:1}}>
  <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
  {ph&&<div style={{background:ph.color+"18",color:ph.color,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+ph.color+"35",fontFamily:FM}}>{ph.icon} {ph.label}</div>}
- {invAlert&&<div style={{background:T.rose+"18",color:T.rose,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+T.rose+"40",fontWeight:700}}>INVALIDATED</div>}
- <div style={{display:"flex",alignItems:"center",gap:2,marginLeft:2}}>
+ {invAlert&&<div style={{background:T.rose+"18",color:T.rose,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+T.rose+"40",fontWeight:700}}>⚠ INVALIDATED</div>}
+ <div style={{display:"flex",alignItems:"center",gap:2}}>
  {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
  <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:3,fontFamily:FD}}>{h.met}/5</span>
  </div>
- <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</div>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</div>
- {ckPct!==null&&<div style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.textDim,fontFamily:FD,marginLeft:"auto"}}>Checklist {ckPct}%</div>}
+ <span style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</span>
+ <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</span>
+ {ckPct!==null&&<span style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.textDim,fontFamily:FD}}>CL {ckPct}%</span>}
  </div>
+ <button onClick={()=>toggleScreenerRow(h.ticker)} style={{background:"transparent",border:"none",color:T.textDim,fontSize:9,cursor:"pointer",fontFamily:FM,letterSpacing:"0.08em",padding:"3px 8px",flexShrink:0,display:"flex",alignItems:"center",gap:3}}>
+ {isRowOpen?"COLLAPSE":"ANALYSIS"} <span style={{fontSize:7}}>{isRowOpen?"▲":"▼"}</span>
+ </button>
+ </div>
+ {invAlert&&!isRowOpen&&(
+ <div style={{padding:"4px 14px 8px",fontSize:9,color:T.rose}}>
+ ⚠ {invAlert}
+ </div>
+ )}
+ {isRowOpen&&(
+ <div style={{borderTop:"1px solid "+T.border,background:T.bg}}>
+ {setup?(
+ <div style={{padding:"12px 14px"}}>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>SETUP ANALYSIS</div>
  {invAlert&&(
- <div style={{padding:"5px 8px",background:T.rose+"12",border:"1px solid "+T.rose+"40",borderRadius:4,fontSize:9,color:T.rose,marginBottom:5}}>
- {invAlert}
+ <div style={{padding:"7px 10px",background:T.rose+"12",border:"1px solid "+T.rose+"40",borderRadius:4,fontSize:9,color:T.rose,marginBottom:10}}>
+ ⚠ {invAlert}
  </div>
  )}
- {setup&&(
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:4}}>
- <div style={{background:T.bg,borderRadius:3,padding:"6px 8px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Narrative</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.5}}>{setup.narrative}</div>
+ <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+ <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Narrative</div>
+ <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.narrative}</div>
  </div>
- <div style={{background:T.bg,borderRadius:3,padding:"6px 8px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Structure</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.5}}>{setup.structure}</div>
+ <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Structure</div>
+ <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.structure}</div>
  </div>
+ </div>
+ {setup.divergence&&(
+ <div style={{padding:"8px 10px",background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,marginBottom:10}}>
+ <div style={{fontSize:7,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Divergence Edge</div>
+ <div style={{fontSize:10,color:T.purple,lineHeight:1.6}}>{setup.divergence}</div>
  </div>
  )}
- {setup&&setup.divergence&&(
- <div style={{marginTop:6,padding:"5px 8px",background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:3}}>
- <div style={{fontSize:7,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Divergence Edge</div>
- <div style={{fontSize:9,color:T.purple,lineHeight:1.5}}>{setup.divergence}</div>
+ {setup.entryNote&&(
+ <div style={{padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:4,marginBottom:10}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Entry Note</div>
+ <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.entryNote}</div>
+ <div style={{marginTop:6,fontSize:9,color:T.rose}}>Invalidation: {setup.invalidation}</div>
+ </div>
+ )}
+ {setup.keyLevels&&setup.keyLevels.length>0&&(
+ <div style={{marginBottom:10}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Key Levels</div>
+ {setup.keyLevels.map((l,i)=>(
+ <div key={i} style={{display:"flex",gap:10,marginBottom:4,padding:"4px 8px",background:T.surface,borderRadius:3,border:"1px solid "+T.border}}>
+ <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:50,fontFamily:FD}}>{l.p}</span>
+ <span style={{color:l.c,fontSize:9}}>{l.l}</span>
+ </div>
+ ))}
+ </div>
+ )}
+ {ckPct!==null&&(
+ <div style={{marginBottom:10}}>
+ <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Checklist — {ck.size}/{CHECKLIST.length}</div>
+ <div style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.rose}}>{ckPct}%</div>
+ </div>
+ <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
+ <div style={{height:"100%",borderRadius:2,background:ckPct===100?T.sage:ckPct>=50?T.gold:T.rose,width:ckPct+"%",transition:"width 0.3s"}}/>
+ </div>
  </div>
  )}
  {ai&&ai.alert&&(
- <div style={{marginTop:5,padding:"4px 8px",background:ai.alertLevel==="critical"?T.rose+"15":ai.alertLevel==="warning"?T.gold+"15":T.teal+"15",border:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40",borderRadius:3}}>
- <span style={{fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal}}>
+ <div style={{padding:"6px 10px",background:ai.alertLevel==="critical"?T.rose+"15":ai.alertLevel==="warning"?T.gold+"15":T.teal+"15",border:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40",borderRadius:4,fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal}}>
  {ai.alertLevel==="critical"?"⚠ ":ai.alertLevel==="warning"?"⚡ ":"→ "}{ai.alert}
- </span>
  </div>
  )}
  </div>
+ ):(
+ <div style={{padding:"12px 14px"}}>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>SCREENER DATA</div>
+ <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+ <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Retracement</div>
+ <div style={{fontSize:13,fontWeight:700,color:T.gold,fontFamily:FD}}>{h.details.retr_pct}%</div>
+ <div style={{fontSize:9,color:T.textDim,marginTop:2}}>into 0–50% zone</div>
  </div>
+ <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Expiration Target</div>
+ <div style={{fontSize:13,fontWeight:700,color:T.teal,fontFamily:FD}}>{h.details.exp_date}</div>
+ <div style={{fontSize:9,color:T.textDim,marginTop:2}}>suggested expiry</div>
+ </div>
+ </div>
+ <div style={{marginBottom:8}}>
+ <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Pre-Conditions</div>
+ {condKeys.map(k=>(
+ <div key={k} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 8px",background:T.surface,borderRadius:3,border:"1px solid "+(h.conditions[k]?T.sage:T.border)+"40"}}>
+ <div style={{width:7,height:7,borderRadius:"50%",background:h.conditions[k]?T.sage:T.border2,flexShrink:0}}/>
+ <span style={{fontSize:9,color:h.conditions[k]?T.textSec:T.textDim}}>{condLabels[k]}</span>
+ </div>
+ ))}
+ </div>
+ <div style={{fontSize:9,color:T.textDim,fontFamily:FM,lineHeight:1.6}}>→ New candidate. No setup analysis yet — add to scanner to enable full tracking.</div>
+ </div>
+ )}
+ </div>
+ )}
  </div>
  );
  };

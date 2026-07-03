@@ -536,6 +536,9 @@ export default function OptionsScanner() {
  const [screenerLoading, setScreenerLoading] = useState(true);
  const [closedTrades, setClosedTrades] = useState([]);
  const [closeModal, setCloseModal] = useState(null);
+ const [exitPrice, setExitPrice] = useState("");
+ const [exitReason, setExitReason] = useState("TARGET_HIT");
+ const [exitNotes, setExitNotes] = useState("");
  useEffect(() => {
  (async () => {
  const [f,c,t,ai,mem,ct] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
@@ -665,6 +668,35 @@ export default function OptionsScanner() {
  const clearChecks = useCallback((sym) => {
  setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
  }, []);
+ const submitClose = () => {
+  if (!closeModal || !exitPrice) return;
+  const s = closeModal.setup;
+  const ep = parseFloat(exitPrice);
+  const entry = s.entryPremium || 0;
+  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
+  const trade = {
+   id: s.symbol + "_" + Date.now(),
+   ticker: s.symbol,
+   company: s.company,
+   direction: s.direction,
+   contract: s.contract,
+   entryPremium: entry,
+   exitPrice: ep,
+   entryDate: s.logEntry?.ts || "—",
+   exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
+   exitReason,
+   pnlPct,
+   phase: s.phase,
+   notes: exitNotes,
+   closedAt: Date.now(),
+  };
+  const next = [...closedTrades, trade];
+  setClosedTrades(next);
+  ss("of_closed_trades", next);
+  setCloseModal(null);
+  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
+ };
+
  const WORKER = window.location.hostname === "localhost"
    ? "/worker"
    : "https://market.electronmailbag.workers.dev";
@@ -736,177 +768,11 @@ export default function OptionsScanner() {
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const [exitPrice, setExitPrice] = useState("");
- const [exitReason, setExitReason] = useState("TARGET_HIT");
- const [exitNotes, setExitNotes] = useState("");
-
- const submitClose = () => {
-  if (!closeModal || !exitPrice) return;
-  const s = closeModal.setup;
-  const ep = parseFloat(exitPrice);
-  const entry = s.entryPremium || 0;
-  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
-  const trade = {
-   id: s.symbol + "_" + Date.now(),
-   ticker: s.symbol,
-   company: s.company,
-   direction: s.direction,
-   contract: s.contract,
-   entryPremium: entry,
-   exitPrice: ep,
-   entryDate: s.logEntry?.ts || AS_OF,
-   exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
-   exitReason,
-   pnlPct,
-   phase: s.phase,
-   notes: exitNotes,
-   closedAt: Date.now(),
-  };
-  const next = [...closedTrades, trade];
-  setClosedTrades(next);
-  ss("of_closed_trades", next);
-  setCloseModal(null);
-  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
- };
 
  const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
-const [exitPrice, setExitPrice] = useState("");
-const [exitReason, setExitReason] = useState("TARGET_HIT");
-const [exitNotes, setExitNotes] = useState("");
 
-const submitClose = () => {
-  if (!closeModal || !exitPrice) return;
-  const s = closeModal.setup;
-  const ep = parseFloat(exitPrice);
-  const entry = s.entryPremium || 0;
-  const pnlPct = entry > 0 ? ((ep - entry) / entry) * 100 : null;
-  
-  const trade = {
-    id: s.symbol + "_" + Date.now(),
-    ticker: s.symbol,
-    company: s.company,
-    direction: s.direction,
-    contract: s.contract,
-    entryPremium: entry,
-    exitPrice: ep,
-    entryDate: s.logEntry?.ts || AS_OF,
-    exitDate: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
-    exitReason,
-    pnlPct,
-    phase: s.phase,
-    notes: exitNotes,
-    closedAt: Date.now(),
-  };
-
-  const next = [...closedTrades, trade];
-  setClosedTrades(next);
-  ss("of_closed_trades", next);
-  setCloseModal(null);
-  setExitPrice(""); setExitReason("TARGET_HIT"); setExitNotes("");
-};
-
-{closeModal && (
-  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-    <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
-      <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:4}}>Close Trade · {closeModal.symbol}</div>
-      <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
-
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
-        <input
-          type="number" step="0.01" placeholder="e.g. 0.85"
-          value={exitPrice} onChange={e=>setExitPrice(e.target.value)}
-          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}}
-        />
-        {exitPrice && closeModal.setup.entryPremium && (
-          <div style={{fontSize:10,marginTop:4,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose,fontFamily:FD}}>
-            {((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
-          </div>
-        )}
-      </div>
-
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
-        <select value={exitReason} onChange={e=>setExitReason(e.target.value)}
-          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
-          <option value="TARGET_HIT">Target Hit</option>
-          <option value="STOP_HIT">Stop Hit</option>
-          <option value="MANUAL_EXIT">Manual Exit</option>
-          <option value="INVALIDATED">Invalidated</option>
-          <option value="EXPIRY">Expiry</option>
-        </select>
-      </div>
-
-      <div style={{marginBottom:16}}>
-        <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
-        <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)}
-          placeholder="What worked or didn't..."
-          style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}}
-        />
-      </div>
-
-      <div style={{display:"flex",gap:8}}>
-        <button onClick={()=>setCloseModal(null)}
-          style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>
-          Cancel
-        </button>
-        <button onClick={submitClose} disabled={!exitPrice}
-          style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>
-          ✓ Close Trade
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
- {closeModal && (
-  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-   <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
-    <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:4}}>Close Trade · {closeModal.symbol}</div>
-    <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
-    <div style={{marginBottom:12}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
-     <input type="number" step="0.01" placeholder="e.g. 0.85"
-      value={exitPrice} onChange={e=>setExitPrice(e.target.value)}
-      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}}/>
-     {exitPrice && closeModal.setup.entryPremium && (
-      <div style={{fontSize:10,marginTop:4,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose,fontFamily:FD}}>
-       {((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
-      </div>
-     )}
-    </div>
-    <div style={{marginBottom:12}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
-     <select value={exitReason} onChange={e=>setExitReason(e.target.value)}
-      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
-      <option value="TARGET_HIT">Target Hit</option>
-      <option value="STOP_HIT">Stop Hit</option>
-      <option value="MANUAL_EXIT">Manual Exit</option>
-      <option value="INVALIDATED">Invalidated</option>
-      <option value="EXPIRY">Expiry</option>
-     </select>
-    </div>
-    <div style={{marginBottom:16}}>
-     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
-     <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)}
-      placeholder="What worked or didn't..."
-      style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}}/>
-    </div>
-    <div style={{display:"flex",gap:8}}>
-     <button onClick={()=>setCloseModal(null)}
-      style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>
-      Cancel
-     </button>
-     <button onClick={submitClose} disabled={!exitPrice}
-      style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>
-      ✓ Close Trade
-     </button>
-    </div>
-   </div>
-  </div>
- )}
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:"linear-gradient(160deg,#0A1423,#0D1B31)",borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
@@ -1767,6 +1633,41 @@ const submitClose = () => {
  )}
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
+ )}
+ {closeModal&&(
+  <div style={{position:"fixed",inset:0,background:"#000000AA",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+   <div style={{background:T.surface,border:"1px solid "+T.border2,borderRadius:8,padding:20,width:"100%",maxWidth:340,boxShadow:"0 16px 48px #000000AA"}}>
+    <div style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,marginBottom:2}}>Close Trade · {closeModal.symbol}</div>
+    <div style={{fontSize:9,color:T.textDim,marginBottom:16}}>{closeModal.setup.contract}</div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Premium ($)</div>
+     <input type="number" step="0.01" placeholder="e.g. 0.85" value={exitPrice} onChange={e=>setExitPrice(e.target.value)} style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FD,outline:"none",width:"100%",boxSizing:"border-box"}} />
+     {exitPrice&&closeModal.setup.entryPremium&&(
+      <div style={{fontSize:10,marginTop:4,fontFamily:FD,color:parseFloat(exitPrice)>=closeModal.setup.entryPremium?T.sage:T.rose}}>
+       {(((parseFloat(exitPrice)-closeModal.setup.entryPremium)/closeModal.setup.entryPremium)*100).toFixed(1)}% vs entry ${closeModal.setup.entryPremium}
+      </div>
+     )}
+    </div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Exit Reason</div>
+     <select value={exitReason} onChange={e=>setExitReason(e.target.value)} style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%"}}>
+      <option value="TARGET_HIT">Target Hit</option>
+      <option value="STOP_HIT">Stop Hit</option>
+      <option value="MANUAL_EXIT">Manual Exit</option>
+      <option value="INVALIDATED">Invalidated</option>
+      <option value="EXPIRY">Expiry</option>
+     </select>
+    </div>
+    <div style={{marginBottom:16}}>
+     <div style={{fontSize:9,color:T.textSec,marginBottom:4}}>Notes (optional)</div>
+     <textarea value={exitNotes} onChange={e=>setExitNotes(e.target.value)} placeholder="What worked or didn't..." style={{background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:10,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box",resize:"vertical",minHeight:56}} />
+    </div>
+    <div style={{display:"flex",gap:8}}>
+     <button onClick={()=>setCloseModal(null)} style={{flex:1,padding:"9px",background:"transparent",border:"1px solid "+T.border2,borderRadius:4,color:T.textSec,fontSize:11,cursor:"pointer",fontFamily:FM}}>Cancel</button>
+     <button onClick={submitClose} disabled={!exitPrice} style={{flex:2,padding:"9px",background:exitPrice?T.sage+"22":"transparent",border:"1px solid "+(exitPrice?T.sage:T.border2),borderRadius:4,color:exitPrice?T.sage:T.textDim,fontSize:11,fontWeight:600,cursor:exitPrice?"pointer":"not-allowed",fontFamily:FM}}>✓ Close Trade</button>
+    </div>
+   </div>
+  </div>
  )}
  <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
  </div>

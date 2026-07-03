@@ -1218,6 +1218,7 @@ export default function OptionsScanner() {
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
+ {s.isActive&&<button onClick={()=>setCloseModal({symbol:s.symbol,setup:s})} style={{marginLeft:"auto",padding:"3px 10px",fontSize:9,background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:3,color:T.rose,cursor:"pointer",fontFamily:FM}}>✕ Close Trade</button>}
  </div>
  </div>
  {ai.alert&&(

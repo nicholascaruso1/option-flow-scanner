@@ -1166,6 +1166,96 @@ export default function OptionsScanner() {
  )}
  {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
+ {view==="all"&&(()=>{
+ const focusData=[...SETUPS].map(s=>{
+ const hist=memoryData[s.symbol]||[];
+ const last=hist[hist.length-1];
+ if(last&&last.invalidated)return{s,pScore:-999,al:0,earnD:null,reasons:[]};
+ if(!s.phase||s.isActive)return{s,pScore:-100,al:0,earnD:null,reasons:[]};
+ let pScore=0;
+ const reasons=[];
+ if(s.phase==="READY"){pScore+=50;reasons.push("READY");}
+ else if(s.phase==="RETRACEMENT"){pScore+=35;reasons.push("Retracing into zone");}
+ else if(s.phase==="EXPANSION"){pScore+=25;reasons.push("Expansion — await pullback");}
+ else if(s.phase==="CONSOLIDATION")pScore+=5;
+ else if(s.phase==="WATCH_REVERSAL")pScore-=10;
+ else if(s.phase==="MANAGING")pScore-=30;
+ const hit=screenerHits.find(h=>h.ticker===s.symbol);
+ if(hit&&hit.met===5){pScore+=25;reasons.push("5/5 screener conditions");}
+ else if(hit&&hit.met>=4){pScore+=15;reasons.push(hit.met+"/5 screener conditions");}
+ const al=alignmentScore(s);
+ if(al>=70){pScore+=15;reasons.push("HTF alignment confirmed");}
+ else if(al>=40)pScore+=8;
+ const earnD=s.earningsDate?daysUntil(s.earningsDate):null;
+ if(earnD!=null&&earnD>7){pScore+=10;reasons.push("Earnings "+earnD+"d away");}
+ if(earnD!=null&&earnD<=7)pScore-=20;
+ return{s,pScore,al,earnD,reasons};
+ }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
+ const readyCount=SETUPS.filter(s=>s.phase==="READY"&&!s.isActive).length;
+ const watchCount=SETUPS.filter(s=>!s.isActive&&s.phase!=="READY"&&s.phase!=="MANAGING").length;
+ const managingCount=SETUPS.filter(s=>s.isActive).length;
+ const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
+ const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
+ const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
+ const avg=(spy+qqq+iwm)/3;
+ const regime=avg>0.5?{l:"Bullish Bias",c:T.sage}:avg<-0.5?{l:"Bearish Bias",c:T.rose}:{l:"Neutral",c:T.gold};
+ const sensitivityLabel=ph=>{
+ if(ph==="READY")return{l:"Valid Today",c:T.sage};
+ if(ph==="RETRACEMENT"||ph==="EXPANSION")return{l:"Waiting",c:T.gold};
+ if(ph==="MANAGING")return{l:"No Action",c:T.teal};
+ return{l:"Monitor",c:T.textDim};
+ };
+ const NUMS=["①","②","③"];
+ return(
+ <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
+ <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+ <div style={{display:"flex",flexDirection:"column",gap:1}}>
+ <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
+ </div>
+ <div style={{width:"1px",height:28,background:T.border,flexShrink:0}}/>
+ <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
+ <span style={{fontSize:8,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
+ <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
+ <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
+ <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Managing <span style={{color:T.teal,fontWeight:700}}>{managingCount}</span></span>
+ </div>
+ </div>
+ {focusData.length===0?(
+ <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. "+(managingCount>0?"All candidates in MANAGING or monitoring phases.":"All candidates in monitoring phases.")}</div>
+ ):focusData.map(({s,al,earnD,reasons},qi)=>{
+ const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
+ const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
+ const starCount=Math.round((ckItems.length/CHECKLIST.length)*5);
+ const filledS="★".repeat(Math.max(0,Math.min(5,starCount)));
+ const emptyS="☆".repeat(5-Math.max(0,Math.min(5,starCount)));
+ const dcolor=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
+ const sens=sensitivityLabel(s.phase);
+ return(
+ <div key={s.symbol}
+ onClick={()=>{setOpen(p=>({...p,[s.symbol]:true}));setTimeout(()=>{document.getElementById("ofc-"+s.symbol)?.scrollIntoView({behavior:"smooth",block:"start"});},60);}}
+ style={{padding:"11px 16px",borderBottom:qi<focusData.length-1?"1px solid "+T.border:"none",display:"flex",gap:12,alignItems:"flex-start",cursor:"pointer",transition:"background 0.15s"}}
+ onMouseEnter={e=>e.currentTarget.style.background=T.border+"30"}
+ onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+ <span style={{fontSize:14,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
+ <div style={{flex:1,minWidth:0}}>
+ <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
+ <span style={{fontFamily:FD,fontSize:15,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:12,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
+ <span style={{fontSize:8,padding:"2px 6px",borderRadius:2,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
+ <span style={{fontSize:8,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
+ </div>
+ {reasons.slice(0,3).map((w,wi)=>(
+ <div key={wi} style={{fontSize:8,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
+ ))}
+ </div>
+ <span style={{fontSize:10,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
+ </div>
+ );
+ })}
+ </div>
+ );
+ })()}
  {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
@@ -1204,7 +1294,7 @@ export default function OptionsScanner() {
   </div>
  );
  return(
- <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
+ <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
  <div style={{padding:"12px 16px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>

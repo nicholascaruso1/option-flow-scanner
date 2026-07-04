@@ -1205,7 +1205,11 @@ export default function OptionsScanner() {
  if(ph==="MANAGING")return{l:"No Action",c:T.teal};
  return{l:"Monitor",c:T.textDim};
  };
- const NUMS=["①","②","③"];
+ const openCloseModal=(s)=>{
+  const hit=screenerHits.find(h=>h.ticker===s.symbol);
+  setCloseModal({ticker:s.symbol,entryPhase:s.phase,score:hit?.met??null});
+  setCloseExitPrice(""); setClosePnlPct(""); setCloseExitReason("TARGET_HIT");
+ };
  return(
  <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
@@ -1346,6 +1350,7 @@ export default function OptionsScanner() {
  <div style={{height:"100%",borderRadius:2,background:pl.pct>=0?T.teal:T.rose,width:Math.min(100,Math.max(0,pl.pct))+"%"}}/>
  </div>
  <span style={{fontSize:9,color:T.textDim}}>Intrinsic ${pl.intrinsic.toFixed(2)}</span>
+ <button onClick={()=>openCloseModal(s)} style={{marginLeft:"auto",padding:"4px 10px",background:T.rose+"18",border:"1px solid "+T.rose+"50",borderRadius:3,color:T.rose,fontSize:9,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Close Trade</button>
  </div>
  )}
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>

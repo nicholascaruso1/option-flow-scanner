@@ -534,12 +534,11 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
- const [closedTrades, setClosedTrades] = useState([]);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,cl] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(cl||[]);
+ const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
  })();
  }, []);
  useEffect(()=>{
@@ -879,44 +878,12 @@ export default function OptionsScanner() {
  <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
  </div>
  );
-
- {(()=>{
- const _spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
- const _qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
- const _iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
- const _avg=(_spy+_qqq+_iwm)/3;
- const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
- const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
- const _readyS=screenerHits.filter(h=>h.met>=4);
- const _topAll=[...SETUPS.filter(s=>!s.isActive)].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const _top=_topAll[0];
- const _earn=SETUPS.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
- const _ne=_earn[0];
- const _nd=_ne?daysUntil(_ne.earningsDate):null;
- const _inv=SETUPS.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
- const _cell=(lbl,val,col,sub)=>(
-  <div style={{padding:"6px 10px",borderRight:"1px solid "+T.border,flex:"1 0 auto",minWidth:75}}>
-   <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{lbl}</div>
-   <div style={{fontSize:11,fontWeight:700,color:col||T.textPri,fontFamily:FD,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{val}</div>
-   {sub&&<div style={{fontSize:7,color:T.textDim,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{sub}</div>}
-  </div>
- );
- return(
-  <div style={{background:"#050a13",borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
-   {_cell("Regime",_reg.l,_reg.c,`SPY ${_spy>=0?"+":""}${_spy.toFixed(1)}%`)}
-   {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
-   {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}
-   {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
-   {_cell("IRA Cap","$200/trade",T.teal,"5% rule")}
-   {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
-  </div>
- );
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.surface,overflowX:"auto"}}>
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["closed","Closed"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1484,8 +1451,8 @@ export default function OptionsScanner() {
  const trackedHits=screenerHits.filter(h=>setupSymbols.has(h.ticker));
  const condKeys=["topdown_bias","expansion","in_zone","vol_confirm","liquid"];
  const condLabels={"topdown_bias":"Top-Down","expansion":"Expansion","in_zone":"0-50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
- const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.sage:T.border2,display:"inline-block",margin:"0 2px"}}/>;
- const biasColor=b=>b==="BULL"?T.sage:T.rose;
+ const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
+ const biasColor=b=>b==="BULL"?T.green:T.rose;
  const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
  const toggleScreenerRow=(ticker)=>setOpenScreenerRows(p=>({...p,[ticker]:!p[ticker]}));
  const renderRow=(h)=>{
@@ -1510,19 +1477,9 @@ export default function OptionsScanner() {
  <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
  {ph&&<div style={{background:ph.color+"18",color:ph.color,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+ph.color+"35",fontFamily:FM}}>{ph.icon} {ph.label}</div>}
  {invAlert&&<div style={{background:T.rose+"18",color:T.rose,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+T.rose+"40",fontWeight:700}}>⚠ INVALIDATED</div>}
- <div>
-  <div style={{display:"flex",alignItems:"center",gap:2,marginBottom:h.met<5?3:0}}>
-   {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
-   <span style={{fontSize:9,color:h.met===5?T.sage:T.textDim,fontWeight:h.met===5?700:400,marginLeft:3,fontFamily:FD}}>{h.met}/5</span>
-  </div>
-  {h.met<5&&<div style={{fontSize:8,color:T.rose,fontFamily:FM,marginBottom:3}}>Missing: {condKeys.filter(k=>!h.conditions[k]).map(k=>condLabels[k]).join(", ")}</div>}
-  {h.met>=4&&(
-   <div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:4}}>
-    <span style={{fontSize:7,padding:"1px 5px",borderRadius:3,background:(h.conditions.topdown_bias?T.sage:T.rose)+"18",border:"1px solid "+(h.conditions.topdown_bias?T.sage:T.rose)+"40",color:h.conditions.topdown_bias?T.sage:T.rose}}>{h.conditions.topdown_bias?"✓ HTF":"✗ HTF"}</span>
-    <span style={{fontSize:7,padding:"1px 5px",borderRadius:3,background:(h.price<100?T.sage:T.amber)+"18",border:"1px solid "+(h.price<100?T.sage:T.amber)+"40",color:h.price<100?T.sage:T.amber}}>{h.price<100?"✓ Budget":"⚠ Verify $"}</span>
-    <span style={{fontSize:7,padding:"1px 5px",borderRadius:3,background:T.amber+"18",border:"1px solid "+T.amber+"40",color:T.amber}}>! Earnings ≥21d</span>
-   </div>
-  )}
+ <div style={{display:"flex",alignItems:"center",gap:2}}>
+ {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
+ <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:3,fontFamily:FD}}>{h.met}/5</span>
  </div>
  <span style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</span>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</span>
@@ -1654,8 +1611,8 @@ export default function OptionsScanner() {
  {newHits.length>0&&(
  <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
  <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
- <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
- <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+ <div style={{width:6,height:6,borderRadius:"50%",background:T.green,flexShrink:0}}/>
+ <span style={{fontSize:9,fontWeight:700,color:T.green,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
  <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
  </div>
  {newHits.sort((a,b)=>b.met-a.met).map(renderRow)}
@@ -1684,76 +1641,6 @@ export default function OptionsScanner() {
  </div>
  );
  })()}
-
- {view==="closed"&&(()=>{
- const _cw=closedTrades.filter(t=>(t.pnlPct||0)>0);
- const _wr=closedTrades.length>0?Math.round((_cw.length/closedTrades.length)*100):null;
- const _ar=closedTrades.length>0?(closedTrades.reduce((s,t)=>s+(t.pnlPct||0),0)/closedTrades.length).toFixed(1):null;
- const _best=closedTrades.length>0?[...closedTrades].sort((a,b)=>(b.pnlPct||0)-(a.pnlPct||0))[0]:null;
- const _scoreGroups=[[5,"5/5 \u2014 Full Conviction",T.sage],[4,"4/5 \u2014 One Miss",T.gold],[0,"Unscored",T.textDim]];
- return(
-  <div style={{padding:16}}>
-   {closedTrades.length===0&&(
-    <div style={{textAlign:"center",padding:"48px 20px"}}>
-     <div style={{fontSize:32,color:T.border2,marginBottom:8}}>\u2014</div>
-     <div style={{fontSize:13,color:T.textSec}}>No closed trades yet</div>
-     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Closed trades appear here after you exit a position</div>
-    </div>
-   )}
-   {closedTrades.length>0&&(
-    <>
-     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-      {[
-       ["Win Rate",_wr!=null?_wr+"%":"\u2014",_wr>=60?T.sage:_wr>=40?T.gold:T.rose],
-       ["Avg Return",_ar!=null?(parseFloat(_ar)>0?"+":"")+_ar+"%":"\u2014",parseFloat(_ar)>0?T.sage:T.rose],
-       ["Total Trades",""+closedTrades.length,T.textPri],
-       ["Best Trade",_best?`${_best.symbol} +${(_best.pnlPct||0).toFixed(0)}%`:"\u2014",T.sage],
-      ].map(([l,v,c])=>(
-       <div key={l} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:5,padding:"10px 12px"}}>
-        <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{l}</div>
-        <div style={{fontSize:16,fontWeight:700,color:c,fontFamily:FD}}>{v}</div>
-       </div>
-      ))}
-     </div>
-     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,padding:"12px 14px",marginBottom:14}}>
-      <div style={{fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em",marginBottom:10}}>WIN RATE BY SCREENER SCORE</div>
-      {_scoreGroups.map(([sc,label,color])=>{
-       const _g=closedTrades.filter(t=>sc===0?!t.score:t.score===sc);
-       if(_g.length===0)return null;
-       const _gwr=Math.round((_g.filter(t=>(t.pnlPct||0)>0).length/_g.length)*100);
-       return(
-        <div key={sc} style={{marginBottom:10}}>
-         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-          <span style={{fontSize:10,color,fontWeight:700,minWidth:28,fontFamily:FD}}>{sc||"?"}/5</span>
-          <span style={{fontSize:9,color:T.textSec,flex:1}}>{label}</span>
-          <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{_g.length} trade{_g.length!==1?"s":""}</span>
-          <span style={{fontSize:13,fontWeight:700,color:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,fontFamily:FD}}>{_gwr}%</span>
-         </div>
-         <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
-          <div style={{height:"100%",borderRadius:2,background:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,width:_gwr+"%",transition:"width 0.4s"}}/>
-         </div>
-        </div>
-       );
-      })}
-      <div style={{marginTop:8,padding:"8px 10px",background:T.bg,borderRadius:4,border:"1px solid "+T.border,fontSize:9,color:T.textDim,lineHeight:1.6}}>Add score to each closed trade to enable segmentation.</div>
-     </div>
-     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
-      <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em"}}>TRADE LOG \u00b7 {closedTrades.length} trades</div>
-      {[...closedTrades].reverse().map((t,i)=>(
-       <div key={i} style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:48}}>{t.symbol||"\u2014"}</span>
-        <span style={{fontSize:9,color:T.textDim,flex:1}}>{t.reason||""}</span>
-        {t.score&&<span style={{fontSize:8,padding:"1px 5px",borderRadius:3,background:T.border,color:T.textSec,fontFamily:FD}}>{t.score}/5</span>}
-        <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{t.closedAt?new Date(t.closedAt).toLocaleDateString("en-US",{month:"short",day:"numeric"}):""}</span>
-        <span style={{fontSize:13,fontWeight:700,color:(t.pnlPct||0)>=0?T.sage:T.rose,fontFamily:FD}}>{(t.pnlPct||0)>=0?"+":""}{(t.pnlPct||0).toFixed(0)}%</span>
-       </div>
-      ))}
-     </div>
-    </>
-   )}
-  </div>
- );
- })()}
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
@@ -1775,6 +1662,71 @@ export default function OptionsScanner() {
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
+
+ {view==="closed"&&(()=>{
+ const _cw=closedTrades.filter(t=>(t.pnlPct||0)>0);
+ const _wr=closedTrades.length>0?Math.round((_cw.length/closedTrades.length)*100):null;
+ const _ar=closedTrades.length>0?(closedTrades.reduce((s,t)=>s+(t.pnlPct||0),0)/closedTrades.length).toFixed(1):null;
+ const _best=closedTrades.length>0?[...closedTrades].sort((a,b)=>(b.pnlPct||0)-(a.pnlPct||0))[0]:null;
+ const _scoreGroups=[[5,"5/5 — Full Conviction",T.sage],[4,"4/5 — One Miss",T.gold],[0,"Unscored",T.textDim]];
+ return(
+  <div style={{padding:16}}>
+   {closedTrades.length===0&&(
+    <div style={{textAlign:"center",padding:"48px 20px"}}>
+     <div style={{fontSize:32,color:T.border2,marginBottom:8}}>—</div>
+     <div style={{fontSize:13,color:T.textSec}}>No closed trades yet</div>
+     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Closed trades appear here after you exit a position</div>
+    </div>
+   )}
+   {closedTrades.length>0&&(
+    <>
+     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+      {[["Win Rate",_wr!=null?_wr+"%":"—",_wr>=60?T.sage:_wr>=40?T.gold:T.rose],["Avg Return",_ar!=null?(parseFloat(_ar)>0?"+":"")+_ar+"%":"—",parseFloat(_ar)>0?T.sage:T.rose],["Total Trades",""+closedTrades.length,T.textPri],["Best Trade",_best?`${_best.symbol} +${(_best.pnlPct||0).toFixed(0)}%`:"—",T.sage]].map(([l,v,c])=>(
+       <div key={l} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:5,padding:"10px 12px"}}>
+        <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{l}</div>
+        <div style={{fontSize:16,fontWeight:700,color:c,fontFamily:FD}}>{v}</div>
+       </div>
+      ))}
+     </div>
+     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,padding:"12px 14px",marginBottom:14}}>
+      <div style={{fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em",marginBottom:10}}>WIN RATE BY SCREENER SCORE</div>
+      {_scoreGroups.map(([sc,label,color])=>{
+       const _g=closedTrades.filter(t=>sc===0?!t.score:t.score===sc);
+       if(_g.length===0)return null;
+       const _gwr=Math.round((_g.filter(t=>(t.pnlPct||0)>0).length/_g.length)*100);
+       return(
+        <div key={sc} style={{marginBottom:10}}>
+         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <span style={{fontSize:10,color,fontWeight:700,minWidth:28,fontFamily:FD}}>{sc||"?"}/5</span>
+          <span style={{fontSize:9,color:T.textSec,flex:1}}>{label}</span>
+          <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{_g.length} trade{_g.length!==1?"s":""}</span>
+          <span style={{fontSize:13,fontWeight:700,color:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,fontFamily:FD}}>{_gwr}%</span>
+         </div>
+         <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
+          <div style={{height:"100%",borderRadius:2,background:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,width:_gwr+"%"}}/>
+         </div>
+        </div>
+       );
+      })}
+      <div style={{marginTop:8,padding:"8px 10px",background:T.bg,borderRadius:4,border:"1px solid "+T.border,fontSize:9,color:T.textDim,lineHeight:1.6}}>Add score to each closed trade to enable segmentation.</div>
+     </div>
+     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+      <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em"}}>TRADE LOG · {closedTrades.length} trades</div>
+      {[...closedTrades].reverse().map((t,i)=>(
+       <div key={i} style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:48}}>{t.symbol||"—"}</span>
+        <span style={{fontSize:9,color:T.textDim,flex:1}}>{t.reason||""}</span>
+        {t.score&&<span style={{fontSize:8,padding:"1px 5px",borderRadius:3,background:T.border,color:T.textSec,fontFamily:FD}}>{t.score}/5</span>}
+        <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{t.closedAt?new Date(t.closedAt).toLocaleDateString("en-US",{month:"short",day:"numeric"}):""}</span>
+        <span style={{fontSize:13,fontWeight:700,color:(t.pnlPct||0)>=0?T.sage:T.rose,fontFamily:FD}}>{(t.pnlPct||0)>=0?"+":""}{(t.pnlPct||0).toFixed(0)}%</span>
+       </div>
+      ))}
+     </div>
+    </>
+   )}
+  </div>
+ );
+ })()}
  <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
  </div>
  );

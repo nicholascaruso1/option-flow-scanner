@@ -1319,16 +1319,19 @@ export default function OptionsScanner() {
  </div>
  </div>
  <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:8}}>
- {vIdx===0&&!invAlert&&!s.isActive&&view!=="managing"&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
- <PhasePipeline phase={effectivePhase}/>
- <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
- <span style={pill(CAP_COLORS[s.capSize]||T.slate)}>{s.capSize} · {s.mcap}</span>
- {s.retailTrap&&<span style={pill(T.purple)}>🪤 Divergence</span>}
- {earnD!=null&&<span style={pill(earnC)}>Earnings {s.earningsLabel} · {earnD}d</span>}
- {dteD!=null&&<span style={pill(dteD<=7?T.rose:T.border2)}>Exp {dteD}d</span>}
- {allCk.length>0&&<span style={pill(T.sage)}>✓ {allCk.length}/{CHECKLIST.length}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
+ <span style={pill(ac)}>{ph.icon} {ph.label}</span>
+ <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
+ {s.retailTrap&&<span style={pill(T.purple)}>🪜 Divergence</span>}
+ {vIdx===0&&!invAlert&&!s.isActive&&view!=="managing"&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
  </div>
+ {(earnD!=null||dteD!=null||allCk.length>0)&&(
+ <div style={{display:"flex",flexWrap:"wrap",gap:10,marginTop:5,alignItems:"center"}}>
+ {allCk.length>0&&<span style={{fontSize:9,color:T.sage,fontFamily:FD}}>✓ {allCk.length}/{CHECKLIST.length} checks</span>}
+ {earnD!=null&&<span style={{fontSize:9,color:earnC,fontFamily:FD}}>Earnings {s.earningsLabel} · {earnD}d</span>}
+ {dteD!=null&&<span style={{fontSize:9,color:dteD<=7?T.rose:T.textDim,fontFamily:FD}}>Exp {dteD}d</span>}
+ </div>
+ )}
  {invAlert&&(
  <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:4,fontSize:10,color:T.rose}}>
  {invAlert}
@@ -1347,6 +1350,7 @@ export default function OptionsScanner() {
  )}
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
+ <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
  {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
  </div>
  </div>

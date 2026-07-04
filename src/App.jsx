@@ -1223,10 +1223,10 @@ export default function OptionsScanner() {
  </div>
  {focusData.length===0?(
  <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. "+(managingCount>0?"All candidates in MANAGING or monitoring phases.":"All candidates in monitoring phases.")}</div>
- ):focusData.map(({s,al,earnD,reasons},qi)=>{
+ ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
  const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
  const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
- const starCount=Math.round((ckItems.length/CHECKLIST.length)*5);
+ const starCount=Math.round((Math.min(pScore,100)/100)*5);
  const filledS="★".repeat(Math.max(0,Math.min(5,starCount)));
  const emptyS="☆".repeat(5-Math.max(0,Math.min(5,starCount)));
  const dcolor=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;

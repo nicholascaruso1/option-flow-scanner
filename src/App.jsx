@@ -760,6 +760,7 @@ export default function OptionsScanner() {
  : SETUPS.filter(s => {
  if (view==="managing") return s.isActive;
  if (view==="favorites") return favs.includes(s.symbol);
+ if (view==="closed") return false;
  if (s.isActive) return false;
  if (dir==="calls" && s.direction!=="call") return false;
  if (dir==="puts" && s.direction!=="put") return false;

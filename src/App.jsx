@@ -177,6 +177,42 @@ const PHASES={
  MANAGING:{label:"Managing",icon:"●",color:T.teal},
  WATCH_REVERSAL:{label:"Watch Reversal",icon:"⚠",color:T.rose},
 };
+
+function PhasePipeline({phase}){
+ const stages=[
+  {key:"EXP",tip:"C2 expansion occurred"},
+  {key:"C2",tip:"Retracing — looking for failure swing"},
+  {key:"READY",tip:"C3 CISD confirmed — entry window"},
+  {key:"LIVE",tip:"Position active"},
+ ];
+ const idx={EXPANSION:0,CONSOLIDATION:0,RETRACEMENT:1,WATCH_REVERSAL:1,READY:2,MANAGING:3};
+ const cur=idx[phase]??0;
+ const inv=phase==="WATCH_REVERSAL";
+ return(
+  <div style={{display:"flex",alignItems:"center",gap:0}}>
+   {stages.map((st,i)=>{
+    const done=i<cur,active=i===cur;
+    const col=inv&&active?T.rose:active?T.gold:done?T.sage:T.border2;
+    return(<span key={st.key} title={st.tip} style={{display:"flex",alignItems:"center"}}>
+     <span style={{
+      display:"inline-block",width:active?8:6,height:active?8:6,
+      borderRadius:"50%",background:done?T.sage:active?T.gold:T.border2,
+      border:active?"1.5px solid "+col:"none",
+      boxShadow:active?"0 0 4px "+col+"60":"none",
+      flexShrink:0,transition:"all 0.18s ease",
+     }}/>
+     {i<stages.length-1&&<span style={{
+      display:"inline-block",width:10,height:1,
+      background:i<cur?T.sage+"50":T.border,margin:"0 2px",
+     }}/>}
+    </span>);
+   })}
+   <span style={{fontSize:8,color:inv?T.rose:T.textDim,fontFamily:FM,marginLeft:5,letterSpacing:"0.06em"}}>
+    {inv?"WATCH":stages[cur]?.key||""}
+   </span>
+  </div>
+ );
+}
 const CAP_COLORS={Mega:T.blue,Large:T.sage,Mid:T.amber,Small:T.gold,Micro:T.purple};
 const CHECKLIST=[
  {id:"swing", label:"C2 closure confirmed (failure swing)", desc:"C2 = middle candle making the extreme. C2 body closing through the level is the entry trigger. C1 = prior direction candle. Wick-only does not count."},
@@ -534,11 +570,13 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [compact, setCompact] = useState(false);
+ const [closedTrades, setClosedTrades] = useState([]);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{})]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{});
+ const [f,c,t,ai,mem,cl] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(cl||[]);
  })();
  }, []);
  useEffect(()=>{
@@ -878,12 +916,46 @@ export default function OptionsScanner() {
  <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
  </div>
  );
+
+ })()}
+ {(()=>{
+ const _spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
+ const _qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
+ const _iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
+ const _avg=(_spy+_qqq+_iwm)/3;
+ const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
+ const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
+ const _readyS=screenerHits.filter(h=>h.met>=4);
+ const _topAll=[...SETUPS.filter(s=>!s.isActive)].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
+ const _top=_topAll[0];
+ const _earn=SETUPS.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
+ const _ne=_earn[0];
+ const _nd=_ne?daysUntil(_ne.earningsDate):null;
+ const _inv=SETUPS.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
+ const _cell=(lbl,val,col,sub)=>(
+  <div style={{padding:"6px 10px",borderRight:"1px solid "+T.border,flex:"1 0 auto",minWidth:75}}>
+   <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{lbl}</div>
+   <div style={{fontSize:11,fontWeight:700,color:col||T.textPri,fontFamily:FD,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{val}</div>
+   {sub&&<div style={{fontSize:7,color:T.textDim,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{sub}</div>}
+  </div>
+ );
+ return(
+  <div style={{background:"#050a13",borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
+   {_cell("Regime",_reg.l,_reg.c,`SPY ${_spy>=0?"+":""}${_spy.toFixed(1)}%`)}
+   {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
+   {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}
+   {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
+   {_cell("IRA Cap","$200/trade",T.teal,"5% rule")}
+   {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
+  </div>
+ );
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.surface,overflowX:"auto"}}>
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
+ <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:"auto",padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["closed","Closed"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1092,9 +1164,9 @@ export default function OptionsScanner() {
  })}
  </div>
  )}
- {!isAltView&&!isEverything&&view!=="budget"&&view!=="screener"&&(
+ {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
- {visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
+ {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
  const invAlert=getInvalidationAlert(memHistory);
@@ -1118,6 +1190,19 @@ export default function OptionsScanner() {
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
+ if(compact&&!isOpen)return(
+  <div key={s.symbol} onClick={()=>tog(s.symbol)} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid "+T.border,background:T.surface,cursor:"pointer",borderLeft:"2px solid "+ac}}>
+   <button onClick={e=>{e.stopPropagation();toggleFav(s.symbol);}} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:13,color:isFav?T.gold:T.border2,lineHeight:1,flexShrink:0}}>★</button>
+   <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{s.symbol}</span>
+   <PhasePipeline phase={effectivePhase}/>
+   <span style={{fontSize:9,padding:"2px 7px",borderRadius:3,background:dc+"22",color:dc,border:"1px solid "+dc+"44",fontFamily:FM,flexShrink:0}}>{s.direction==="call"?"↑ CALL":s.direction==="put"?"↓ PUT":"WATCH"}</span>
+   <span style={{fontFamily:FD,fontSize:12,color:T.textPri,marginLeft:"auto",flexShrink:0}}>${(liveData[s.symbol]?.price||s.price).toFixed(2)}</span>
+   <span style={{fontFamily:FD,fontSize:10,color:dispChg>0?T.blue:dispChg<0?T.rose:T.textSec,flexShrink:0}}>{dispChg>0?"+":""}{typeof dispChg==="number"?dispChg.toFixed(1):s.chg.toFixed(1)}%</span>
+   {earnD!=null&&earnD<=21&&<span style={{fontSize:8,color:earnC,flexShrink:0}}>⚡{earnD}d</span>}
+   {invAlert&&<span style={{fontSize:8,color:T.rose,flexShrink:0}}>⚠</span>}
+   <span style={{fontSize:8,color:T.border2}}>›</span>
+  </div>
+ );
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
  <div style={{padding:"12px 16px 0"}}>
@@ -1145,7 +1230,7 @@ export default function OptionsScanner() {
  </div>
  <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:8}}>
  {vIdx===0&&!invAlert&&!s.isActive&&view!=="managing"&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
- <span style={pill(ac)}>{ph.icon} {ph.label}</span>
+ <PhasePipeline phase={effectivePhase}/>
  <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
  <span style={pill(CAP_COLORS[s.capSize]||T.slate)}>{s.capSize} · {s.mcap}</span>
  {s.retailTrap&&<span style={pill(T.purple)}>🪤 Divergence</span>}
@@ -1445,202 +1530,54 @@ export default function OptionsScanner() {
  </div>
  );
  })}
- {view==="screener"&&(()=>{
- const setupSymbols=new Set(SETUPS.map(s=>s.symbol));
- const newHits=screenerHits.filter(h=>!setupSymbols.has(h.ticker));
- const trackedHits=screenerHits.filter(h=>setupSymbols.has(h.ticker));
- const condKeys=["topdown_bias","expansion","in_zone","vol_confirm","liquid"];
- const condLabels={"topdown_bias":"Top-Down","expansion":"Expansion","in_zone":"0-50% Zone","vol_confirm":"Vol Confirm","liquid":"Liquid"};
- const dot=(on)=><div style={{width:6,height:6,borderRadius:"50%",background:on?T.green:T.border2,display:"inline-block",margin:"0 2px"}}/>;
- const biasColor=b=>b==="BULL"?T.green:T.rose;
- const doReload=()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));};
- const toggleScreenerRow=(ticker)=>setOpenScreenerRows(p=>({...p,[ticker]:!p[ticker]}));
- const renderRow=(h)=>{
- const setup=SETUPS.find(s=>s.symbol===h.ticker)||null;
- const ph=setup?PHASES[setup.phase]:null;
- const memHist=setup?(memoryData[setup.symbol]||[]):[];
- const invAlert=setup?getInvalidationAlert(memHist):null;
- const ck=setup?new Set([...(checks[setup.symbol]||[]),...(setup.autoChecks||[])]):new Set();
- const ckPct=setup?Math.round((ck.size/CHECKLIST.length)*100):null;
- const ai=setup?(aiUpdates[setup.symbol]||{}):null;
- const bc=biasColor(h.bias);
- const isRowOpen=openScreenerRows[h.ticker]||false;
- const ac=ph?ph.color:bc;
- return(
- <div key={h.ticker} style={{borderBottom:"1px solid "+T.border,borderTop:"2px solid "+ac+"60",marginBottom:2,borderRadius:4,overflow:"hidden",background:T.surface}}>
- <div style={{padding:"10px 14px",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
- <div style={{minWidth:52,flexShrink:0}}>
- <div style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:-0.3}}>{h.ticker}</div>
- <div style={{fontSize:10,color:T.textDim,fontFamily:FD,marginTop:1}}>${h.price.toFixed(2)}</div>
- </div>
- <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",flex:1}}>
- <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"^ CALL":"v PUT"}</div>
- {ph&&<div style={{background:ph.color+"18",color:ph.color,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+ph.color+"35",fontFamily:FM}}>{ph.icon} {ph.label}</div>}
- {invAlert&&<div style={{background:T.rose+"18",color:T.rose,fontSize:8,padding:"2px 8px",borderRadius:10,border:"1px solid "+T.rose+"40",fontWeight:700}}>⚠ INVALIDATED</div>}
- <div style={{display:"flex",alignItems:"center",gap:2}}>
- {condKeys.map(k=><span key={k} title={condLabels[k]}>{dot(h.conditions[k])}</span>)}
- <span style={{fontSize:9,color:h.met===5?T.green:T.textDim,fontWeight:h.met===5?700:400,marginLeft:3,fontFamily:FD}}>{h.met}/5</span>
- </div>
- <span style={{fontSize:9,color:T.textSec,fontFamily:FD}}>Retr {h.details.retr_pct}%</span>
- <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Exp {h.details.exp_date}</span>
- {ckPct!==null&&<span style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.textDim,fontFamily:FD}}>CL {ckPct}%</span>}
- </div>
- <button onClick={()=>toggleScreenerRow(h.ticker)} style={{background:"transparent",border:"none",color:T.textDim,fontSize:9,cursor:"pointer",fontFamily:FM,letterSpacing:"0.08em",padding:"3px 8px",flexShrink:0,display:"flex",alignItems:"center",gap:3}}>
- {isRowOpen?"COLLAPSE":"ANALYSIS"} <span style={{fontSize:7}}>{isRowOpen?"▲":"▼"}</span>
- </button>
- </div>
- {invAlert&&!isRowOpen&&(
- <div style={{padding:"4px 14px 8px",fontSize:9,color:T.rose}}>
- ⚠ {invAlert}
- </div>
- )}
- {isRowOpen&&(
- <div style={{borderTop:"1px solid "+T.border,background:T.bg}}>
- {setup?(
- <div style={{padding:"12px 14px"}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>SETUP ANALYSIS</div>
- {invAlert&&(
- <div style={{padding:"7px 10px",background:T.rose+"12",border:"1px solid "+T.rose+"40",borderRadius:4,fontSize:9,color:T.rose,marginBottom:10}}>
- ⚠ {invAlert}
- </div>
- )}
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Narrative</div>
- <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.narrative}</div>
- </div>
- <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Structure</div>
- <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.structure}</div>
- </div>
- </div>
- {setup.divergence&&(
- <div style={{padding:"8px 10px",background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,marginBottom:10}}>
- <div style={{fontSize:7,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Divergence Edge</div>
- <div style={{fontSize:10,color:T.purple,lineHeight:1.6}}>{setup.divergence}</div>
- </div>
- )}
- {setup.entryNote&&(
- <div style={{padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:4,marginBottom:10}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Entry Note</div>
- <div style={{fontSize:10,color:T.textSec,lineHeight:1.6}}>{setup.entryNote}</div>
- <div style={{marginTop:6,fontSize:9,color:T.rose}}>Invalidation: {setup.invalidation}</div>
- </div>
- )}
- {setup.keyLevels&&setup.keyLevels.length>0&&(
- <div style={{marginBottom:10}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Key Levels</div>
- {setup.keyLevels.map((l,i)=>(
- <div key={i} style={{display:"flex",gap:10,marginBottom:4,padding:"4px 8px",background:T.surface,borderRadius:3,border:"1px solid "+T.border}}>
- <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:50,fontFamily:FD}}>{l.p}</span>
- <span style={{color:l.c,fontSize:9}}>{l.l}</span>
- </div>
- ))}
- </div>
- )}
- {ckPct!==null&&(
- <div style={{marginBottom:10}}>
- <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Checklist — {ck.size}/{CHECKLIST.length}</div>
- <div style={{fontSize:8,color:ckPct===100?T.sage:ckPct>=50?T.gold:T.rose}}>{ckPct}%</div>
- </div>
- <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",borderRadius:2,background:ckPct===100?T.sage:ckPct>=50?T.gold:T.rose,width:ckPct+"%",transition:"width 0.3s"}}/>
- </div>
- </div>
- )}
- {ai&&ai.alert&&(
- <div style={{padding:"6px 10px",background:ai.alertLevel==="critical"?T.rose+"15":ai.alertLevel==="warning"?T.gold+"15":T.teal+"15",border:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40",borderRadius:4,fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal}}>
- {ai.alertLevel==="critical"?"⚠ ":ai.alertLevel==="warning"?"⚡ ":"→ "}{ai.alert}
- </div>
- )}
- </div>
- ):(
- <div style={{padding:"12px 14px"}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>SCREENER DATA</div>
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Retracement</div>
- <div style={{fontSize:13,fontWeight:700,color:T.gold,fontFamily:FD}}>{h.details.retr_pct}%</div>
- <div style={{fontSize:9,color:T.textDim,marginTop:2}}>into 0–50% zone</div>
- </div>
- <div style={{background:T.surface,borderRadius:4,padding:"8px 10px",border:"1px solid "+T.border}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Expiration Target</div>
- <div style={{fontSize:13,fontWeight:700,color:T.teal,fontFamily:FD}}>{h.details.exp_date}</div>
- <div style={{fontSize:9,color:T.textDim,marginTop:2}}>suggested expiry</div>
- </div>
- </div>
- <div style={{marginBottom:8}}>
- <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Pre-Conditions</div>
- {condKeys.map(k=>(
- <div key={k} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 8px",background:T.surface,borderRadius:3,border:"1px solid "+(h.conditions[k]?T.sage:T.border)+"40"}}>
- <div style={{width:7,height:7,borderRadius:"50%",background:h.conditions[k]?T.sage:T.border2,flexShrink:0}}/>
- <span style={{fontSize:9,color:h.conditions[k]?T.textSec:T.textDim}}>{condLabels[k]}</span>
- </div>
- ))}
- </div>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FM,lineHeight:1.6}}>→ New candidate. No setup analysis yet — add to scanner to enable full tracking.</div>
- </div>
- )}
- </div>
- )}
- </div>
- );
- };
- return(
+ {view==="screener"&&(
  <div style={{padding:16}}>
- {screenerLoading&&<div style={{textAlign:"center",padding:32,color:T.textDim,fontSize:12,fontFamily:FM}}>Loading screener data...</div>}
- {!screenerLoading&&screenerHits.length===0&&(
- <div style={{textAlign:"center",padding:32,color:T.textDim}}>
- <div style={{fontSize:12,fontFamily:FM}}>No screener data found</div>
- <div style={{fontSize:10,color:T.border2,marginTop:4,fontFamily:FD}}>Trigger CI workflow manually from GitHub Actions</div>
- <button onClick={doReload} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Retry</button>
+  {screenerLoading&&(
+   <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
+  )}
+  {!screenerLoading&&screenerHits.length===0&&(
+   <div style={{textAlign:"center",padding:32}}>
+    <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
+    <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
+   </div>
+  )}
+  {!screenerLoading&&screenerHits.length>0&&(
+   <>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+     <div>
+      <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
+      <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4</div>
+     </div>
+    </div>
+    {screenerHits.slice().sort((a,b)=>b.met-a.met).map(h=>{
+     const allSyms=new Set([...SETUPS,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
+     const inScanner=allSyms.has(h.ticker);
+     const bc=h.bias==="BULL"?T.sage:T.rose;
+     return(
+      <div key={h.ticker} style={{padding:"10px 14px",marginBottom:6,background:T.surface,borderRadius:4,border:"1px solid "+T.border,borderLeft:"2px solid "+bc,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+       <div style={{minWidth:52}}>
+        <div style={{fontSize:13,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
+        <div style={{fontSize:10,color:T.textDim,fontFamily:FD}}>${Number(h.price||0).toFixed(2)}</div>
+       </div>
+       <div style={{fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,color:bc,border:"1px solid "+bc+"44",background:bc+"18"}}>{h.bias==="BULL"?"↑ CALL":"↓ PUT"}</div>
+       <div style={{display:"flex",alignItems:"center",gap:3}}>
+        {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
+         <div key={k} title={k} style={{width:6,height:6,borderRadius:"50%",background:(h.conditions&&h.conditions[k])?T.sage:T.border2}}/>
+        ))}
+        <span style={{fontSize:9,fontWeight:700,color:h.met===5?T.gold:T.textSec,marginLeft:4,fontFamily:FD}}>{h.met}/5</span>
+       </div>
+       <div style={{fontSize:9,color:T.textSec,fontFamily:FD,marginLeft:"auto"}}>
+        {h.details&&h.details.retr_pct!=null?`Retr ${h.details.retr_pct}%`:""}{h.details&&h.details.exp_date?` · ${h.details.exp_date}`:""}
+       </div>
+       {inScanner&&<div style={{fontSize:8,color:T.gold,fontFamily:FM}}>★ In Scanner</div>}
+      </div>
+     );
+    })}
+   </>
+  )}
  </div>
- )}
- {!screenerLoading&&screenerHits.length>0&&(
- <>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
- <div>
- <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
- {screenerMeta.universe_size} stocks / {screenerHits.length} candidates / {screenerMeta.generated_at?new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):""}
- </div>
- </div>
- <button onClick={doReload} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Refresh</button>
- </div>
- {newHits.length>0&&(
- <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
- <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
- <div style={{width:6,height:6,borderRadius:"50%",background:T.green,flexShrink:0}}/>
- <span style={{fontSize:9,fontWeight:700,color:T.green,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
- <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
- </div>
- {newHits.sort((a,b)=>b.met-a.met).map(renderRow)}
- </div>
- )}
- {trackedHits.length>0&&(
- <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
- <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
- <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
- <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
- <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
- </div>
- {trackedHits.map(renderRow)}
- </div>
- )}
- <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:6,padding:"8px 0",borderTop:"1px solid "+T.border}}>
- {condKeys.map(k=>(
- <div key={k} style={{display:"flex",alignItems:"center",gap:4}}>
- {dot(true)}
- <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>{condLabels[k]}</span>
- </div>
- ))}
- </div>
- </>
- )}
- </div>
- );
- })()}
+)}
+
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
@@ -1662,71 +1599,6 @@ export default function OptionsScanner() {
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
-
- {view==="closed"&&(()=>{
- const _cw=closedTrades.filter(t=>(t.pnlPct||0)>0);
- const _wr=closedTrades.length>0?Math.round((_cw.length/closedTrades.length)*100):null;
- const _ar=closedTrades.length>0?(closedTrades.reduce((s,t)=>s+(t.pnlPct||0),0)/closedTrades.length).toFixed(1):null;
- const _best=closedTrades.length>0?[...closedTrades].sort((a,b)=>(b.pnlPct||0)-(a.pnlPct||0))[0]:null;
- const _scoreGroups=[[5,"5/5 — Full Conviction",T.sage],[4,"4/5 — One Miss",T.gold],[0,"Unscored",T.textDim]];
- return(
-  <div style={{padding:16}}>
-   {closedTrades.length===0&&(
-    <div style={{textAlign:"center",padding:"48px 20px"}}>
-     <div style={{fontSize:32,color:T.border2,marginBottom:8}}>—</div>
-     <div style={{fontSize:13,color:T.textSec}}>No closed trades yet</div>
-     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Closed trades appear here after you exit a position</div>
-    </div>
-   )}
-   {closedTrades.length>0&&(
-    <>
-     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-      {[["Win Rate",_wr!=null?_wr+"%":"—",_wr>=60?T.sage:_wr>=40?T.gold:T.rose],["Avg Return",_ar!=null?(parseFloat(_ar)>0?"+":"")+_ar+"%":"—",parseFloat(_ar)>0?T.sage:T.rose],["Total Trades",""+closedTrades.length,T.textPri],["Best Trade",_best?`${_best.symbol} +${(_best.pnlPct||0).toFixed(0)}%`:"—",T.sage]].map(([l,v,c])=>(
-       <div key={l} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:5,padding:"10px 12px"}}>
-        <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{l}</div>
-        <div style={{fontSize:16,fontWeight:700,color:c,fontFamily:FD}}>{v}</div>
-       </div>
-      ))}
-     </div>
-     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,padding:"12px 14px",marginBottom:14}}>
-      <div style={{fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em",marginBottom:10}}>WIN RATE BY SCREENER SCORE</div>
-      {_scoreGroups.map(([sc,label,color])=>{
-       const _g=closedTrades.filter(t=>sc===0?!t.score:t.score===sc);
-       if(_g.length===0)return null;
-       const _gwr=Math.round((_g.filter(t=>(t.pnlPct||0)>0).length/_g.length)*100);
-       return(
-        <div key={sc} style={{marginBottom:10}}>
-         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-          <span style={{fontSize:10,color,fontWeight:700,minWidth:28,fontFamily:FD}}>{sc||"?"}/5</span>
-          <span style={{fontSize:9,color:T.textSec,flex:1}}>{label}</span>
-          <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{_g.length} trade{_g.length!==1?"s":""}</span>
-          <span style={{fontSize:13,fontWeight:700,color:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,fontFamily:FD}}>{_gwr}%</span>
-         </div>
-         <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
-          <div style={{height:"100%",borderRadius:2,background:_gwr>=60?T.sage:_gwr>=40?T.gold:T.rose,width:_gwr+"%"}}/>
-         </div>
-        </div>
-       );
-      })}
-      <div style={{marginTop:8,padding:"8px 10px",background:T.bg,borderRadius:4,border:"1px solid "+T.border,fontSize:9,color:T.textDim,lineHeight:1.6}}>Add score to each closed trade to enable segmentation.</div>
-     </div>
-     <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
-      <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,fontSize:9,fontWeight:700,color:T.textPri,letterSpacing:"0.08em"}}>TRADE LOG · {closedTrades.length} trades</div>
-      {[...closedTrades].reverse().map((t,i)=>(
-       <div key={i} style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:48}}>{t.symbol||"—"}</span>
-        <span style={{fontSize:9,color:T.textDim,flex:1}}>{t.reason||""}</span>
-        {t.score&&<span style={{fontSize:8,padding:"1px 5px",borderRadius:3,background:T.border,color:T.textSec,fontFamily:FD}}>{t.score}/5</span>}
-        <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>{t.closedAt?new Date(t.closedAt).toLocaleDateString("en-US",{month:"short",day:"numeric"}):""}</span>
-        <span style={{fontSize:13,fontWeight:700,color:(t.pnlPct||0)>=0?T.sage:T.rose,fontFamily:FD}}>{(t.pnlPct||0)>=0?"+":""}{(t.pnlPct||0).toFixed(0)}%</span>
-       </div>
-      ))}
-     </div>
-    </>
-   )}
-  </div>
- );
- })()}
  <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
  </div>
  );

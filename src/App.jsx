@@ -1206,6 +1206,7 @@ export default function OptionsScanner() {
  if(ph==="MANAGING")return{l:"No Action",c:T.teal};
  return{l:"Monitor",c:T.textDim};
  };
+ const NUMS=["①","②","③"];
  const openCloseModal=(s)=>{
   const hit=screenerHits.find(h=>h.ticker===s.symbol);
   setCloseModal({ticker:s.symbol,entryPhase:s.phase,score:hit?.met??null});

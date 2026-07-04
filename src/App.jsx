@@ -574,20 +574,45 @@ export default function OptionsScanner() {
   setRefreshing(true);
   setLiveError(null);
 
-  const ALL_SYMS = ["ABCL","ATAI","SMCI","SPCX","MLYS","ILLR","GLD","SLV","CPER","PPLT","PALL","USO","UNG","SPY","QQQ","DIA","IWM","BTC","ETH","SOL","LTC"];
+  const EQUITY_SYMS = ["ABCL","ATAI","SMCI","SPCX","MLYS","ILLR","GLD","SLV","CPER","PPLT","PALL","USO","UNG","SPY","QQQ","DIA","IWM"];
+  const CRYPTO_SYMS = ["BTC","ETH","SOL","LTC"];
+  const CHUNK_SIZE = 3;
+  const CHUNK_DELAY_MS = 15000;
+
+  const equityChunks = [];
+  for (let i = 0; i < EQUITY_SYMS.length; i += CHUNK_SIZE) {
+    equityChunks.push(EQUITY_SYMS.slice(i, i + CHUNK_SIZE));
+  }
 
   let allPrices = {};
   let allErrors = [];
+  const totalChunks = equityChunks.length + 1;
 
-  setRefreshStatus("Fetching prices...");
+  setRefreshStatus(`Fetching crypto (1/${totalChunks})...`);
   try {
-    const resp = await fetch(`${WORKER}?symbols=${ALL_SYMS.join(",")}`, {headers:{Accept:"application/json"}});
+    const resp = await fetch(`${WORKER}?symbols=${CRYPTO_SYMS.join(",")}`, {headers:{Accept:"application/json"}});
     const json = await resp.json();
     if (json.prices) allPrices = {...allPrices, ...json.prices};
     if (json.errors) allErrors = [...allErrors, ...json.errors];
     setLiveData(prev => ({...prev, ...json.prices}));
   } catch(e) {
-    allErrors.push("fetch: " + e.message);
+    allErrors.push("crypto chunk: " + e.message);
+  }
+
+  for (let i = 0; i < equityChunks.length; i++) {
+    setRefreshStatus(`Fetching equities (${i+2}/${totalChunks})...`);
+    try {
+      const resp = await fetch(`${WORKER}?symbols=${equityChunks[i].join(",")}`, {headers:{Accept:"application/json"}});
+      const json = await resp.json();
+      if (json.prices) allPrices = {...allPrices, ...json.prices};
+      if (json.errors) allErrors = [...allErrors, ...json.errors];
+      setLiveData(prev => ({...prev, ...json.prices}));
+    } catch(e) {
+      allErrors.push(equityChunks[i].join(",") + ": " + e.message);
+    }
+    if (i < equityChunks.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, CHUNK_DELAY_MS));
+    }
   }
 
   const lts = new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});

@@ -1631,32 +1631,7 @@ export default function OptionsScanner() {
  })}
  {view==="screener"&&(
  <div style={{padding:16}}>
-  {(()=>{
-   const topQ=[...SETUPS].filter(s=>!s.isActive).sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
-   if(!topQ.length)return null;
-   return(
-    <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
-     <div style={{padding:"7px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
-      <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>⚡ Action Queue</span>
-      <span style={{fontSize:9,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>Top 3 by alignment</span>
-     </div>
-     {topQ.map((s,i)=>{
-      const ph=PHASES[s.phase];
-      const urgency=s.phase==="READY"?"🔴 Enter":s.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building";
-      return(
-       <div key={s.symbol} style={{padding:"8px 14px",borderBottom:i<topQ.length-1?"1px solid "+T.border:"none",display:"flex",gap:10,alignItems:"center"}}>
-        <div style={{minWidth:50}}>
-         <div style={{fontSize:12,fontWeight:700,color:i===0?T.gold:T.textPri,fontFamily:FM}}>{s.symbol}</div>
-         <div style={{fontSize:8,color:ph?.color||T.textDim,fontFamily:FD,textTransform:"uppercase",letterSpacing:"0.05em"}}>{ph?.label||s.phase}</div>
-        </div>
-        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.phaseNote||s.structure?.slice(0,70)||"—"}</div>
-        <div style={{fontSize:8,color:s.phase==="READY"?T.rose:s.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD,flexShrink:0}}>{urgency}</div>
-       </div>
-      );
-     })}
-    </div>
-   );
-  })()}
+
   {screenerLoading&&(
    <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
   )}
@@ -1772,39 +1747,57 @@ export default function OptionsScanner() {
       const retrPct=parseFloat(h.details?.retr_pct||0);
       const retrColor=retrPct<=50?T.sage:T.rose;
       const bc=biasColor(h.bias);
+      const expanded=scrExpand[h.ticker];
       return(
-       <div key={h.ticker} style={{borderBottom:"1px solid "+T.border,padding:"12px 14px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-         <div>
-          <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
-          <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
+       <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
+        <div style={{padding:"12px 14px"}}>
+         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+          <div>
+           <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
+           <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
+          </div>
+          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+          <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
+           {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
+            <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
+           ))}
+           <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
+          </div>
          </div>
-         <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
-         <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
-          {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
-           <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
-          ))}
-          <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
+         <div style={{marginBottom:6}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
+           <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
+           <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
+          </div>
+          <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
+           <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
+           <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>0%</span>
+           <span style={{fontSize:7,color:T.sage,fontFamily:FD}}>50%</span>
+           <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>100%</span>
+          </div>
+         </div>
+         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+          <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
+           {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
+          </div>
+          <button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Chart ↗"}</button>
          </div>
         </div>
-        <div style={{marginBottom:6}}>
-         <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
-          <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
-          <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
+        {expanded&&(
+         <div style={{background:T.bg,borderTop:"1px solid "+T.border,padding:"8px 10px 10px"}}>
+          <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+           <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
+           <span>TradingView</span>
+          </div>
+          <iframe
+           src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
+           style={{width:"100%",height:280,border:"none",borderRadius:4,display:"block"}}
+           allowTransparency={true}
+          />
          </div>
-         <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
-          <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
-         </div>
-         <div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
-          <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>0%</span>
-          <span style={{fontSize:7,color:T.sage,fontFamily:FD}}>50%</span>
-          <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>100%</span>
-         </div>
-        </div>
-        <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
-         {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
-        </div>
-        {allSyms.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:4}}>★ In Scanner</div>}
+        )}
        </div>
       );
      };

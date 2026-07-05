@@ -1209,7 +1209,6 @@ export default function OptionsScanner() {
   setCloseModal({ticker:s.symbol,entryPhase:s.phase,score:hit?.met??null});
   setCloseExitPrice(""); setClosePnlPct(""); setCloseExitReason("TARGET_HIT");
  };
- if(view==="screener")return null;
  return(
  <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
@@ -1724,20 +1723,58 @@ export default function OptionsScanner() {
          </div>
         </div>
         {expanded&&match&&(()=>{
+         const activeTab=scrTab[h.ticker]||"analysis";
          return(
-          <div style={{padding:"10px 14px 14px",background:T.bg,borderTop:"1px solid "+T.border}}>
-           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-            <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match.phase}</span>
-            {match.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
+          <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
+           <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
+            {[["analysis","Analysis"],["chart","Chart ↗"]].map(([t,l])=>(
+             <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
+            ))}
            </div>
-           {(match.thesis||match.structure)&&<div style={{fontSize:10,color:T.textSec,lineHeight:1.6,fontFamily:FD,marginBottom:8}}>{(match.thesis||match.structure).slice(0,180)}{(match.thesis||match.structure).length>180?"…":""}</div>}
-           {match.keyLevels&&match.keyLevels.slice(0,3).map((kl,ki)=>(
-            <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
-             <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:70,flexShrink:0}}>{kl.label||kl.type}</span>
-             <span style={{color:T.textSec}}>{kl.p}</span>
-             {kl.note&&<span>— {String(kl.note).slice(0,50)}</span>}
+           {activeTab==="analysis"&&(
+            <div style={{padding:"10px 14px 14px"}}>
+             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+              <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match.phase}</span>
+              {urgency&&<span style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</span>}
+              {match.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
+             </div>
+             {(match.thesis||match.structure)&&(
+              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border}}>
+               {(match.thesis||match.structure).slice(0,260)}{(match.thesis||match.structure).length>260?"…":""}
+              </div>
+             )}
+             {match.keyLevels&&match.keyLevels.length>0&&(
+              <div>
+               <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
+               {match.keyLevels.slice(0,4).map((kl,ki)=>(
+                <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
+                 <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
+                 <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>
+                 {kl.note&&<span style={{color:T.textDim}}>{String(kl.note).slice(0,60)}</span>}
+                </div>
+               ))}
+              </div>
+             )}
+             {match.invalidation&&(
+              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:4,fontSize:9,color:T.rose,fontFamily:FD}}>
+               <span style={{fontWeight:700}}>Invalidation: </span>{match.invalidation}
+              </div>
+             )}
             </div>
-           ))}
+           )}
+           {activeTab==="chart"&&(
+            <div style={{padding:"8px 10px 10px"}}>
+             <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
+              <span>TradingView</span>
+             </div>
+             <iframe
+              src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
+              style={{width:"100%",height:300,border:"none",borderRadius:4,display:"block"}}
+              allowTransparency={true}
+             />
+            </div>
+           )}
           </div>
          );
         })()}

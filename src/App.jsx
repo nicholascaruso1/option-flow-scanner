@@ -1209,6 +1209,7 @@ export default function OptionsScanner() {
   setCloseModal({ticker:s.symbol,entryPhase:s.phase,score:hit?.met??null});
   setCloseExitPrice(""); setClosePnlPct(""); setCloseExitReason("TARGET_HIT");
  };
+ if(view==="screener")return null;
  return(
  <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>

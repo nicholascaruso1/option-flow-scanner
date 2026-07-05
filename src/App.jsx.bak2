@@ -570,6 +570,7 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [scrExpand, setScrExpand] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
@@ -1765,10 +1766,13 @@ export default function OptionsScanner() {
  {fwOpen&&(
  <div style={{padding:"0 16px 12px",fontSize:10,color:T.textSec,lineHeight:2,borderTop:"1px solid "+T.border}}>
  <div style={{marginTop:8}}>Top-down:12M→6M→3M→Monthly→Weekly→Daily · 30-candle lookback</div>
- <div>Opposing candle open = range floor/ceiling · 3-candle swing at 4pm = entry trigger</div>
+ <div>Opposing candle open = range floor/ceiling · 3-candle swing at 4pm = entry trigger · 9:30 open confirms directional framework</div>
+ <div style={{color:T.teal,marginTop:2}}>Weekly profiles: Classic Expansion · Midweek Reversal · Consolidation Reversal · Intraweek Reversal · TGIF · Thursday Counter</div>
+ <div style={{color:T.textDim}}>C3 CISD body close = confirmation · IC-CISD (intracandle) = higher conviction · Only protected (relevant) swings = invalidation anchors</div>
  <div>Enter at 0–50% Fib · Extensions = targets · Nest new Fib at each swing</div>
  <div style={{color:T.purple}}>Narrative vs structure divergence = proprietary edge</div>
  <div style={{color:T.rose}}>Expansion → Expansion impossible · Entry lives in the middle phase</div>
+ <div style={{color:T.textDim}}>Bias invalidation = potential directional flip — protected swing taken creates opposite opportunity</div>
  <div style={{color:T.textDim,marginTop:4}}>IRA: $200 max (5%) · Individual: $3–5 max (5%)</div>
  </div>
  )}

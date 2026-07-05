@@ -570,6 +570,7 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [scrExpand, setScrExpand] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
@@ -1637,6 +1638,32 @@ export default function OptionsScanner() {
  })}
  {view==="screener"&&(
  <div style={{padding:16}}>
+  {(()=>{
+   const topQ=[...SETUPS].filter(s=>!s.isActive).sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
+   if(!topQ.length)return null;
+   return(
+    <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+     <div style={{padding:"7px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
+      <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>⚡ Action Queue</span>
+      <span style={{fontSize:9,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>Top 3 by alignment</span>
+     </div>
+     {topQ.map((s,i)=>{
+      const ph=PHASES[s.phase];
+      const urgency=s.phase==="READY"?"🔴 Enter":s.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building";
+      return(
+       <div key={s.symbol} style={{padding:"8px 14px",borderBottom:i<topQ.length-1?"1px solid "+T.border:"none",display:"flex",gap:10,alignItems:"center"}}>
+        <div style={{minWidth:50}}>
+         <div style={{fontSize:12,fontWeight:700,color:i===0?T.gold:T.textPri,fontFamily:FM}}>{s.symbol}</div>
+         <div style={{fontSize:8,color:ph?.color||T.textDim,fontFamily:FD,textTransform:"uppercase",letterSpacing:"0.05em"}}>{ph?.label||s.phase}</div>
+        </div>
+        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.signal||s.thesis?.slice(0,70)||"—"}</div>
+        <div style={{fontSize:8,color:s.phase==="READY"?T.rose:s.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD,flexShrink:0}}>{urgency}</div>
+       </div>
+      );
+     })}
+    </div>
+   );
+  })()}
   {screenerLoading&&(
    <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
   )}
@@ -1686,6 +1713,68 @@ export default function OptionsScanner() {
      const newHits=sorted.filter(h=>!allSyms.has(h.ticker));
      const tracked=sorted.filter(h=>allSyms.has(h.ticker));
      const biasColor=b=>b==="BULL"?T.green:T.rose;
+     const renderTrackedCard=h=>{
+      const match=SETUPS.find(s=>s.symbol===h.ticker);
+      const expanded=scrExpand[h.ticker];
+      const mPh=match?PHASES[match.phase]:null;
+      const urgency=match?(match.phase==="READY"?"🔴 Enter":match.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building"):null;
+      const retrPct=parseFloat(h.details?.retr_pct||0);
+      const retrColor=retrPct<=50?T.sage:T.rose;
+      const bc=biasColor(h.bias);
+      return(
+       <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
+        <div style={{padding:"12px 14px"}}>
+         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+          <div>
+           <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
+           <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
+          </div>
+          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+          {urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
+          <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
+           {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
+            <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
+           ))}
+           <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
+          </div>
+         </div>
+         <div style={{marginBottom:6}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
+           <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
+           <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
+          </div>
+          <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
+           <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
+          </div>
+         </div>
+         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
+           {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
+          </div>
+          {match&&<button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>}
+         </div>
+        </div>
+        {expanded&&match&&(()=>{
+         return(
+          <div style={{padding:"10px 14px 14px",background:T.bg,borderTop:"1px solid "+T.border}}>
+           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match.phase}</span>
+            {match.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
+           </div>
+           {(match.thesis||match.structure)&&<div style={{fontSize:10,color:T.textSec,lineHeight:1.6,fontFamily:FD,marginBottom:8}}>{(match.thesis||match.structure).slice(0,180)}{(match.thesis||match.structure).length>180?"…":""}</div>}
+           {match.keyLevels&&match.keyLevels.slice(0,3).map((kl,ki)=>(
+            <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:3}}>
+             <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:70,flexShrink:0}}>{kl.label||kl.type}</span>
+             <span style={{color:T.textSec}}>{kl.p}</span>
+             {kl.note&&<span>— {String(kl.note).slice(0,50)}</span>}
+            </div>
+           ))}
+          </div>
+         );
+        })()}
+       </div>
+      );
+     };
      const renderCard=h=>{
       const retrPct=parseFloat(h.details?.retr_pct||0);
       const retrColor=retrPct<=50?T.sage:T.rose;
@@ -1745,7 +1834,7 @@ export default function OptionsScanner() {
           <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
           <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
          </div>
-         {tracked.map(renderCard)}
+         {tracked.map(renderTrackedCard)}
         </div>
        )}
       </>
@@ -1765,10 +1854,13 @@ export default function OptionsScanner() {
  {fwOpen&&(
  <div style={{padding:"0 16px 12px",fontSize:10,color:T.textSec,lineHeight:2,borderTop:"1px solid "+T.border}}>
  <div style={{marginTop:8}}>Top-down:12M→6M→3M→Monthly→Weekly→Daily · 30-candle lookback</div>
- <div>Opposing candle open = range floor/ceiling · 3-candle swing at 4pm = entry trigger</div>
+ <div>Opposing candle open = range floor/ceiling · 3-candle swing at 4pm = entry trigger · 9:30 open confirms directional framework</div>
+ <div style={{color:T.teal,marginTop:2}}>Weekly profiles: Classic Expansion · Midweek Reversal · Consolidation Reversal · Intraweek Reversal · TGIF · Thursday Counter</div>
+ <div style={{color:T.textDim}}>C3 CISD body close = confirmation · IC-CISD (intracandle) = higher conviction · Only protected (relevant) swings = invalidation anchors</div>
  <div>Enter at 0–50% Fib · Extensions = targets · Nest new Fib at each swing</div>
  <div style={{color:T.purple}}>Narrative vs structure divergence = proprietary edge</div>
  <div style={{color:T.rose}}>Expansion → Expansion impossible · Entry lives in the middle phase</div>
+ <div style={{color:T.textDim}}>Bias invalidation = potential directional flip — protected swing taken creates opposite opportunity</div>
  <div style={{color:T.textDim,marginTop:4}}>IRA: $200 max (5%) · Individual: $3–5 max (5%)</div>
  </div>
  )}

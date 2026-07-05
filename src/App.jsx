@@ -1755,7 +1755,6 @@ export default function OptionsScanner() {
   )}
  </div>
 )}
-)}
 
  {(view==="all"||view==="managing"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>

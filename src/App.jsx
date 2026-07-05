@@ -631,13 +631,17 @@ export default function OptionsScanner() {
 
   setRefreshStatus(`Fetching crypto (1/${totalChunks})...`);
   try {
-    const resp = await fetch(`${WORKER}?symbols=${CRYPTO_SYMS.join(",")}`, {headers:{Accept:"application/json"}});
-    const json = await resp.json();
-    if (json.prices) allPrices = {...allPrices, ...json.prices};
-    if (json.errors) allErrors = [...allErrors, ...json.errors];
-    setLiveData(prev => ({...prev, ...json.prices}));
+    const cgIds = {BTC:"bitcoin",ETH:"ethereum",SOL:"solana",LTC:"litecoin"};
+    const cgResp = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${Object.values(cgIds).join(",")}&vs_currencies=usd&include_24hr_change=true`);
+    const cgJson = await cgResp.json();
+    const cryptoPrices = {};
+    for (const [sym,id] of Object.entries(cgIds)) {
+      if (cgJson[id]) cryptoPrices[sym] = {price:cgJson[id].usd, chg:cgJson[id].usd_24h_change??0};
+    }
+    allPrices = {...allPrices, ...cryptoPrices};
+    setLiveData(prev => ({...prev, ...cryptoPrices}));
   } catch(e) {
-    allErrors.push("crypto chunk: " + e.message);
+    allErrors.push("crypto (CoinGecko): " + e.message);
   }
 
   for (let i = 0; i < equityChunks.length; i++) {

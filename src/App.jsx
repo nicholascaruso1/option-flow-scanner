@@ -570,6 +570,8 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [scrSort, setScrSort] = useState("score");
+ const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
  const [closedTrades, setClosedTrades] = useState([]);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
@@ -1069,6 +1071,7 @@ export default function OptionsScanner() {
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.dir==="call"?"Long ↑":s.dir==="put"?"Short ↓":"Watch"}</span>
  {s.cap&&<span style={pill(CAP_COLORS[s.cap]||T.slate)}>{s.cap}</span>}
+ {typeof alScore!=="undefined"&&alScore>0&&!invAlert&&<span style={pill(alScore>=70?T.sage:alScore>=35?T.gold:T.textDim)} title="Alignment score">Align {alScore}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
@@ -1285,6 +1288,7 @@ export default function OptionsScanner() {
  const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[])])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+ const alScore=alignmentScore(s);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
  if(compact&&!isOpen)return(
   <div key={s.symbol} onClick={()=>tog(s.symbol)} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid "+T.border,background:T.surface,cursor:"pointer",borderLeft:"2px solid "+ac}}>
@@ -1640,43 +1644,117 @@ export default function OptionsScanner() {
    <div style={{textAlign:"center",padding:32}}>
     <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
+    <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Retry</button>
    </div>
   )}
   {!screenerLoading&&screenerHits.length>0&&(
    <>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
      <div>
-      <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>SCREENER HITS</div>
+      <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
       <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4</div>
      </div>
+     <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
-    {screenerHits.slice().sort((a,b)=>b.met-a.met).map(h=>{
+    <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:5}}>
+     <div style={{display:"flex",alignItems:"center",gap:5}}>
+      <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
+      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:3,fontFamily:FM,cursor:"pointer"}}>
+       <option value="score">Score ↓</option>
+       <option value="retr">Retracement %</option>
+       <option value="ticker">Ticker A–Z</option>
+      </select>
+     </div>
+     <div style={{display:"flex",alignItems:"center",gap:5}}>
+      <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
+      <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:3,fontFamily:FM,cursor:"pointer"}}>
+       <option value="all">All</option>
+       <option value="BULL">Calls ▲</option>
+       <option value="BEAR">Puts ▼</option>
+      </select>
+     </div>
+     <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).length} shown</span>
+    </div>
+    {(()=>{
      const allSyms=new Set([...SETUPS,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
-     const inScanner=allSyms.has(h.ticker);
-     const bc=h.bias==="BULL"?T.sage:T.rose;
+     const filtered=scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias);
+     const sorted=[...filtered].sort((a,b)=>{
+      if(scrSort==="score") return b.met-a.met;
+      if(scrSort==="retr") return parseFloat(b.details?.retr_pct||0)-parseFloat(a.details?.retr_pct||0);
+      return a.ticker.localeCompare(b.ticker);
+     });
+     const newHits=sorted.filter(h=>!allSyms.has(h.ticker));
+     const tracked=sorted.filter(h=>allSyms.has(h.ticker));
+     const biasColor=b=>b==="BULL"?T.green:T.rose;
+     const renderCard=h=>{
+      const retrPct=parseFloat(h.details?.retr_pct||0);
+      const retrColor=retrPct<=50?T.sage:T.rose;
+      const bc=biasColor(h.bias);
+      return(
+       <div key={h.ticker} style={{borderBottom:"1px solid "+T.border,padding:"12px 14px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+         <div>
+          <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
+          <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
+         </div>
+         <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+         <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
+          {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
+           <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
+          ))}
+          <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
+         </div>
+        </div>
+        <div style={{marginBottom:6}}>
+         <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
+          <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
+          <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
+         </div>
+         <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
+          <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
+         </div>
+         <div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
+          <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>0%</span>
+          <span style={{fontSize:7,color:T.sage,fontFamily:FD}}>50%</span>
+          <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>100%</span>
+         </div>
+        </div>
+        <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
+         {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
+        </div>
+        {allSyms.has(h.ticker)&&<div style={{fontSize:8,color:T.gold,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:4}}>★ In Scanner</div>}
+       </div>
+      );
+     };
      return(
-      <div key={h.ticker} style={{padding:"10px 14px",marginBottom:6,background:T.surface,borderRadius:4,border:"1px solid "+T.border,borderLeft:"2px solid "+bc,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-       <div style={{minWidth:52}}>
-        <div style={{fontSize:13,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</div>
-        <div style={{fontSize:10,color:T.textDim,fontFamily:FD}}>${Number(h.price||0).toFixed(2)}</div>
-       </div>
-       <div style={{fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,color:bc,border:"1px solid "+bc+"44",background:bc+"18"}}>{h.bias==="BULL"?"↑ CALL":"↓ PUT"}</div>
-       <div style={{display:"flex",alignItems:"center",gap:3}}>
-        {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
-         <div key={k} title={k} style={{width:6,height:6,borderRadius:"50%",background:(h.conditions&&h.conditions[k])?T.sage:T.border2}}/>
-        ))}
-        <span style={{fontSize:9,fontWeight:700,color:h.met===5?T.gold:T.textSec,marginLeft:4,fontFamily:FD}}>{h.met}/5</span>
-       </div>
-       <div style={{fontSize:9,color:T.textSec,fontFamily:FD,marginLeft:"auto"}}>
-        {h.details&&h.details.retr_pct!=null?`Retr ${h.details.retr_pct}%`:""}{h.details&&h.details.exp_date?` · ${h.details.exp_date}`:""}
-       </div>
-       {inScanner&&<div style={{fontSize:8,color:T.gold,fontFamily:FM}}>★ In Scanner</div>}
-      </div>
+      <>
+       {newHits.length>0&&(
+        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+         <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
+          <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+          <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
+         </div>
+         {newHits.map(renderCard)}
+        </div>
+       )}
+       {tracked.length>0&&(
+        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+         <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
+          <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
+          <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
+         </div>
+         {tracked.map(renderCard)}
+        </div>
+       )}
+      </>
      );
-    })}
+    })()}
    </>
   )}
  </div>
+)}
 )}
 
  {(view==="all"||view==="managing"||view==="everything")&&(

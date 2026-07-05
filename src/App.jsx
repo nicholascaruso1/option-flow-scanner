@@ -1656,7 +1656,7 @@ export default function OptionsScanner() {
          <div style={{fontSize:12,fontWeight:700,color:i===0?T.gold:T.textPri,fontFamily:FM}}>{s.symbol}</div>
          <div style={{fontSize:8,color:ph?.color||T.textDim,fontFamily:FD,textTransform:"uppercase",letterSpacing:"0.05em"}}>{ph?.label||s.phase}</div>
         </div>
-        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.signal||s.thesis?.slice(0,70)||"—"}</div>
+        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.phaseNote||s.structure?.slice(0,70)||"—"}</div>
         <div style={{fontSize:8,color:s.phase==="READY"?T.rose:s.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD,flexShrink:0}}>{urgency}</div>
        </div>
       );

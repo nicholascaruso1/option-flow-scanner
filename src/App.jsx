@@ -1036,7 +1036,7 @@ export default function OptionsScanner() {
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const tab=getTab(s.symbol);
- const ac=ph.color;
+ const ac=ph?.color||T.textDim;
  const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
@@ -1271,7 +1271,7 @@ export default function OptionsScanner() {
  const dispVol=ld?.vol||s.vol;
  const effectivePhase=ai.phase||s.phase;
  const ph=PHASES[effectivePhase]||PHASES[s.phase];
- const ac=ph.color;
+ const ac=ph?.color||T.textDim;
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const ck=checks[s.symbol]||[];

@@ -1260,9 +1260,7 @@ export default function OptionsScanner() {
  </div>
  );
  })()}
- {view!=="screener"&&visible.map((s,vIdx)=>{
- try{
-const ai=aiUpdates[s.symbol]||{};
+ {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
  const invAlert=getInvalidationAlert(memHistory);
@@ -1689,7 +1687,6 @@ const ai=aiUpdates[s.symbol]||{};
  )}
  </div>
  );
- }catch(e){console.error("🔴 Card crash:",s?.symbol,e.message,e);return null;}
  })}
  {view==="screener"&&(
  <div style={{padding:16}}>

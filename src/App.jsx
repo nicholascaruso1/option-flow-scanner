@@ -1357,7 +1357,7 @@ export default function OptionsScanner() {
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
- {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
+ {(s.accountFit||[]).map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
  </div>
  </div>
  {ai.alert&&(
@@ -1830,7 +1830,7 @@ export default function OptionsScanner() {
              {match.keyLevels&&match.keyLevels.length>0&&(
               <div>
                <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
-               {match.keyLevels.slice(0,4).map((kl,ki)=>(
+               {(match.keyLevels||[]).slice(0,4).map((kl,ki)=>(
                 <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
                  <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
                  <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>

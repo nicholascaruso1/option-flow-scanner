@@ -571,6 +571,7 @@ export default function OptionsScanner() {
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
  const [scrExpand, setScrExpand] = useState({});
+ const [scrTab, setScrTab] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
@@ -1631,7 +1632,32 @@ export default function OptionsScanner() {
  })}
  {view==="screener"&&(
  <div style={{padding:16}}>
-
+  {(()=>{
+   const topQ=[...SETUPS].filter(s=>!s.isActive).sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
+   if(!topQ.length)return null;
+   return(
+    <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+     <div style={{padding:"7px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
+      <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>⚡ Action Queue</span>
+      <span style={{fontSize:9,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>Top 3 by alignment</span>
+     </div>
+     {topQ.map((s,i)=>{
+      const ph=PHASES[s.phase];
+      const urgency=s.phase==="READY"?"🔴 Enter":s.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building";
+      return(
+       <div key={s.symbol} style={{padding:"8px 14px",borderBottom:i<topQ.length-1?"1px solid "+T.border:"none",display:"flex",gap:10,alignItems:"center"}}>
+        <div style={{minWidth:50}}>
+         <div style={{fontSize:12,fontWeight:700,color:i===0?T.gold:T.textPri,fontFamily:FM}}>{s.symbol}</div>
+         <div style={{fontSize:8,color:ph?.color||T.textDim,fontFamily:FD,textTransform:"uppercase",letterSpacing:"0.05em"}}>{ph?.label||s.phase}</div>
+        </div>
+        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.phaseNote||s.structure?.slice(0,70)||"—"}</div>
+        <div style={{fontSize:8,color:s.phase==="READY"?T.rose:s.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD,flexShrink:0}}>{urgency}</div>
+       </div>
+      );
+     })}
+    </div>
+   );
+  })()}
   {screenerLoading&&(
    <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
   )}
@@ -1820,22 +1846,48 @@ export default function OptionsScanner() {
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
-          <button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Chart ↗"}</button>
+          <button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
          </div>
         </div>
-        {expanded&&(
-         <div style={{background:T.bg,borderTop:"1px solid "+T.border,padding:"8px 10px 10px"}}>
-          <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-           <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
-           <span>TradingView</span>
+        {expanded&&(()=>{
+         const activeTab=scrTab[h.ticker]||"analysis";
+         return(
+          <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
+           <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
+            {[["analysis","Analysis"],["chart","Chart ↗"]].map(([t,l])=>(
+             <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
+            ))}
+           </div>
+           {activeTab==="analysis"&&(
+            <div style={{padding:"10px 14px 14px"}}>
+             <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:8}}>Screener Conditions</div>
+             {[["topdown_bias","Top-down Bias Aligned"],["expansion","In Expansion Phase"],["in_zone","Price in 0–50% Retracement Zone"],["vol_confirm","Volume Confirmation"],["liquid","Liquid (>500K avg vol)"]].map(([k,label])=>(
+              <div key={k} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",borderBottom:"1px solid "+T.border}}>
+               <span style={{fontSize:11,color:h.conditions?.[k]?T.sage:T.rose}}>{h.conditions?.[k]?"✓":"✗"}</span>
+               <span style={{fontSize:9,color:h.conditions?.[k]?T.textSec:T.textDim,fontFamily:FD}}>{label}</span>
+              </div>
+             ))}
+             <div style={{marginTop:10,padding:"7px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border,fontSize:9,color:T.textDim,fontFamily:FD,fontStyle:"italic"}}>
+              Algorithm-only hit — no manual narrative written. Add to scanner to track with full analysis.
+             </div>
+            </div>
+           )}
+           {activeTab==="chart"&&(
+            <div style={{padding:"8px 10px 10px"}}>
+             <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
+              <span>TradingView</span>
+             </div>
+             <iframe
+              src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
+              style={{width:"100%",height:280,border:"none",borderRadius:4,display:"block"}}
+              allowTransparency={true}
+             />
+            </div>
+           )}
           </div>
-          <iframe
-           src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
-           style={{width:"100%",height:280,border:"none",borderRadius:4,display:"block"}}
-           allowTransparency={true}
-          />
-         </div>
-        )}
+         );
+        })()}
        </div>
       );
      };

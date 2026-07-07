@@ -1717,11 +1717,11 @@ export default function OptionsScanner() {
    );
   })()}
   {screenerLoading&&(
-   <div style={{textAlign:"center",padding:32}}><div style={{color:T.textPri,fontSize:14,fontWeight:600,fontFamily:FM,marginBottom:8}}>⏳ Loading screener data...</div><div style={{color:T.textDim,fontSize:10,fontFamily:FD}}>Fetching stocks.json · {screenerHits.length} hits loaded</div><button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:10,padding:"6px 16px",background:T.surface,border:"1px solid "+T.border,color:T.textPri,borderRadius:4,cursor:"pointer",fontFamily:FM}}>↺ Retry</button></div>
+   <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
   )}
   {!screenerLoading&&screenerHits.length===0&&(
    <div style={{textAlign:"center",padding:32}}>
-    <div style={{fontSize:14,color:T.textPri,fontFamily:FM,fontWeight:600}}>No screener data found</div>
+    <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
     <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Retry</button>
    </div>

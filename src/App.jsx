@@ -1025,7 +1025,7 @@ export default function OptionsScanner() {
  })()}
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
  {view==="managing"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:13,color:T.textSec}}>No active positions</div></div>)}
- {false&&(
+ {(isAltView||isEverything)&&(
  <div style={{padding:"10px 20px"}}>
  {visible.map((s)=>{
  const ph=PHASES[s.phase];
@@ -1036,7 +1036,7 @@ export default function OptionsScanner() {
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const tab=getTab(s.symbol);
- const ac=ph?.color||T.textDim;
+ const ac=ph.color;
  const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
@@ -1163,7 +1163,7 @@ export default function OptionsScanner() {
  })}
  </div>
  )}
- {view!=="screener"&&view!=="budget"&&(
+ {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
  {view==="all"&&(()=>{
  const focusData=[...SETUPS].map(s=>{
@@ -1271,7 +1271,7 @@ export default function OptionsScanner() {
  const dispVol=ld?.vol||s.vol;
  const effectivePhase=ai.phase||s.phase;
  const ph=PHASES[effectivePhase]||PHASES[s.phase];
- const ac=ph?.color||T.textDim;
+ const ac=ph.color;
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const ck=checks[s.symbol]||[];
@@ -1357,7 +1357,7 @@ export default function OptionsScanner() {
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
- {(s.accountFit||[]).map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
+ {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
  </div>
  </div>
  {ai.alert&&(
@@ -1373,7 +1373,7 @@ export default function OptionsScanner() {
  {isOpen&&(
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
- {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"],["journal","Journal"]].map(([t,l])=>(
+ {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"]].map(([t,l])=>(
  <button key={t} onClick={()=>setTab(s.symbol,t)} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
@@ -1384,6 +1384,14 @@ export default function OptionsScanner() {
  const rsLeader=sameDir.length>0?[...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;
  return(
  <div>
+ {memNarrative&&(
+ <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+ <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em"}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
+ </div>
+ <div style={{fontSize:10,color:T.textSec}}>{memNarrative}</div>
+ </div>
+ )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
  <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
@@ -1429,6 +1437,21 @@ export default function OptionsScanner() {
  })()}
  </div>
  )}
+ <div>
+ <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
+ {ai.logEntry&&(
+ <div style={{padding:"9px 11px",background:T.teal+"08",borderRadius:4,borderLeft:"2px solid "+T.teal,marginBottom:5}}>
+ <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:2}}>🤖 AI</span></div>
+ <div style={{color:T.textSec,fontSize:10}}>{ai.logEntry}</div>
+ </div>
+ )}
+ {s.logEntry&&(
+ <div style={{padding:"9px 11px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.border2}}>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:4}}>{s.logEntry.ts} <span style={{color:T.sage,marginLeft:6}}>● base</span></div>
+ <div style={{color:T.textSec,fontSize:10}}>{s.logEntry.note}</div>
+ </div>
+ )}
+ </div>
  </div>
  );
  })()}
@@ -1438,25 +1461,6 @@ export default function OptionsScanner() {
  const sameDir=SETUPS.filter(x=>!x.isActive&&x.direction===s.direction&&x.symbol!==s.symbol&&x.phase!=="EXPANSION");
  return(
  <div>
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 → C2 → C3 Entry Sequence</div>
- <div style={{display:"flex",gap:6,marginBottom:8}}>
- {[
- {k:"C1",desc:"Opposing candle at OB/key level — establishes C1 range",done:["RETRACEMENT","READY","MANAGING","EXPANSION"].includes(s.phase)},
- {k:"C2",desc:"Retracement 0–50% into OB zone — OTE setup",done:["READY","MANAGING"].includes(s.phase)},
- {k:"C3 CISD",desc:"Body close through C1 range — entry trigger",done:s.phase==="MANAGING"},
- ].map(({k,desc,done})=>(
- <div key={k} style={{flex:1,padding:"7px 6px",borderRadius:4,background:done?ac+"15":T.surface,border:"1px solid "+(done?ac:T.border),textAlign:"center"}}>
- <div style={{fontSize:9,fontWeight:700,color:done?ac:T.textDim,marginBottom:2}}>{k}</div>
- <div style={{fontSize:7,color:T.textDim,lineHeight:1.4}}>{desc}</div>
- <div style={{fontSize:11,color:done?ac:T.border2,marginTop:4}}>{done?"✓":"○"}</div>
- </div>
- ))}
- </div>
- <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,padding:"6px 8px",background:T.surface,borderRadius:3}}>
- <span style={{color:T.gold,fontWeight:600}}>CISD Rule: </span>C3 candle BODY must close through the range that created C1. IC-CISD (intracandle) = higher conviction — enter on body close. Wick through = manipulation, not confirmation.
- </div>
- </div>
  <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
  <div style={{fontSize:8,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
@@ -1467,8 +1471,8 @@ export default function OptionsScanner() {
  <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+sessionProfile.color+"20",fontSize:9,color:T.textDim}}>
  <span style={{color:sessionProfile.color,fontWeight:600}}>9:30 Rule: </span>
  {s.direction==="call"
- ? "If 9:30 opens above "+((s.keyLevels||[])[(s.keyLevels||[]).length-2]?.p||"key level")+", continuation confirmed. If 9:30 creates a manipulation (spike down then closes back up), intraday reversal in play — hold entry."
- : "If 9:30 opens below "+((s.keyLevels||[])[(s.keyLevels||[]).length-2]?.p||"key level")+", continuation confirmed. If 9:30 spikes up then closes back below, manipulation reversal in play — hold entry."}
+ ? "If 9:30 opens above "+( s.keyLevels[s.keyLevels.length-2]?.p||"key level")+", continuation confirmed. If 9:30 creates a manipulation (spike down then closes back up), intraday reversal in play — hold entry."
+ : "If 9:30 opens below "+(s.keyLevels[s.keyLevels.length-2]?.p||"key level")+", continuation confirmed. If 9:30 spikes up then closes back below, manipulation reversal in play — hold entry."}
  </div>
  </div>
  <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
@@ -1522,31 +1526,8 @@ export default function OptionsScanner() {
  );
  })()}
  {tab==="checklist"&&(()=>{
- const ckEarnD=s.earningsDate?daysUntil(s.earningsDate):null;
  return(
  <div>
- <div style={{marginBottom:12,padding:"9px 11px",background:T.surface,border:"1px solid "+T.border,borderRadius:4}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Framework Pre-Flight</div>
- {[
- [["RETRACEMENT","READY","MANAGING","EXPANSION"].includes(s.phase),"HTF Bias Confirmed","Monthly + Weekly direction aligns with Daily setup direction"],
- [["RETRACEMENT","READY","MANAGING","EXPANSION"].includes(s.phase),"C1 Printed","Opposing candle at Order Block / key level identified"],
- [["READY","MANAGING"].includes(s.phase),"C2 Retracing 0–50%","Price in OTE zone — Fibonacci retracement of C1 move confirmed"],
- [!!s.nestedFib,"OB Mean Threshold","Nested Fib at Order Block — mean threshold marked for entry"],
- [ckEarnD==null||ckEarnD>7,"Earnings Cleared",ckEarnD!=null?"Earnings "+ckEarnD+"d away — no binary risk":"No near-term earnings"],
- [true,"Economic Calendar","Check red folder events today + tomorrow (high / medium impact only)"],
- [true,"IRA Budget","$200 max · 5% rule · 1–2 contracts · Delta 0.35–0.45"],
- ].map(([check,label,desc],i)=>(
- <div key={i} style={{display:"flex",gap:8,padding:"5px 0",borderBottom:i<6?"1px solid "+T.border:"none",alignItems:"flex-start"}}>
- <div style={{width:14,height:14,borderRadius:3,flexShrink:0,marginTop:1,background:check?T.sage+"20":"transparent",border:"1.5px solid "+(check?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
- {check&&<span style={{fontSize:8,color:T.sage,fontWeight:900}}>✓</span>}
- </div>
- <div>
- <div style={{fontSize:9,color:check?T.textSec:T.textDim,fontWeight:check?600:400}}>{label}</div>
- <div style={{fontSize:8,color:T.textDim}}>{desc}</div>
- </div>
- </div>
- ))}
- </div>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
@@ -1584,16 +1565,6 @@ export default function OptionsScanner() {
  {tab==="entry"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>{s.isActive?"Position Management":"Entry — 3-Candle Swing · 4pm Close"}</div>
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C2 / C3 Entry Protocol — TTrades Framework</div>
- <div style={{display:"flex",flexDirection:"column",gap:7}}>
- <div><span style={{fontSize:8,color:T.gold,fontWeight:700,letterSpacing:"0.06em"}}>C2 TRIGGER </span><span style={{fontSize:9,color:T.textSec}}>Wait for failure swing — a candle making a new low/high vs recent structure. Do not enter on the C2 candle itself.</span></div>
- <div><span style={{fontSize:8,color:T.sage,fontWeight:700,letterSpacing:"0.06em"}}>C3 CISD ENTRY </span><span style={{fontSize:9,color:T.textSec}}>Candle body closes through the range that created C1. IC-CISD = enter on the body close. Wick through = manipulation only.</span></div>
- <div><span style={{fontSize:8,color:T.blue,fontWeight:700,letterSpacing:"0.06em"}}>OTE ZONE </span><span style={{fontSize:9,color:T.textSec}}>Enter at 0–50% Fibonacci retracement of C1. Nest new Fib at each swing. Beyond 50% = reduced probability setup.</span></div>
- <div><span style={{fontSize:8,color:T.rose,fontWeight:700,letterSpacing:"0.06em"}}>STOP PLACEMENT </span><span style={{fontSize:9,color:T.textSec}}>Protected swing only — the relevant swing that invalidates the fractal. Body close beyond = stop. Wick through ≠ invalidation.</span></div>
- <div><span style={{fontSize:8,color:T.teal,fontWeight:700,letterSpacing:"0.06em"}}>SCALE PLAN </span><span style={{fontSize:9,color:T.textSec}}>2R minimum target. Scale at first Fib extension. Trail with opposing candle opens. Never let a 2R winner go negative.</span></div>
- </div>
- </div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px"}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
@@ -1603,14 +1574,14 @@ export default function OptionsScanner() {
  ))}
  </div>
  <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation} — body close only (wick through = manipulation, not invalidation)</div>
- <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{(s.accountFit||[]).join(" · ")}</div>
+ <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{s.accountFit.join(" · ")}</div>
  </div>
  </div>
  )}
  {tab==="levels"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Price Levels</div>
- {(s.keyLevels||[]).map((l,i)=>(
+ {s.keyLevels.map((l,i)=>(
  <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
  <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:50,flexShrink:0,fontFamily:FD}}>{l.p}</span>
  <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
@@ -1620,7 +1591,7 @@ export default function OptionsScanner() {
  <div style={{borderTop:"1px solid "+T.border,paddingTop:12}}>
  {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:4}}><div style={{fontSize:8,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:9,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
- {(s.catalysts||[]).map((c,i)=>(
+ {s.catalysts.map((c,i)=>(
  <div key={i} style={{display:"flex",gap:7,marginBottom:4}}>
  <span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span>
  <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
@@ -1653,35 +1624,6 @@ export default function OptionsScanner() {
  </div>
  );
  })()}
- {tab==="journal"&&(
- <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:10}}>Session Journal</div>
- {(!memNarrative&&!ai.logEntry&&!s.logEntry)?(
- <div style={{padding:20,textAlign:"center",color:T.textDim,fontSize:9,fontStyle:"italic"}}>No journal entries yet. Entries populate after each market close when the screener runs.</div>
- ):(
- <div>
- {memNarrative&&(
- <div style={{marginBottom:10,padding:"9px 11px",background:T.teal+"08",border:"1px solid "+T.teal+"30",borderRadius:4}}>
- <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
- <div style={{fontSize:10,color:T.textSec,lineHeight:1.7}}>{memNarrative}</div>
- </div>
- )}
- {ai.logEntry&&(
- <div style={{padding:"9px 11px",background:T.teal+"08",borderRadius:4,borderLeft:"2px solid "+T.teal,marginBottom:8}}>
- <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:2}}>🤖 AI</span></div>
- <div style={{color:T.textSec,fontSize:10,lineHeight:1.6}}>{ai.logEntry}</div>
- </div>
- )}
- {s.logEntry&&(
- <div style={{padding:"9px 11px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.border2,marginBottom:8}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:4}}>{s.logEntry.ts} <span style={{color:T.sage,marginLeft:6}}>● base</span></div>
- <div style={{color:T.textSec,fontSize:10,lineHeight:1.6}}>{s.logEntry.note}</div>
- </div>
- )}
- </div>
- )}
- </div>
- )}
  </div>
  </div>
  )}
@@ -1830,7 +1772,7 @@ export default function OptionsScanner() {
              {match.keyLevels&&match.keyLevels.length>0&&(
               <div>
                <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
-               {(match.keyLevels||[]).slice(0,4).map((kl,ki)=>(
+               {match.keyLevels.slice(0,4).map((kl,ki)=>(
                 <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
                  <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
                  <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>

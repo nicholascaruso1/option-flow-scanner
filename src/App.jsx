@@ -1696,7 +1696,7 @@ export default function OptionsScanner() {
      </div>
      <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).length} shown</span>
     </div>
-    {(()=>{
+    {(()=>{ try{
      const allSyms=new Set([...SETUPS,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
      const filtered=scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias);
      const sorted=[...filtered].sort((a,b)=>{
@@ -1915,6 +1915,7 @@ export default function OptionsScanner() {
        )}
       </>
      );
+    }catch(e){return(<div style={{color:"#ef4444",padding:"14px 16px",margin:"8px 0",background:"#1a0000",borderRadius:4,border:"1px solid #ef444440",fontFamily:"SF Mono,monospace",fontSize:11}}>⚠ Screener render error: {e.message}</div>);}
     })()}
    </>
   )}

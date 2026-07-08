@@ -570,6 +570,9 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [c123, setC123] = useState({});
+ const [journalNotes, setJournalNotes] = useState({});
+ const [journalInput, setJournalInput] = useState({});
  const [scrExpand, setScrExpand] = useState({});
  const [scrTab, setScrTab] = useState({});
  const [scrSort, setScrSort] = useState("score");
@@ -579,8 +582,8 @@ export default function OptionsScanner() {
  const [openScreenerRows, setOpenScreenerRows] = useState({});
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,cl] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[])]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(cl||[]);
+ const [f,c,t,ai,mem,cl,c1d,jnl] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[]),ls("of_c123",{}),ls("of_journal",{})]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(cl||[]); setC123(c1d||{}); setJournalNotes(jnl||{});
  })();
  }, []);
  useEffect(()=>{
@@ -1373,7 +1376,7 @@ export default function OptionsScanner() {
  {isOpen&&(
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
- {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"]].map(([t,l])=>(
+ {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"],["journal","Journal"]].map(([t,l])=>(
  <button key={t} onClick={()=>setTab(s.symbol,t)} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
@@ -1621,6 +1624,78 @@ export default function OptionsScanner() {
  </div>
  ))}
  <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
+ </div>
+ );
+ })()}
+ {tab==="journal"&&(()=>{
+ const sym=s.symbol;
+ const c1data=c123[sym]||{};
+ const notes=journalNotes[sym]||[];
+ const setCandle=(candle,confirmed)=>{
+  const ts2=confirmed?new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):null;
+  const next={...c123,[sym]:{...c1data,[candle]:confirmed?{confirmed:true,ts:ts2}:null}};
+  setC123(next);ss("of_c123",next);
+ };
+ const addNote=()=>{
+  const inp=journalInput[sym]||"";
+  if(!inp.trim())return;
+  const newnote={ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),note:inp.trim()};
+  const next={...journalNotes,[sym]:[newnote,...(journalNotes[sym]||[])]};
+  setJournalNotes(next);ss("of_journal",next);
+  setJournalInput({...journalInput,[sym]:""});
+ };
+ const candles=[
+  {key:"c1",label:"C1",color:T.blue,desc:"Direction candle — prior move confirming the trend. Sets up the swing."},
+  {key:"c2",label:"C2",color:T.gold,desc:"Failure swing — middle candle making the extreme. BODY close through level required. Wick-only = invalid."},
+  {key:"c3",label:"C3",color:T.sage,desc:"CISD body close — Change in State of Delivery. Drop to lower TF and confirm body close. Missing CISD = skip."},
+ ];
+ const seqDone=candles.every(c=>c1data[c.key]&&c1data[c.key].confirmed);
+ return(
+ <div>
+ <div style={{marginBottom:12}}>
+ <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
+ {seqDone&&(
+ <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:4,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
+ )}
+ <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+ {candles.map(({key,label,color,desc})=>{
+  const cd=c1data[key]||{};
+  return(
+  <div key={key} style={{background:cd.confirmed?color+"10":T.bg,border:"1px solid "+(cd.confirmed?color+"50":T.border),borderRadius:4,padding:"9px 10px"}}>
+  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+  <span style={{fontSize:13,fontWeight:700,color:cd.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
+  <div style={{width:8,height:8,borderRadius:"50%",background:cd.confirmed?color:T.border2}}/>
+  </div>
+  <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
+  {cd.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd.ts}</div>}
+  <button onClick={()=>setCandle(key,!cd.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd.confirmed?T.rose+"50":color+"50"),color:cd.confirmed?T.rose:color,borderRadius:3,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd.confirmed?"RESET":"CONFIRM"}</button>
+  </div>
+  );
+ })}
+ </div>
+ </div>
+ <div>
+ <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
+ <div style={{display:"flex",gap:6,marginBottom:8}}>
+ <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:3,fontFamily:FM,outline:"none"}}/>
+ <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:3,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
+ </div>
+ {notes.length===0&&s.logEntry&&(
+ <div style={{padding:"8px 10px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
+ <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
+ </div>
+ )}
+ {notes.map((n,i)=>(
+ <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
+ <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
+ <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
+ </div>
+ ))}
+ {notes.length===0&&!s.logEntry&&(
+ <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
+ )}
+ </div>
  </div>
  );
  })()}

@@ -1276,6 +1276,27 @@ export default function OptionsScanner() {
  const dispVol=ld?.vol||s.vol;
  const effectivePhase=ai.phase||s.phase;
  const ph=PHASES[effectivePhase]||PHASES[s.phase];
+ const pfSym=s.symbol;
+ const pfC1data=c123[pfSym]||{};
+ const pfChecks2=pfChecks[pfSym]||[];
+ const pfMtfRows=s.mtf||[];
+ const pfDirBias=s.direction==="call"?"bull":"bear";
+ const pfMtfCount=pfMtfRows.filter(r=>r[1]===pfDirBias).length;
+ const pfMtfOk=pfMtfRows.length>=4&&pfMtfCount>=4;
+ const pfSessOk=sessionProfile.actionable;
+ const pfNow=new Date(),pfUtc=pfNow.getTime()+pfNow.getTimezoneOffset()*60000,pfEst=new Date(pfUtc-18000000),pfEstDay=pfEst.getDay();
+ const pfDayOk=pfEstDay!==1;
+ const pfDayNote=pfEstDay===3?"Wed — Primary entry day":pfEstDay===4?"Thu — Second opportunity":pfEstDay===1?"Mon — Monday Rule: avoid":pfEstDay===5?"Fri — TGIF setups only":"Valid entry day";
+ const pfC1ok=!!(pfC1data.c1&&pfC1data.c1.confirmed);
+ const pfC2ok=!!(pfC1data.c2&&pfC1data.c2.confirmed);
+ const pfC3ok=!!(pfC1data.c3&&pfC1data.c3.confirmed);
+ const pfAutoPass=[pfMtfOk,pfSessOk,pfDayOk,pfC1ok,pfC2ok,pfC3ok].filter(Boolean).length;
+ const pfManPass=["g_ote","g_oi","g_swing","g_cal"].filter(id=>pfChecks2.includes(id)).length;
+ const pfTotal=10;
+ const pfPassing=pfAutoPass+pfManPass;
+ const pfVerdict=pfPassing===pfTotal?"GO":pfPassing>=7?"CAUTION":"NO-GO";
+ const pfVColor=pfVerdict==="GO"?T.sage:pfVerdict==="CAUTION"?T.gold:T.rose;
+ const pfIsPfOpen=pfOpen[pfSym]!==false;
  const ac=ph.color;
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
@@ -1571,67 +1592,31 @@ export default function OptionsScanner() {
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>{s.isActive?"Position Management":"Entry — 3-Candle Swing · 4pm Close"}</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
- {(()=>{
-  const sym=s.symbol;
-  const c1data=c123[sym]||{};
-  const pfc2=pfChecks[sym]||[];
-  const togglePf=(id)=>{
-   const cur=pfChecks[sym]||[];
-   const nxt={...pfChecks,[sym]:cur.includes(id)?cur.filter(x=>x!==id):[...cur,id]};
-   setPfChecks(nxt);ss("of_preflight",nxt);
-  };
-  const mtfRows=s.mtf||[];
-  const dirBias=s.direction==="call"?"bull":"bear";
-  const mtfCount=mtfRows.filter(r=>r[1]===dirBias).length;
-  const mtfOk=mtfRows.length>=4&&mtfCount>=4;
-  const sessionOk=sessionProfile.actionable;
-  const _n=new Date();const _u=_n.getTime()+_n.getTimezoneOffset()*60000;const _e=new Date(_u-18000000);const estDay=_e.getDay();
-  const dayOk=estDay!==1;
-  const dayNote=estDay===3?"Wed — Primary entry day (Classic Expansion)":estDay===4?"Thu — Second opportunity":estDay===1?"Mon — Monday Rule: avoid all scenarios":estDay===5?"Fri — TGIF setups only":"Valid profile day";
-  const c1ok=!!(c1data.c1&&c1data.c1.confirmed);
-  const c2ok=!!(c1data.c2&&c1data.c2.confirmed);
-  const c3ok=!!(c1data.c3&&c1data.c3.confirmed);
-  const autoGates=[
-   {id:"g_mtf",label:"MTF Aligned (4+ timeframes)",ok:mtfOk,note:mtfRows.length===0?"No MTF data — populate Multi-TF tab":mtfCount+"/"+mtfRows.length+" timeframes aligned "+dirBias},
-   {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:sessionOk,note:sessionProfile.profile},
-   {id:"g_day",label:"Valid Profile Day",ok:dayOk,note:dayNote},
-   {id:"g_c1",label:"C1 — Direction candle confirmed",ok:c1ok,note:c1ok?"Confirmed "+c1data.c1.ts:"Not yet — mark in Journal tab"},
-   {id:"g_c2",label:"C2 — Failure swing body close confirmed",ok:c2ok,note:c2ok?"Confirmed "+c1data.c2.ts:"Not yet — mark in Journal tab"},
-   {id:"g_c3",label:"C3 — CISD body close confirmed",ok:c3ok,note:c3ok?"Confirmed "+c1data.c3.ts:"Not yet — mark in Journal tab"},
-  ];
-  const manGates=[
-   {id:"g_ote",label:"Price in 0–50% OTE Zone",desc:"Confirm price is between 0–50% Fib retracement from the C1 swing anchor"},
-   {id:"g_oi",label:"OI > 500 on target strike",desc:"Check options chain. Low OI = wide spreads and difficult exits."},
-   {id:"g_swing",label:"Protected swing intact",desc:"Body close has NOT crossed the protected swing / invalidation level"},
-   {id:"g_cal",label:"Economic calendar clear",desc:"No red folder events in next 2 hrs (FOMC, NFP, CPI, PPI, JOLTS)"},
-  ];
-  const autoPass=autoGates.filter(g=>g.ok).length;
-  const manPass=manGates.filter(g=>pfc2.includes(g.id)).length;
-  const total=autoGates.length+manGates.length;
-  const passing=autoPass+manPass;
-  const verdict=passing===total?"GO":passing>=7?"CAUTION":"NO-GO";
-  const vColor=verdict==="GO"?T.sage:verdict==="CAUTION"?T.gold:T.rose;
-  const isPfOpen=pfOpen[sym]!==false;
-  const togglePfOpen=()=>setPfOpen(p=>({...p,[sym]:!isPfOpen}));
-  return(
-  <div style={{marginBottom:12,border:"1px solid "+vColor+"50",borderRadius:4,overflow:"hidden"}}>
-  <div onClick={togglePfOpen} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:vColor+"15",cursor:"pointer"}}>
+ <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:4,overflow:"hidden"}}>
+  <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
    <div style={{display:"flex",alignItems:"center",gap:10}}>
-   <span style={{fontSize:12,fontWeight:700,color:vColor,letterSpacing:"0.08em",fontFamily:FD}}>{verdict}</span>
-   <span style={{fontSize:9,color:T.textSec}}>{passing}/{total} pre-flight gates</span>
-   {verdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:2,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
-   {verdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>Review open gates</span>}
-   {verdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:2,color:T.rose}}>Do not enter</span>}
+   <span style={{fontSize:12,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
+   <span style={{fontSize:9,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
+   {pfVerdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:2,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
+   {pfVerdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>Review open gates</span>}
+   {pfVerdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:2,color:T.rose}}>Do not enter</span>}
    </div>
    <div style={{display:"flex",alignItems:"center",gap:5}}>
    <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
-   <span style={{fontSize:8,color:T.textDim}}>{isPfOpen?"▲":"▼"}</span>
+   <span style={{fontSize:8,color:T.textDim}}>{pfIsPfOpen?"▲":"▼"}</span>
    </div>
   </div>
-  {isPfOpen&&(
+  {pfIsPfOpen&&(
   <div style={{padding:"10px 12px"}}>
    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Auto-Detected</div>
-   {autoGates.map(g=>(
+   {[
+    {id:"g_mtf",label:"MTF Aligned (4+ timeframes)",ok:pfMtfOk,note:pfMtfRows.length===0?"No MTF data — populate Multi-TF tab":pfMtfCount+"/"+pfMtfRows.length+" timeframes aligned "+pfDirBias},
+    {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:pfSessOk,note:sessionProfile.profile},
+    {id:"g_day",label:"Valid Profile Day",ok:pfDayOk,note:pfDayNote},
+    {id:"g_c1",label:"C1 — Direction candle confirmed",ok:pfC1ok,note:pfC1ok?"Confirmed "+(pfC1data.c1&&pfC1data.c1.ts||""): "Not yet — mark in Journal tab"},
+    {id:"g_c2",label:"C2 — Failure swing confirmed",ok:pfC2ok,note:pfC2ok?"Confirmed "+(pfC1data.c2&&pfC1data.c2.ts||""): "Not yet — mark in Journal tab"},
+    {id:"g_c3",label:"C3 — CISD body close confirmed",ok:pfC3ok,note:pfC3ok?"Confirmed "+(pfC1data.c3&&pfC1data.c3.ts||""): "Not yet — mark in Journal tab"},
+   ].map(g=>(
    <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
     <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
     <div style={{flex:1}}>
@@ -1641,10 +1626,15 @@ export default function OptionsScanner() {
    </div>
    ))}
    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6,marginTop:10}}>Manual Confirmation</div>
-   {manGates.map(g=>{
-    const ck2=pfc2.includes(g.id);
+   {[
+    {id:"g_ote",label:"Price in 0–50% OTE Zone",desc:"Confirm price between 0–50% Fib retracement from C1 anchor swing"},
+    {id:"g_oi",label:"OI > 500 on target strike",desc:"Check options chain before entry. Low OI = wide spreads."},
+    {id:"g_swing",label:"Protected swing intact",desc:"Body close has NOT crossed the protected swing / invalidation level"},
+    {id:"g_cal",label:"Economic calendar clear",desc:"No red folder events in next 2 hrs (FOMC, NFP, CPI, PPI, JOLTS)"},
+   ].map(g=>{
+    const ck2=pfChecks2.includes(g.id);
     return(
-    <div key={g.id} onClick={()=>togglePf(g.id)} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+    <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
      <div style={{width:12,height:12,borderRadius:2,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
       {ck2&&<span style={{color:T.bg,fontSize:7,fontWeight:900}}>✓</span>}
      </div>
@@ -1657,9 +1647,7 @@ export default function OptionsScanner() {
    })}
   </div>
   )}
-  </div>
-  );
- })()}
+ </div>
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px"}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>

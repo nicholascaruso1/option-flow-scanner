@@ -2040,6 +2040,7 @@ export default function OptionsScanner() {
      });
      const newHits=sorted.filter(h=>!allSyms.has(h.ticker));
      const tracked=sorted.filter(h=>allSyms.has(h.ticker));
+     const STAGE_RANK_FE={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
      const biasColor=b=>b==="BULL"?T.green:T.rose;
      const renderTrackedCard=h=>{
       const match=SETUPS.find(s=>s.symbol===h.ticker);
@@ -2079,7 +2080,7 @@ export default function OptionsScanner() {
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
-          {match&&<button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>}
+          {match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>}
          </div>
         </div>
         {expanded&&match&&(()=>{
@@ -2087,7 +2088,7 @@ export default function OptionsScanner() {
          return(
           <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
            <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
-            {[["analysis","Analysis"],["chart","Chart ↗"]].map(([t,l])=>(
+            {[["analysis","Analysis"],["checklist","Checklist"],["chart","Chart ↗"]].map(([t,l])=>(
              <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
             ))}
            </div>
@@ -2122,7 +2123,74 @@ export default function OptionsScanner() {
              )}
             </div>
            )}
-           {activeTab==="chart"&&(
+           {activeTab==="checklist"&&(()=>{
+            const cd=candleData[h.ticker];
+            const pre=h.candle;
+            const dr=cd?.daily||null;
+            const sd=dr||pre||null;
+            const sc={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber}[sd?.stage]||T.textDim;
+            const cc={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+            const ha=[];
+            if(h.conditions.topdown_bias)ha.push("topdown");
+            if(h.conditions.in_zone)ha.push("fib50");
+            ha.push("budget");
+            if(pre&&STAGE_RANK_FE[pre.stage]>=1)ha.push("c123_daily");
+            if(pre?.detected)ha.push("cisd_daily");
+            if(pre?.at_ob_mean)ha.push("ob_mean");
+            if(dr&&STAGE_RANK_FE[dr.stage]>=1&&!ha.includes("c123_daily"))ha.push("c123_daily");
+            if(dr?.detected&&!ha.includes("cisd_daily"))ha.push("cisd_daily");
+            if(dr?.atOBMean&&!ha.includes("ob_mean"))ha.push("ob_mean");
+            const allCk=[...new Set(ha)];
+            const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+            return(
+             <div style={{padding:"10px 14px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+               <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
+              </div>
+              <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
+               <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+              </div>
+              <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
+               {sd?(
+                <div>
+                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                  <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
+                  {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
+                 </div>
+                 {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
+                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
+                   <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
+                    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+                    <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+                   </div>
+                  ))}
+                 </div>}
+                 <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
+                </div>
+               ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
+              </div>
+              {CHECKLIST.map(item=>{
+               const isAuto=allCk.includes(item.id);
+               return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
+                <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+                 {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+                </div>
+                <div style={{flex:1}}>
+                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
+                  <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
+                  {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
+                 </div>
+                 <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+                </div>
+               </div>);
+              })}
+             </div>
+            );
+           })()}
+                      {activeTab==="chart"&&(
             <div style={{padding:"8px 10px 10px"}}>
              <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
@@ -2180,7 +2248,7 @@ export default function OptionsScanner() {
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
-          <button onClick={()=>setScrExpand(p=>({...p,[h.ticker]:!p[h.ticker]}))} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
+          <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
          </div>
         </div>
         {expanded&&(()=>{
@@ -2188,7 +2256,7 @@ export default function OptionsScanner() {
          return(
           <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
            <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
-            {[["analysis","Analysis"],["chart","Chart ↗"]].map(([t,l])=>(
+            {[["analysis","Analysis"],["checklist","Checklist"],["chart","Chart ↗"]].map(([t,l])=>(
              <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
             ))}
            </div>
@@ -2206,7 +2274,74 @@ export default function OptionsScanner() {
              </div>
             </div>
            )}
-           {activeTab==="chart"&&(
+           {activeTab==="checklist"&&(()=>{
+            const cd=candleData[h.ticker];
+            const pre=h.candle;
+            const dr=cd?.daily||null;
+            const sd=dr||pre||null;
+            const sc={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber}[sd?.stage]||T.textDim;
+            const cc={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+            const ha=[];
+            if(h.conditions.topdown_bias)ha.push("topdown");
+            if(h.conditions.in_zone)ha.push("fib50");
+            ha.push("budget");
+            if(pre&&STAGE_RANK_FE[pre.stage]>=1)ha.push("c123_daily");
+            if(pre?.detected)ha.push("cisd_daily");
+            if(pre?.at_ob_mean)ha.push("ob_mean");
+            if(dr&&STAGE_RANK_FE[dr.stage]>=1&&!ha.includes("c123_daily"))ha.push("c123_daily");
+            if(dr?.detected&&!ha.includes("cisd_daily"))ha.push("cisd_daily");
+            if(dr?.atOBMean&&!ha.includes("ob_mean"))ha.push("ob_mean");
+            const allCk=[...new Set(ha)];
+            const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+            return(
+             <div style={{padding:"10px 14px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+               <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
+              </div>
+              <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
+               <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+              </div>
+              <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
+               {sd?(
+                <div>
+                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                  <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
+                  {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
+                 </div>
+                 {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
+                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
+                   <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
+                    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+                    <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+                   </div>
+                  ))}
+                 </div>}
+                 <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
+                </div>
+               ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
+              </div>
+              {CHECKLIST.map(item=>{
+               const isAuto=allCk.includes(item.id);
+               return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
+                <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+                 {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+                </div>
+                <div style={{flex:1}}>
+                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
+                  <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
+                  {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
+                 </div>
+                 <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+                </div>
+               </div>);
+              })}
+             </div>
+            );
+           })()}
+                      {activeTab==="chart"&&(
             <div style={{padding:"8px 10px 10px"}}>
              <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>

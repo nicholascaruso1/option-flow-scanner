@@ -163,6 +163,107 @@ function ordinalSuffix(n) {
  return "th";
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// detectC123 — TTrades Core Concepts Model OHLC Detection
+// Input: candles[] {o,h,l,c,v,t} oldest→newest | direction "bull"|"bear"
+// Output: {detected, stage, c1, c2, c3, ob, oteZone, confidence, ...}
+// ─────────────────────────────────────────────────────────────────────────────
+function detectC123(candles, direction="bull") {
+  if (!candles || candles.length < 5)
+    return { detected:false, stage:"INSUFFICIENT_DATA", reason:"Need at least 5 candles" };
+  const n=candles.length;
+  const isBearish=c=>c.c<c.o;
+  const isBullish=c=>c.c>c.o;
+  if (direction==="bull") {
+    let swingHighIdx=0;
+    for (let i=1;i<n;i++) if (candles[i].h>candles[swingHighIdx].h) swingHighIdx=i;
+    let bearishLegEnd=-1, foundBearish=false;
+    for (let i=swingHighIdx;i<n;i++) {
+      if (isBearish(candles[i])) { bearishLegEnd=i; foundBearish=true; }
+      else if (foundBearish) break;
+    }
+    if (bearishLegEnd===-1) return { detected:false, stage:"NO_C1", reason:"No bearish leg from swing high", swingHigh:candles[swingHighIdx].h };
+    const bearishLegOriginOpen=candles[swingHighIdx].o;
+    const c1Idx=bearishLegEnd, c1=candles[c1Idx];
+    let c2Idx=-1;
+    for (let i=c1Idx+1;i<n;i++) { const c=candles[i]; if (c.l<c1.l&&c.c>c1.c){c2Idx=i;break;} }
+    if (c2Idx===-1) {
+      const last=candles[n-1];
+      return { detected:false, stage:last.l<c1.l?"C2_FORMING":"C1_ONLY",
+        reason:last.l<c1.l?`C2 wick below $${c1.l.toFixed(2)} — waiting for body close back above $${c1.c.toFixed(2)}`:`C1 confirmed. Waiting for C2 below $${c1.l.toFixed(2)}.`,
+        c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, protectedSwing:c1.l, swingHigh:candles[swingHighIdx].h };
+    }
+    const c2=candles[c2Idx];
+    const ob={open:c1.o,close:c1.c,mean:(c1.o+c1.c)/2,high:c1.h,low:c1.l};
+    const swingHigh=candles[swingHighIdx].h, swingLow=c2.l;
+    const oteZone={low:swingLow, high:swingLow+0.5*(swingHigh-swingLow)};
+    let c3Idx=-1;
+    for (let i=c2Idx+1;i<n;i++) { const c=candles[i]; if (c.l<c2.l&&c.c>bearishLegOriginOpen){c3Idx=i;break;} }
+    if (c3Idx===-1) {
+      const last=candles[n-1];
+      return { detected:false, stage:last.l<c2.l?"C3_FORMING":"C2_CONFIRMED",
+        reason:last.l<c2.l?`C3 wick below $${c2.l.toFixed(2)} — waiting for CISD body close above $${bearishLegOriginOpen.toFixed(2)}`:`C2 at $${c2.l.toFixed(2)}. Waiting for C3.`,
+        c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, c2:{idx:c2Idx,o:c2.o,h:c2.h,l:c2.l,c:c2.c},
+        ob, oteZone, swingHigh, swingLow, bearishLegOriginOpen, protectedSwing:c2.l };
+    }
+    const c3=candles[c3Idx];
+    const inOTE=c3.c>=oteZone.low&&c3.c<=oteZone.high;
+    let protectedSwingIntact=true;
+    for (let i=c3Idx+1;i<n;i++) if (candles[i].c<c2.l){protectedSwingIntact=false;break;}
+    const lastClose=candles[n-1].c, atOBMean=lastClose>=ob.mean;
+    const confidence=(inOTE&&protectedSwingIntact&&atOBMean)?"HIGH":(protectedSwingIntact&&(inOTE||atOBMean))?"MEDIUM":"LOW";
+    return { detected:true, stage:"C3_CISD_CONFIRMED", direction:"bull",
+      c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, c2:{idx:c2Idx,o:c2.o,h:c2.h,l:c2.l,c:c2.c}, c3:{idx:c3Idx,o:c3.o,h:c3.h,l:c3.l,c:c3.c},
+      cisd:true, swingHigh, swingLow, bearishLegOriginOpen, ob, oteZone,
+      inOTE, atOBMean, protectedSwingIntact, protectedSwing:c2.l, confidence,
+      summary:`C3 CISD confirmed. OB mean $${ob.mean.toFixed(2)}. OTE $${oteZone.low.toFixed(2)}–$${oteZone.high.toFixed(2)}. Protected swing $${c2.l.toFixed(2)}.` };
+  }
+  if (direction==="bear") {
+    let swingLowIdx=0;
+    for (let i=1;i<n;i++) if (candles[i].l<candles[swingLowIdx].l) swingLowIdx=i;
+    let bullishLegEnd=-1, foundBullish=false;
+    for (let i=swingLowIdx;i<n;i++) {
+      if (isBullish(candles[i])) { bullishLegEnd=i; foundBullish=true; }
+      else if (foundBullish) break;
+    }
+    if (bullishLegEnd===-1) return { detected:false, stage:"NO_C1", reason:"No bullish leg from swing low", swingLow:candles[swingLowIdx].l };
+    const bullishLegOriginOpen=candles[swingLowIdx].o;
+    const c1Idx=bullishLegEnd, c1=candles[c1Idx];
+    let c2Idx=-1;
+    for (let i=c1Idx+1;i<n;i++) { const c=candles[i]; if (c.h>c1.h&&c.c<c1.c){c2Idx=i;break;} }
+    if (c2Idx===-1) {
+      const last=candles[n-1];
+      return { detected:false, stage:last.h>c1.h?"C2_FORMING":"C1_ONLY",
+        c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, protectedSwing:c1.h, swingLow:candles[swingLowIdx].l };
+    }
+    const c2=candles[c2Idx];
+    const ob={open:c1.o,close:c1.c,mean:(c1.o+c1.c)/2,high:c1.h,low:c1.l};
+    const swingLow=candles[swingLowIdx].l, swingHigh=c2.h;
+    const oteZone={low:swingHigh-0.5*(swingHigh-swingLow), high:swingHigh};
+    let c3Idx=-1;
+    for (let i=c2Idx+1;i<n;i++) { const c=candles[i]; if (c.h>c2.h&&c.c<bullishLegOriginOpen){c3Idx=i;break;} }
+    if (c3Idx===-1) {
+      const last=candles[n-1];
+      return { detected:false, stage:last.h>c2.h?"C3_FORMING":"C2_CONFIRMED",
+        c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, c2:{idx:c2Idx,o:c2.o,h:c2.h,l:c2.l,c:c2.c},
+        ob, oteZone, swingHigh, swingLow, bullishLegOriginOpen, protectedSwing:c2.h };
+    }
+    const c3=candles[c3Idx];
+    const inOTE=c3.c>=oteZone.low&&c3.c<=oteZone.high;
+    let protectedSwingIntact=true;
+    for (let i=c3Idx+1;i<n;i++) if (candles[i].c>c2.h){protectedSwingIntact=false;break;}
+    const lastClose=candles[n-1].c, atOBMean=lastClose<=ob.mean;
+    const confidence=(inOTE&&protectedSwingIntact&&atOBMean)?"HIGH":(protectedSwingIntact&&(inOTE||atOBMean))?"MEDIUM":"LOW";
+    return { detected:true, stage:"C3_CISD_CONFIRMED", direction:"bear",
+      c1:{idx:c1Idx,o:c1.o,h:c1.h,l:c1.l,c:c1.c}, c2:{idx:c2Idx,o:c2.o,h:c2.h,l:c2.l,c:c2.c}, c3:{idx:c3Idx,o:c3.o,h:c3.h,l:c3.l,c:c3.c},
+      cisd:true, swingHigh, swingLow, bullishLegOriginOpen, ob, oteZone,
+      inOTE, atOBMean, protectedSwingIntact, protectedSwing:c2.h, confidence,
+      summary:`C3 CISD confirmed. OB mean $${ob.mean.toFixed(2)}. OTE $${oteZone.low.toFixed(2)}–$${oteZone.high.toFixed(2)}. Protected swing $${c2.h.toFixed(2)}.` };
+  }
+  return { detected:false, stage:"UNKNOWN_DIRECTION" };
+}
+
 function pnlCalc(ep,price,strike,dir){
  if(!ep||!price)return null;
  const intrinsic=dir==="call"?Math.max(0,price-strike):Math.max(0,strike-price);
@@ -225,6 +326,10 @@ const CHECKLIST=[
  {id:"budget", label:"Within account budget (5%)", desc:"IRA ≤$200 · Individual ≤$5 per contract."},
  {id:"oi", label:"OI > 500 on target strike", desc:"Confirms liquidity. Check bid/ask spread < 10% of mid."},
  {id:"topdown", label:"Top-down bias aligned", desc:"Monthly/weekly direction confirms daily setup direction."},
+ {id:"c123_daily", label:"C1/C2/C3 detected — daily OHLC", desc:"Auto-detected via 30-candle Polygon OHLC lookback. C1 = last bearish candle in leg. C2 = failure swing (wick + body close). C3/CISD = body close through candles that created the move."},
+ {id:"cisd_daily", label:"CISD body close confirmed — daily", desc:"Auto-detected: C3 body closed through the bearish leg origin open. Highest-conviction signal = this fires simultaneously with IC-CISD on 5-min."},
+ {id:"ob_mean", label:"Price at or above OB mean threshold", desc:"Auto-detected: current close ≥ OB mean (50% of C1 body). OB = last bearish candle before expansion. Body close through OB mean = invalidation."},
+ {id:"ic_cisd", label:"IC-CISD confirmed — 5-min intraday", desc:"Auto-detected via 5-min OHLC (78 bars). Fractal C1/C2/C3 CISD on intraday aligning to daily setup = highest-conviction confirmation."},
 ];
 const SETUPS=[
  {symbol:"ABCL",company:"AbCellera Biologics",price:7.60,chg:-1.17,vol:"8.0M",mcap:"$2.03B",capSize:"Small",
@@ -570,6 +675,7 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [candleData, setCandleData] = useState({});
  const [c123, setC123] = useState({});
  const [journalNotes, setJournalNotes] = useState({});
  const [journalInput, setJournalInput] = useState({});
@@ -704,7 +810,30 @@ export default function OptionsScanner() {
    : "https://market.electronmailbag.workers.dev";
 
 
- const tog = (sym) => setOpen(p=>({...p,[sym]:!p[sym]}));
+
+ const fetchCandleAnalysis = useCallback(async (sym, direction) => {
+  if (candleData[sym]?.loaded || candleData[sym]?.loading) return;
+  setCandleData(prev => ({...prev, [sym]: {loading:true}}));
+  const dir = (direction==="call"||direction==="bull") ? "bull" : "bear";
+  try {
+   const dailyResp = await fetch(`${WORKER}/candles?symbol=${sym}&resolution=daily&bars=30`);
+   const dailyJson  = await dailyResp.json();
+   const daily    = dailyJson.ok ? detectC123(dailyJson.candles, dir) : {detected:false, stage:"FETCH_ERROR", reason:dailyJson.error};
+   const intraday = {detected:false, stage:"MANUAL", reason:"Drop to 5-min on TradingView — IC-CISD requires visual confirmation"};
+   setCandleData(prev => ({...prev, [sym]: {daily, intraday, loaded:true, loading:false}}));
+  } catch(e) {
+   setCandleData(prev => ({...prev, [sym]: {error:e.message, loaded:true, loading:false}}));
+  }
+ }, [candleData, WORKER]);
+
+ const tog = (sym) => {
+  const willOpen = !open[sym];
+  setOpen(p=>({...p,[sym]:!p[sym]}));
+  if (willOpen) {
+   const setup = SETUPS.find(s=>s.symbol===sym);
+   if (setup) fetchCandleAnalysis(sym, setup.direction);
+  }
+ };
  const setTab = (sym,t) => setTabs(p=>({...p,[sym]:t}));
  const getTab = (sym) => tabs[sym]||"narrative";
  const cc = (v) => v>0?T.blue:v<0?T.rose:T.textSec;
@@ -1306,7 +1435,12 @@ export default function OptionsScanner() {
  const earnD=s.earningsDate?daysUntil(s.earningsDate):null;
  const earnC=earnD!=null?(earnD<=14?T.rose:earnD<=30?T.gold:T.sage):null;
  const dteD=s.expiryDate?daysUntil(s.expiryDate):null;
- const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[])])];
+ const cd=candleData[s.symbol];
+ const candleAutoChecks=[];
+ if (cd?.daily?.detected){candleAutoChecks.push("c123_daily");candleAutoChecks.push("cisd_daily");}
+ if (cd?.daily?.atOBMean) candleAutoChecks.push("ob_mean");
+ if (cd?.intraday?.detected) candleAutoChecks.push("ic_cisd");
+ const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[]),...candleAutoChecks])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
  const alScore=alignmentScore(s);
@@ -1566,6 +1700,52 @@ export default function OptionsScanner() {
  {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:3,color:T.rose,cursor:"pointer"}}>Clear</button>}
  </div>
  </div>
+ {(()=>{
+  const cd=candleData[s.symbol];
+  if (!cd&&!open[s.symbol]) return null;
+  const stageColor={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber,NO_C1:T.textDim,INSUFFICIENT_DATA:T.textDim,FETCH_ERROR:T.rose};
+  const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+  const dr=cd?.daily, ir=cd?.intraday;
+  return(
+   <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
+    {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
+    {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
+    {dr&&!cd?.loading&&(
+     <div>
+      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
+       <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
+       {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:2,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
+      </div>
+      {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
+      {dr.detected&&dr.ob&&(
+       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+        {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
+         <div key={k} style={{background:T.surface,borderRadius:3,padding:"4px 6px"}}>
+          <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+          <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+         </div>
+        ))}
+       </div>
+      )}
+      {ir&&(
+       <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
+         <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
+         {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:2,color:T.sage}}>✓ CONFIRMED</span>}
+        {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>manual</span>}
+        </div>
+        {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
+       </div>
+      )}
+     </div>
+    )}
+    {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
+   </div>
+  );
+ })()}
  {CHECKLIST.map(item=>{
  const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
  return(

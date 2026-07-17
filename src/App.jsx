@@ -675,6 +675,8 @@ export default function OptionsScanner() {
  const [screenerHits, setScreenerHits] = useState([]);
  const [screenerMeta, setScreenerMeta] = useState({});
  const [screenerLoading, setScreenerLoading] = useState(true);
+ const [aiCards, setAiCards] = useState({});
+ const [analyzing, setAnalyzing] = useState({});
  const [candleData, setCandleData] = useState({});
  const [c123, setC123] = useState({});
  const [journalNotes, setJournalNotes] = useState({});
@@ -700,6 +702,7 @@ export default function OptionsScanner() {
  .then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);})
  .catch(()=>setScreenerLoading(false));
  },[]);
+ useEffect(()=>{(async()=>{const ac=await ls("of_ai_cards",{});setAiCards(ac||{});})();},[]);
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
  const key = todayKey();
@@ -727,7 +730,8 @@ export default function OptionsScanner() {
   setRefreshing(true);
   setLiveError(null);
 
-  const EQUITY_SYMS = ["ABCL","ATAI","SMCI","SPCX","MLYS","ILLR","GLD","SLV","CPER","PPLT","PALL","USO","UNG","SPY","QQQ","DIA","IWM"];
+  const BASE_SYMS = ["ATAI","SMCI","SPCX","MLYS","ILLR","GLD","SLV","CPER","PPLT","PALL","USO","UNG","SPY","QQQ","DIA","IWM"];
+  const EQUITY_SYMS = [...BASE_SYMS, ...Object.keys(aiCards).filter(s=>!BASE_SYMS.includes(s))];
   const CRYPTO_SYMS = ["BTC","ETH","SOL","LTC"];
 
   let allPrices = {};
@@ -826,6 +830,31 @@ export default function OptionsScanner() {
   }
  }, [candleData, WORKER]);
 
+ const analyzeHit = useCallback(async (h) => {
+  setAnalyzing(p=>({...p,[h.ticker]:true}));
+  try {
+   const resp = await fetch(WORKER+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ticker:h.ticker,price:h.price,bias:h.bias,retracement:h.details?.retr_pct,conditions:h.conditions,details:h.details})});
+   const json = await resp.json();
+   if(!json.ok) throw new Error(json.error||"analyze failed");
+   const a = json.analysis||{};
+   const KIND_C = {target:T.sage,entry:T.gold,current:T.teal,invalidation:T.rose};
+   const card = {
+    tier:"Tier 2", isActive:false, contract:null, aiGenerated:true,
+    price:h.price, chg:0, vol:"\u2014",
+    ...a,
+    cap:a.capSize||"Mid", capSize:a.capSize||"Mid",
+    accountFit:a.accountFit||["IRA ($200)"],
+    earningsDate:a.earningsDate&&a.earningsDate!=="null"?a.earningsDate:null,
+    earningsLabel:a.earningsLabel&&a.earningsLabel!=="null"?a.earningsLabel:null,
+    keyLevels:(a.keyLevels||[]).map(k=>({p:k.p,l:k.l,c:KIND_C[k.kind]||T.gold})),
+   };
+   if(!card.symbol) throw new Error("no symbol in analysis");
+   setAiCards(prev=>{const n={...prev,[card.symbol]:card};ss("of_ai_cards",n);return n;});
+   setFavs(p=>{const n=p.includes(card.symbol)?p:[...p,card.symbol];ss("of_favs",n);return n;});
+  } catch(e){ alert("Analysis failed: "+e.message); }
+  setAnalyzing(p=>({...p,[h.ticker]:false}));
+ }, [WORKER]);
  const tog = (sym) => {
   const willOpen = !open[sym];
   setOpen(p=>({...p,[sym]:!p[sym]}));
@@ -841,7 +870,9 @@ export default function OptionsScanner() {
  const isAltView=["crypto","commodities","indices"].includes(view);
  const isEverything=view==="everything";
  const altData=altMap[view]||[];
- const ASSET_MAP={"options":SETUPS,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
+ const aiSetupList = Object.values(aiCards);
+const allSetups = [...SETUPS, ...aiSetupList.filter(a=>a&&a.symbol&&!SETUPS.some(s=>s.symbol===a.symbol))];
+const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
  const everythingData=evAsset==="all"?[...SETUPS,...CRYPTO,...COMMODITIES,...INDICES]:ASSET_MAP[evAsset]||[];
 
  // ── Alignment score: ranks setups by actionability using real framework
@@ -888,7 +919,7 @@ export default function OptionsScanner() {
  })
  : isAltView ? altData.filter(s=>phase==="all"||s.phase===phase)
  .sort((a,b)=>phase==="all"?PHASE_ORDER.indexOf(a.phase)-PHASE_ORDER.indexOf(b.phase):0)
- : SETUPS.filter(s => {
+ : allSetups.filter(s => {
  if (view==="managing") return s.isActive;
  if (view==="favorites") return favs.includes(s.symbol);
  if (view==="closed") return false;
@@ -896,7 +927,7 @@ export default function OptionsScanner() {
  if (dir==="calls" && s.direction!=="call") return false;
  if (dir==="puts" && s.direction!=="put") return false;
  if (dir==="watch" && s.direction!=="watch") return false;
- if (cap!=="all" && s.capSize.toLowerCase()!==cap) return false;
+ if (cap!=="all" && (s.capSize||"").toLowerCase()!==cap) return false;
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
@@ -2248,9 +2279,40 @@ export default function OptionsScanner() {
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
+          {!aiCards[h.ticker]&&(
+           <button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:3,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"\u23f3 Analyzing\u2026":"\u2605 Analyze + Save"}</button>
+          )}
+          {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:8,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>\u2605 SAVED</span>}
           <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
          </div>
         </div>
+        {h.am_projection&&(
+         <div style={{margin:"0 14px 10px",padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center"}}>
+          <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>
+           <span>📍</span>{" "}
+           <span style={{color:h.am_projection.reaction_swing?.type==="low"?T.sage:T.rose,fontWeight:700}}>
+            {h.am_projection.reaction_swing?.type==="low"?"Swing Low":"Swing High"}{" "}${h.am_projection.reaction_swing?.price}
+           </span>
+           <span style={{color:T.textDim,margin:"0 6px"}}>→</span>
+           <span style={{color:T.gold,fontWeight:700}}>🎯 ${h.am_projection.draw_target?.price}</span>
+           {h.am_projection.draw_pct!=null&&(
+            <span style={{color:h.am_projection.draw_pct>0?T.sage:T.rose,marginLeft:5,fontWeight:700}}>
+             {h.am_projection.draw_pct>0?"+":""}{h.am_projection.draw_pct}%
+            </span>
+           )}
+          </div>
+          <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>📅 {h.am_projection.profile?.label}</div>
+          <div style={{
+           fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",
+           padding:"2px 7px",borderRadius:3,fontFamily:FM,marginLeft:"auto",
+           background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",
+           color:h.am_projection.both_gates?T.sage:T.gold,
+           border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"
+          }}>
+           {h.am_projection.both_gates?"✅ Both Gates":"⚠ Hold"}
+          </div>
+         </div>
+        )}
         {expanded&&(()=>{
          const activeTab=scrTab[h.ticker]||"analysis";
          return(

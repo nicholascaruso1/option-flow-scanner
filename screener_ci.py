@@ -99,6 +99,10 @@ def analyze(df):
     # Suggested direction: bias drives it, but expansion direction is tie-breaker
     direction = bias if bias in ("BULL", "BEAR") else exp_dir or "MIXED"
 
+    # AM Trades: detect swings + compute draw-on-liquidity projection
+    sw_high, sw_low = detect_swings(df)
+    projection      = am_projection(price, direction, sw_high, sw_low)
+
     return {
         "ticker":     None,          # filled in below
         "price":      round(price, 2),
@@ -121,7 +125,67 @@ def analyze(df):
             "exp_date": exp_day.strftime("%Y-%m-%d") if exp_day is not None else None,
             "exp_dir":  exp_dir,
         },
+        "am_projection": projection,
     }
+
+
+# ── AM Trades Framework: Swing Detection + Projection ───────────────────────
+
+def detect_swings(df, lookback=10):
+    highs = df["High"].values
+    lows  = df["Low"].values
+    dates = df.index
+    n = len(df)
+    swing_high = None
+    swing_low  = None
+    for i in range(n - lookback - 1, lookback - 1, -1):
+        if swing_high is None:
+            window_h = highs[i - lookback : i + lookback + 1]
+            if highs[i] == max(window_h):
+                swing_high = {"price": round(float(highs[i]), 2), "date": dates[i].strftime("%Y-%m-%d"), "bars_ago": n - 1 - i}
+        if swing_low is None:
+            window_l = lows[i - lookback : i + lookback + 1]
+            if lows[i] == min(window_l):
+                swing_low = {"price": round(float(lows[i]), 2), "date": dates[i].strftime("%Y-%m-%d"), "bars_ago": n - 1 - i}
+        if swing_high and swing_low:
+            break
+    return swing_high, swing_low
+
+
+def profile_guess():
+    from datetime import datetime, timedelta
+    tomorrow = datetime.now() + timedelta(days=1)
+    while tomorrow.weekday() >= 5:
+        tomorrow += timedelta(days=1)
+    wd = tomorrow.weekday()
+    profiles = {
+        0: ("Monday Rule — Avoid", "No trades Monday per AM protocol. Observe structure and plan."),
+        1: ("Classic Expansion", "Tuesday trend day. Price typically expands in primary direction from weekly open."),
+        2: ("Midweek Reversal Watch", "Wednesday pivot watch. If Mon-Tue trended, reversal risk increases at prior highs/lows."),
+        3: ("Continuation or Counter", "Thursday: continuation of expansion OR early setup for Friday TGIF."),
+        4: ("TGIF Setup", "Friday: fade the week move. Watch for reversal into close at prior swing."),
+    }
+    label, note = profiles.get(wd, ("Unknown", ""))
+    return {"label": label, "note": note, "next_day": tomorrow.strftime("%A %b %d")}
+
+
+def am_projection(price, direction, swing_high, swing_low):
+    reaction = None; target = None; draw_pct = None; gate_reaction = False
+    if direction == "BULL" and swing_low and swing_high:
+        reaction = {"type": "low",  **swing_low}
+        target   = {"type": "high", **swing_high}
+        draw_pct = round((swing_high["price"] - price) / price * 100, 1) if price > 0 else None
+        gate_reaction = True
+    elif direction == "BEAR" and swing_high and swing_low:
+        reaction = {"type": "high", **swing_high}
+        target   = {"type": "low",  **swing_low}
+        draw_pct = round((price - swing_low["price"]) / price * 100, 1) if price > 0 else None
+        gate_reaction = True
+    prof = profile_guess()
+    gate_profile = prof["label"] != "Monday Rule — Avoid"
+    return {"reaction_swing": reaction, "draw_target": target, "draw_pct": draw_pct,
+            "profile": prof, "gate_reaction": gate_reaction, "gate_profile": gate_profile,
+            "both_gates": gate_reaction and gate_profile}
 
 def main():
     # Config from env vars (set in GitHub Actions workflow)

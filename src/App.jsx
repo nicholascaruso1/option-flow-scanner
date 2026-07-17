@@ -841,6 +841,7 @@ export default function OptionsScanner() {
    const KIND_C = {target:T.sage,entry:T.gold,current:T.teal,invalidation:T.rose};
    const card = {
     tier:"Tier 2", isActive:false, contract:null, aiGenerated:true,
+    dataAsOf:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
     price:h.price, chg:0, vol:"\u2014",
     ...a,
     cap:a.capSize||"Mid", capSize:a.capSize||"Mid",
@@ -1259,7 +1260,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  ))}
  </div>
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {AS_OF.toUpperCase()}</div>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(
  <div>
  {memNarrative&&(
@@ -1569,7 +1570,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  ))}
  </div>
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {AS_OF.toUpperCase()}</div>
+ <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(()=>{
  const sameDir=SETUPS.filter(x=>!x.isActive&&x.direction===s.direction&&x.symbol!==s.symbol);
  const rsLeader=sameDir.length>0?[...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;

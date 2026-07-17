@@ -783,7 +783,7 @@ export default function OptionsScanner() {
   setRefreshing(false);
   setHint(true);
   setTimeout(()=>setHint(false),4000);
- }, [updateMarketMemory]);
+ }, [updateMarketMemory, aiCards]);
 
  // Auto-refresh every 15 minutes
  useEffect(() => {

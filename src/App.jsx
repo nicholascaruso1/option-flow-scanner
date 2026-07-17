@@ -856,6 +856,7 @@ export default function OptionsScanner() {
   } catch(e){ alert("Analysis failed: "+e.message); }
   setAnalyzing(p=>({...p,[h.ticker]:false}));
  }, [WORKER]);
+ const regenCard = (s) => analyzeHit({ticker:s.symbol, price:s.price, bias:s.direction==="put"?"BEAR":"BULL", retracement:null, conditions:{}, details:{}});
  const tog = (sym) => {
   const willOpen = !open[sym];
   setOpen(p=>({...p,[sym]:!p[sym]}));
@@ -867,14 +868,15 @@ export default function OptionsScanner() {
  const setTab = (sym,t) => setTabs(p=>({...p,[sym]:t}));
  const getTab = (sym) => tabs[sym]||"narrative";
  const cc = (v) => v>0?T.blue:v<0?T.rose:T.textSec;
- const altMap={"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
+ const ovl = (x) => aiCards[x.symbol] ? {...x, ...aiCards[x.symbol], isActive:x.isActive, contract:x.contract} : x;
+const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
  const isAltView=["crypto","commodities","indices"].includes(view);
  const isEverything=view==="everything";
  const altData=altMap[view]||[];
  const aiSetupList = Object.values(aiCards);
-const allSetups = [...SETUPS, ...aiSetupList.filter(a=>a&&a.symbol&&!SETUPS.some(s=>s.symbol===a.symbol))];
+const allSetups = [...SETUPS.map(ovl), ...aiSetupList.filter(a=>a&&a.symbol&&!SETUPS.some(s=>s.symbol===a.symbol))];
 const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
- const everythingData=evAsset==="all"?[...SETUPS,...CRYPTO,...COMMODITIES,...INDICES]:ASSET_MAP[evAsset]||[];
+ const everythingData=evAsset==="all"?[...SETUPS.map(ovl),...CRYPTO.map(ovl),...COMMODITIES.map(ovl),...INDICES.map(ovl)]:ASSET_MAP[evAsset]||[];
 
  // ── Alignment score: ranks setups by actionability using real framework
  // fields only — phase, checklist completion, invalidation state, and
@@ -1249,9 +1251,12 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  </span>
  </div>
  )}
- <button onClick={()=>tog(s.symbol)} style={{width:"100%",padding:"5px 16px",background:T.bg,border:"none",borderTop:"1px solid "+T.border,cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+ <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
  </button>
+ </div>
  {isOpen&&(
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
@@ -1559,9 +1564,12 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  </span>
  </div>
  )}
- <button onClick={()=>tog(s.symbol)} style={{width:"100%",padding:"5px 16px",background:T.bg,border:"none",borderTop:"1px solid "+T.border,cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+ <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
  </button>
+ </div>
  {isOpen&&(
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>

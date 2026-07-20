@@ -672,7 +672,7 @@ export default function OptionsScanner() {
  const [phase, setPhase] = useState("all");
  const [iraB, setIraB] = useState("");
  const [indB, setIndB] = useState("");
- const [open, setOpen] = useState({ABCL:true});
+ const [open, setOpen] = useState({});
  const [tabs, setTabs] = useState({});
  const [favs, setFavs] = useState([]);
  const [checks, setChecks] = useState({});

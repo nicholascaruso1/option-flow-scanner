@@ -45,7 +45,9 @@ def get_sp500_tickers():
         syms = tables[0]["Symbol"].tolist()
         return [s.replace(".", "-") for s in syms]
     except Exception as e:
-        print(f"  ! S&P 500 fetch failed ({e}), falling back to default universe")
+        print(f"  ! S&P 500 fetch failed ({e})")
+        print(f"  ! FALLBACK ACTIVE — using DEFAULT_UNIVERSE ({len(DEFAULT_UNIVERSE)} tickers), NOT the S&P 500")
+        print(f"  ! Results this run may differ from expected. Check Wikipedia table format if this persists.")
         return DEFAULT_UNIVERSE
 
 def analyze(df):

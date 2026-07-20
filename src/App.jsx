@@ -1334,7 +1334,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  })}
  </div>
  )}
- {!isAltView&&!isEverything&&view!=="budget"&&(
+ {!isAltView&&!isEverything&&view!=="budget"&&view!=="screener"&&(
  <div style={{padding:"10px 20px"}}>
  {view==="all"&&(()=>{
  const focusData=[...SETUPS].map(s=>{
@@ -2081,7 +2081,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
      const newHits=sorted.filter(h=>!allSyms.has(h.ticker));
      const tracked=sorted.filter(h=>allSyms.has(h.ticker));
      const STAGE_RANK_FE={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
-     const biasColor=b=>b==="BULL"?T.green:T.rose;
+     const biasColor=b=>b==="BULL"?T.sage:T.rose;
      const renderTrackedCard=h=>{
       const match=SETUPS.find(s=>s.symbol===h.ticker);
       const expanded=scrExpand[h.ticker];
@@ -2149,7 +2149,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
                <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
                {match.keyLevels.slice(0,4).map((kl,ki)=>(
                 <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
-                 <span style={{color:kl.type==="support"?T.green:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
+                 <span style={{color:kl.type==="support"?T.sage:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
                  <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>
                  {kl.note&&<span style={{color:T.textDim}}>{String(kl.note).slice(0,60)}</span>}
                 </div>

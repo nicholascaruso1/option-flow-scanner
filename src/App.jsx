@@ -355,7 +355,7 @@ const SETUPS=[
  narrative:"🔴 Bearish — clinical losses (-$146M). Retail skeptical. C1 = downtrend from $11→$2.75.",
  structure:"🟢 Bullish — 52-wk high at $7.39 on record volume. C2 closed through $6.86 OB. C3 CISD confirmed. Weekly fractal expansion.",
  divergence:"AMD: Accumulation $2.75–$5 base. Manipulation = $6.66 AH dip trapping bears. Distribution = expansion toward $8.84–$11. Retail selling into record-volume weekly candle.",
- phaseNote:"MANAGING — Protected swing = $6.66 OB. Monday 4pm BODY close ABOVE $6.66 = hold IRA. Body close BELOW $6.66 = exit. Wick through $6.66 does NOT invalidate per TTrades.",
+ phaseNote:"RETRACEMENT — Watching for C2 failure swing at $6.66–$6.86 OB zone. Body close back above $6.86 = C3 CISD call entry. Protected swing = $6.66. Body close below $6.66 = invalidation.",
  entryNote:"$5 call intrinsic ~$1.66 at $6.66. Monitor Monday open. If holds above $6.66 with C3 CISD body close, IRA continues. Body close below $6.66 = exit IRA same day.",
  nestedFib:"OB: $6.86 (last down-close before Jun 27 expansion). Anchor Fib from OB body high to swing low. Mean Threshold = 50% of OB body. -1 extension = next target.",
  invalidation:"Daily body close below $6.66 (Order Block / protected swing violated)",
@@ -372,7 +372,7 @@ const SETUPS=[
  narrative:"🔴 Bearish — psychedelic biotech, $660M losses. C1 = downtrend from $20+→$2.15. Retail skeptical.",
  structure:"🟢 Bullish — +15.94% today on 63M volume. C2 closed through $4.30 OB. C3 CISD confirmed. Russell add tomorrow.",
  divergence:"Classic AMD: Accumulation $3.78–$4.30 (3 weeks). Manipulation = Jun 23 wick below $3.78 trapping shorts. Distribution = +15.94% expansion. Retail bearish = exit liquidity.",
- phaseNote:"MANAGING — IRA riding. Watch retrace to $4.68–$5.00 Mon/Tue. New C2 at $4.00 OB + C3 body close up = leg 2. Hold above $4.00.",
+ phaseNote:"RETRACEMENT — Watch retrace to $4.00–$4.30 OB zone. C2 failure swing + C3 body close above = call entry. Protected swing = $3.78. Body close below $3.78 = invalidation.",
  entryNote:"No new entries. If retrace to $4.00–$4.30 holds and C2/C3 develops, confirms next leg. Protected swing = $3.78 (C2 low). Body close below $3.78 = full invalidation.",
  nestedFib:"OB: ~$4.00 (last down-close before Jun 22 expansion). Anchor nested Fib from $5.31 to swing low on retrace. Mean Threshold = 50% of OB body. -1 = next target.",
  invalidation:"Daily body close below $3.78 (protected swing / OB violated)",
@@ -1310,7 +1310,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  return{s,pScore,al,earnD,reasons};
  }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
  const readyCount=SETUPS.filter(s=>s.phase==="READY").length;
- const watchCount=SETUPS.filter(s=>s.phase!=="READY"&&s.phase!=="MANAGING").length;
+ const watchCount=SETUPS.filter(s=>s.phase!=="READY").length;
  const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
  const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
  const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;

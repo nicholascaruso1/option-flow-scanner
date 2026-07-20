@@ -13,7 +13,14 @@ function daysUntil(d){return Math.max(0,Math.ceil((new Date(d+"T16:00:00")-new D
 function getSessionProfile() {
  const now = new Date();
  const utc = now.getTime() + now.getTimezoneOffset()*60000;
- const est = new Date(utc + (-5*3600000));
+ const etOffset = (() => {
+  const jan = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
+  const jul = new Date(new Date().getFullYear(), 6, 1).getTimezoneOffset();
+  const stdOffset = Math.max(jan, jul); // EST = 300 (UTC-5)
+  const nowOffset = new Date().getTimezoneOffset();
+  return nowOffset === stdOffset ? -5*3600000 : -4*3600000;
+})();
+ const est = new Date(utc + etOffset);
  const h = est.getHours() + est.getMinutes()/60;
  if (h>=18||h<1) return {profile:"18:00 Reversal Watch",session:"Asia",color:"#4A90D9",actionable:false,
  note:"Asia session (18:00–01:00 EST). Watch for Asia to set the intraday high/low. If Asia sets it and London expands away — 18:00 Reversal profile confirmed. NY continues in that direction."};
@@ -29,7 +36,14 @@ function getSessionProfile() {
 function getWeeklyProfile() {
  const now = new Date();
  const utc = now.getTime() + now.getTimezoneOffset()*60000;
- const est = new Date(utc + (-5*3600000));
+ const etOffset = (() => {
+  const jan = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
+  const jul = new Date(new Date().getFullYear(), 6, 1).getTimezoneOffset();
+  const stdOffset = Math.max(jan, jul); // EST = 300 (UTC-5)
+  const nowOffset = new Date().getTimezoneOffset();
+  return nowOffset === stdOffset ? -5*3600000 : -4*3600000;
+})();
+ const est = new Date(utc + etOffset);
  const day = est.getDay(); 
  const profiles = [
  {day:0,name:"Weekend",color:"#3A5270",desc:"Market closed. Plan: identify weekly high/low structure, set bias for Monday open."},
@@ -48,7 +62,14 @@ const MEMORY_MAX_DAYS = 14;
 function todayKey() {
  const now = new Date();
  const utc = now.getTime() + now.getTimezoneOffset()*60000;
- const est = new Date(utc + (-5*3600000));
+ const etOffset = (() => {
+  const jan = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
+  const jul = new Date(new Date().getFullYear(), 6, 1).getTimezoneOffset();
+  const stdOffset = Math.max(jan, jul); // EST = 300 (UTC-5)
+  const nowOffset = new Date().getTimezoneOffset();
+  return nowOffset === stdOffset ? -5*3600000 : -4*3600000;
+})();
+ const est = new Date(utc + etOffset);
  return est.toISOString().slice(0,10);
 }
 
@@ -789,7 +810,7 @@ export default function OptionsScanner() {
  useEffect(() => {
  const interval = setInterval(() => {
  doRefresh();
- }, 60 * 1000);
+ }, 5 * 60 * 1000); // 5-min interval — stays under Finnhub 60 req/min
  return () => clearInterval(interval);
  }, [doRefresh]);
  // Fire live data refresh once on mount (useRef avoids infinite-loop from dep array)
@@ -1161,36 +1182,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <div style={{marginLeft:"auto",fontSize:9,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
  </div>
  )}
- {view==="budget_disabled"&&(()=>{
- const ira=parseFloat(iraB)||0, ind=parseFloat(indB)||0;
- const iraMax=ira>0?(ira*0.05).toFixed(2):null, indMax=ind>0?(ind*0.05).toFixed(2):null;
- const activeP=SETUPS.filter(s=>s.isActive);
- const iraUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("IRA"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium*100:0),0);
- const indUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("Ind"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium:0),0);
- const inp={background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"8px 10px",fontSize:12,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box"};
- const lbl={fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4};
- const row=(l,v,c)=>(<div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:10,color:T.textSec}}>{l}</span><span style={{fontSize:13,color:c||T.textPri,fontWeight:600,fontFamily:FD}}>{v}</span></div>);
- return(
- <div style={{padding:"20px"}}>
- <div style={{fontSize:9,color:T.textDim,fontFamily:FD,marginBottom:16}}>{AS_OF} · 5% risk rule</div>
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
- {[[iraB,setIraB,iraMax,iraUsed,ira,"IRA Account",T.teal,"IRA"],[indB,setIndB,indMax,indUsed,ind,"Individual",T.purple,"Ind"]].map(([bal,setBal,max,used,total,label,color,key])=>(
- <div key={key} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,padding:14,borderTop:"2px solid "+color}}>
- <div style={{fontSize:12,fontWeight:600,color,marginBottom:10}}>{label}</div>
- <div style={lbl}>Balance ($)</div>
- <input type="number" placeholder={key==="IRA"?"4000":"67"} value={bal} onChange={e=>setBal(e.target.value)} style={inp}/>
- {max&&<div style={{marginTop:10}}>{row("Max per trade","$"+max,T.sage)}{row("Deployed est.","$"+used.toFixed(2),T.gold)}{row("Available","$"+(total-used).toFixed(2),(total-used)>0?T.sage:T.rose)}<div style={{height:3,background:T.border,borderRadius:2,marginTop:6,overflow:"hidden"}}><div style={{height:"100%",background:color,width:Math.min(100,(used/total)*100)+"%",borderRadius:2}}/></div></div>}
- {!max&&<div style={{fontSize:10,color:T.textDim,marginTop:8}}>Enter balance to calculate</div>}
- </div>
- ))}
- </div>
- <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,padding:12,fontSize:10,color:T.textSec,lineHeight:1.8}}>
- <div style={{color:T.gold,fontWeight:600,marginBottom:3}}>Scaling Rule</div>
- 5% risk stays constant as account grows. IRA target ≤$200/contract · Individual ≤$5/contract at current size.
- </div>
- </div>
- );
- })()}
+
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
  {view==="managing"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:13,color:T.textSec}}>No active positions</div></div>)}
  {(isAltView||isEverything)&&(

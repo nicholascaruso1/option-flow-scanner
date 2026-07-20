@@ -359,7 +359,7 @@ const SETUPS=[
  entryNote:"$5 call intrinsic ~$1.66 at $6.66. Monitor Monday open. If holds above $6.66 with C3 CISD body close, IRA continues. Body close below $6.66 = exit IRA same day.",
  nestedFib:"OB: $6.86 (last down-close before Jun 27 expansion). Anchor Fib from OB body high to swing low. Mean Threshold = 50% of OB body. -1 extension = next target.",
  invalidation:"Daily body close below $6.66 (Order Block / protected swing violated)",
- logEntry:{ts:"Jul 1, 2026",note:"$7.60 close Jul 1, holding above $6.66 OB/protected swing. IRA position active. ABCL635 Phase 2 data expected Q3 2026 = primary catalyst. Earnings Aug 6. Body close below $6.66 = exit signal."},
+ logEntry:{ts:"Jul 19, 2026",note:"Jul 17 call expired. Watching retracement to $6.66–$6.86 OB zone for new C2 failure swing. ABCL635 Phase 2 data expected Q3 2026 = primary catalyst. Earnings Aug 6."},
  keyLevels:[{p:"$7.44",l:"52-wk high / swing high watch",c:T.gold},{p:"$7.39",l:"Prior close",c:T.teal},{p:"$6.86",l:"OB / Fib anchor · Mean Threshold $6.76",c:T.gold},{p:"$6.66",l:"Order Block / Protected Swing — body close below = exit IRA",c:T.rose},{p:"$5.00",l:"Strike",c:T.textDim}],
  catalysts:["Record volume 52-wk high close","ABCL635 Phase 2 data Q3 2026","Jazz Pharma TCE partnership","Cantor Fitz OW + $7 PT","EPS beat · Revenue 2x YoY","⚠ Earnings Aug 6 — after expiry, consider rolling"],
  mtf:[["12M","bull","Basing"],["6M","bull","Exp."],["3M","bull","Momentum"],["Monthly","bull","Breakout"],["Weekly","bull","Fractal exp."],["Daily","bull","Above levels"]],
@@ -376,7 +376,7 @@ const SETUPS=[
  entryNote:"No new entries. If retrace to $4.00–$4.30 holds and C2/C3 develops, confirms next leg. Protected swing = $3.78 (C2 low). Body close below $3.78 = full invalidation.",
  nestedFib:"OB: ~$4.00 (last down-close before Jun 22 expansion). Anchor nested Fib from $5.31 to swing low on retrace. Mean Threshold = 50% of OB body. -1 = next target.",
  invalidation:"Daily body close below $3.78 (protected swing / OB violated)",
- logEntry:{ts:"Jul 1, 2026",note:"$4.88 Jul 1 — retracing from $5.36 peak. Russell add completed Jun 29. Watch $4.00–$4.30 OB zone for C2 failure swing. Body close below $3.78 = exit IRA."},
+ logEntry:{ts:"Jul 19, 2026",note:"Jul 17 call rolled. Watching $4.00–$4.30 OB zone for C2 failure swing. C3 body close above = call entry. Protected swing = $3.78. Earnings Aug 12."},
  keyLevels:[{p:"$6.75",l:"52-wk high / macro target",c:T.sage},{p:"$5.31",l:"Current / expansion close",c:T.teal},{p:"$4.30",l:"Prior OB / support",c:T.gold},{p:"$4.00",l:"OB range floor · Mean Threshold ~$4.08",c:T.gold},{p:"$3.78",l:"Protected Swing / C2 low — body close below = full invalidation",c:T.rose}],
  catalysts:["Russell 2000 + 3000 add Jun 29","BPL-003 Phase 3 · VLS-01 Phase 2b Q4","White House EO tailwind","Q1 EPS beat · Rev 4x · $209.9M runway","⚠ Earnings Aug 12 — after expiry, consider rolling"],
  mtf:[["12M","bear","Down"],["6M","neut","Basing"],["3M","bull","Recov."],["Monthly","bull","Breakout"],["Weekly","bull","Conf."],["Daily","bull","Above levels"]],
@@ -656,7 +656,7 @@ const INDICES=[
  cats:["Small/microcap outperformance signal Jun 27","ATAI Russell 2000 addition Jun 29 — passive inflows","Years of underperformance vs large caps — rotation catalyst","Healthcare and REITs attracting buyers"],
  },
 ];
-const AS_OF = "Jul 1, 2026";
+const AS_OF = new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 const PHASE_ORDER = ["READY","RETRACEMENT","CONSOLIDATION","EXPANSION","MANAGING","WATCH_REVERSAL"];
 const TL_STEPS = ["EXPANSION","CONSOLIDATION","RETRACEMENT","READY","MANAGING"];
 export default function OptionsScanner() {
@@ -1068,6 +1068,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const _iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
  const _avg=(_spy+_qqq+_iwm)/3;
  const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
+ // Note: spy/qqq/iwm also computed in sticky bar above — future refactor: extract to useMemo
  const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
  const _readyS=screenerHits.filter(h=>h.met>=4);
  const _topAll=[...SETUPS].sort((a,b)=>alignmentScore(b)-alignmentScore(a));

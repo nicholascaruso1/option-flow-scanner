@@ -2011,7 +2011,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
      const tracked=sorted.filter(h=>allSyms.has(h.ticker));
      const STAGE_RANK_FE={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
      const biasColor=b=>b==="BULL"?T.sage:T.rose;
-     const renderTrackedCard=h=>{
+     const renderScreenerCard=(h,isTracked=false)=>{
       const match=SETUPS.find(s=>s.symbol===h.ticker);
       const expanded=scrExpand[h.ticker];
       const mPh=match?PHASES[match.phase]:null;
@@ -2019,6 +2019,25 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
       const retrPct=parseFloat(h.details?.retr_pct||0);
       const retrColor=retrPct<=50?T.sage:T.rose;
       const bc=biasColor(h.bias);
+      const cd=candleData[h.ticker];
+      const pre=h.candle;
+      const dr=cd?.daily||null;
+      const sd=dr||pre||null;
+      const sc={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber}[sd?.stage]||T.textDim;
+      const cc={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+      const ha=[];
+      if(h.conditions.topdown_bias)ha.push("topdown");
+      if(h.conditions.in_zone)ha.push("fib50");
+      ha.push("budget");
+      if(pre&&STAGE_RANK_FE[pre.stage]>=1)ha.push("c123_daily");
+      if(pre?.detected)ha.push("cisd_daily");
+      if(pre?.at_ob_mean)ha.push("ob_mean");
+      if(dr&&STAGE_RANK_FE[dr.stage]>=1&&!ha.includes("c123_daily"))ha.push("c123_daily");
+      if(dr?.detected&&!ha.includes("cisd_daily"))ha.push("cisd_daily");
+      if(dr?.atOBMean&&!ha.includes("ob_mean"))ha.push("ob_mean");
+      const allCk=[...new Set(ha)];
+      const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+      const activeTab=scrTab[h.ticker]||"analysis";
       return(
        <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
         <div style={{padding:"12px 14px"}}>
@@ -2028,7 +2047,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
            <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
           </div>
           <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
-          {urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
+          {isTracked&&urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
           <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
            {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
             <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
@@ -2044,187 +2063,28 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
           <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
            <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
           </div>
-         </div>
-         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
-           {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
-          </div>
-          {match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>}
-         </div>
-        </div>
-        {expanded&&match&&(()=>{
-         const activeTab=scrTab[h.ticker]||"analysis";
-         return(
-          <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
-           <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
-            {[["analysis","Analysis"],["checklist","Checklist"],["chart","Chart ↗"]].map(([t,l])=>(
-             <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
-            ))}
-           </div>
-           {activeTab==="analysis"&&(
-            <div style={{padding:"10px 14px 14px"}}>
-             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-              <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match.phase}</span>
-              {urgency&&<span style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</span>}
-              {match.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
-             </div>
-             {(match.thesis||match.structure)&&(
-              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border}}>
-               {(match.thesis||match.structure).slice(0,260)}{(match.thesis||match.structure).length>260?"…":""}
-              </div>
-             )}
-             {match.keyLevels&&match.keyLevels.length>0&&(
-              <div>
-               <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
-               {match.keyLevels.slice(0,4).map((kl,ki)=>(
-                <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
-                 <span style={{color:kl.type==="support"?T.sage:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
-                 <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>
-                 {kl.note&&<span style={{color:T.textDim}}>{String(kl.note).slice(0,60)}</span>}
-                </div>
-               ))}
-              </div>
-             )}
-             {match.invalidation&&(
-              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:4,fontSize:9,color:T.rose,fontFamily:FD}}>
-               <span style={{fontWeight:700}}>Invalidation: </span>{match.invalidation}
-              </div>
-             )}
-            </div>
-           )}
-           {activeTab==="checklist"&&(()=>{
-            const cd=candleData[h.ticker];
-            const pre=h.candle;
-            const dr=cd?.daily||null;
-            const sd=dr||pre||null;
-            const sc={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber}[sd?.stage]||T.textDim;
-            const cc={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
-            const ha=[];
-            if(h.conditions.topdown_bias)ha.push("topdown");
-            if(h.conditions.in_zone)ha.push("fib50");
-            ha.push("budget");
-            if(pre&&STAGE_RANK_FE[pre.stage]>=1)ha.push("c123_daily");
-            if(pre?.detected)ha.push("cisd_daily");
-            if(pre?.at_ob_mean)ha.push("ob_mean");
-            if(dr&&STAGE_RANK_FE[dr.stage]>=1&&!ha.includes("c123_daily"))ha.push("c123_daily");
-            if(dr?.detected&&!ha.includes("cisd_daily"))ha.push("cisd_daily");
-            if(dr?.atOBMean&&!ha.includes("ob_mean"))ha.push("ob_mean");
-            const allCk=[...new Set(ha)];
-            const pct=Math.round((allCk.length/CHECKLIST.length)*100);
-            return(
-             <div style={{padding:"10px 14px 14px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
-               <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
-              </div>
-              <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
-               <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
-              </div>
-              <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
-               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
-               {sd?(
-                <div>
-                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-                  <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
-                  {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
-                 </div>
-                 {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
-                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
-                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
-                   <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
-                    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-                    <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
-                   </div>
-                  ))}
-                 </div>}
-                 <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
-                </div>
-               ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
-              </div>
-              {CHECKLIST.map(item=>{
-               const isAuto=allCk.includes(item.id);
-               return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
-                <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-                 {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
-                </div>
-                <div style={{flex:1}}>
-                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
-                  <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
-                  {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
-                 </div>
-                 <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
-                </div>
-               </div>);
-              })}
-             </div>
-            );
-           })()}
-                      {activeTab==="chart"&&(
-            <div style={{padding:"8px 10px 10px"}}>
-             <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
-              <span>TradingView</span>
-             </div>
-             <iframe
-              src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
-              style={{width:"100%",height:300,border:"none",borderRadius:4,display:"block"}}
-              allowTransparency={true}
-             />
-            </div>
-           )}
-          </div>
-         );
-        })()}
-       </div>
-      );
-     };
-     const renderCard=h=>{
-      const retrPct=parseFloat(h.details?.retr_pct||0);
-      const retrColor=retrPct<=50?T.sage:T.rose;
-      const bc=biasColor(h.bias);
-      const expanded=scrExpand[h.ticker];
-      return(
-       <div key={h.ticker} style={{borderBottom:"1px solid "+T.border}}>
-        <div style={{padding:"12px 14px"}}>
-         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-          <div>
-           <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
-           <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
-          </div>
-          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
-          <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
-           {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
-            <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
-           ))}
-           <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
-          </div>
-         </div>
-         <div style={{marginBottom:6}}>
-          <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
-           <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
-           <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
-          </div>
-          <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
-           <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
-          </div>
-          <div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
+          {!isTracked&&<div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
            <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>0%</span>
            <span style={{fontSize:7,color:T.sage,fontFamily:FD}}>50%</span>
            <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>100%</span>
-          </div>
+          </div>}
          </div>
          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
-          {!aiCards[h.ticker]&&(
-           <button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:3,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"\u23f3 Analyzing\u2026":"\u2605 Analyze + Save"}</button>
+          {isTracked?(
+           match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>
+          ):(
+           <>
+            {!aiCards[h.ticker]&&<button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:3,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"⏳ Analyzing…":"★ Analyze + Save"}</button>}
+            {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:8,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>★ SAVED</span>}
+            <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
+           </>
           )}
-          {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:8,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>\u2605 SAVED</span>}
-          <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
          </div>
         </div>
-        {h.am_projection&&(
+        {!isTracked&&h.am_projection&&(
          <div style={{margin:"0 14px 10px",padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center"}}>
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>
            <span>📍</span>{" "}
@@ -2240,19 +2100,12 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
            )}
           </div>
           <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>📅 {h.am_projection.profile?.label}</div>
-          <div style={{
-           fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",
-           padding:"2px 7px",borderRadius:3,fontFamily:FM,marginLeft:"auto",
-           background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",
-           color:h.am_projection.both_gates?T.sage:T.gold,
-           border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"
-          }}>
+          <div style={{fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",padding:"2px 7px",borderRadius:3,fontFamily:FM,marginLeft:"auto",background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",color:h.am_projection.both_gates?T.sage:T.gold,border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"}}>
            {h.am_projection.both_gates?"✅ Both Gates":"⚠ Hold"}
           </div>
          </div>
         )}
-        {expanded&&(()=>{
-         const activeTab=scrTab[h.ticker]||"analysis";
+        {expanded&&(!isTracked||match)&&(()=>{
          return(
           <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
            <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
@@ -2260,7 +2113,37 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
              <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
             ))}
            </div>
-           {activeTab==="analysis"&&(
+           {activeTab==="analysis"&&(isTracked?(
+            <div style={{padding:"10px 14px 14px"}}>
+             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+              <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match?.phase}</span>
+              {urgency&&<span style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</span>}
+              {match?.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
+             </div>
+             {(match?.thesis||match?.structure)&&(
+              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border}}>
+               {(match.thesis||match.structure).slice(0,260)}{(match.thesis||match.structure).length>260?"…":""}
+              </div>
+             )}
+             {match?.keyLevels&&match.keyLevels.length>0&&(
+              <div>
+               <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
+               {match.keyLevels.slice(0,4).map((kl,ki)=>(
+                <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
+                 <span style={{color:kl.type==="support"?T.sage:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
+                 <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>
+                 {kl.note&&<span style={{color:T.textDim}}>{String(kl.note).slice(0,60)}</span>}
+                </div>
+               ))}
+              </div>
+             )}
+             {match?.invalidation&&(
+              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:4,fontSize:9,color:T.rose,fontFamily:FD}}>
+               <span style={{fontWeight:700}}>Invalidation: </span>{match.invalidation}
+              </div>
+             )}
+            </div>
+           ):(
             <div style={{padding:"10px 14px 14px"}}>
              <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:8}}>Screener Conditions</div>
              {[["topdown_bias","Top-down Bias Aligned"],["expansion","In Expansion Phase"],["in_zone","Price in 0–50% Retracement Zone"],["vol_confirm","Volume Confirmation"],["liquid","Liquid (>500K avg vol)"]].map(([k,label])=>(
@@ -2273,75 +2156,55 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
               Algorithm-only hit — no manual narrative written. Add to scanner to track with full analysis.
              </div>
             </div>
-           )}
-           {activeTab==="checklist"&&(()=>{
-            const cd=candleData[h.ticker];
-            const pre=h.candle;
-            const dr=cd?.daily||null;
-            const sd=dr||pre||null;
-            const sc={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber}[sd?.stage]||T.textDim;
-            const cc={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
-            const ha=[];
-            if(h.conditions.topdown_bias)ha.push("topdown");
-            if(h.conditions.in_zone)ha.push("fib50");
-            ha.push("budget");
-            if(pre&&STAGE_RANK_FE[pre.stage]>=1)ha.push("c123_daily");
-            if(pre?.detected)ha.push("cisd_daily");
-            if(pre?.at_ob_mean)ha.push("ob_mean");
-            if(dr&&STAGE_RANK_FE[dr.stage]>=1&&!ha.includes("c123_daily"))ha.push("c123_daily");
-            if(dr?.detected&&!ha.includes("cisd_daily"))ha.push("cisd_daily");
-            if(dr?.atOBMean&&!ha.includes("ob_mean"))ha.push("ob_mean");
-            const allCk=[...new Set(ha)];
-            const pct=Math.round((allCk.length/CHECKLIST.length)*100);
-            return(
-             <div style={{padding:"10px 14px 14px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
-               <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
-              </div>
-              <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
-               <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
-              </div>
-              <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
-               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
-               {sd?(
-                <div>
-                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-                  <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
-                  {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
-                 </div>
-                 {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
-                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
-                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
-                   <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
-                    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-                    <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
-                   </div>
-                  ))}
-                 </div>}
-                 <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
-                </div>
-               ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
-              </div>
-              {CHECKLIST.map(item=>{
-               const isAuto=allCk.includes(item.id);
-               return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
-                <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-                 {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
-                </div>
-                <div style={{flex:1}}>
-                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
-                  <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
-                  {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
-                 </div>
-                 <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
-                </div>
-               </div>);
-              })}
+           ))}
+           {activeTab==="checklist"&&(
+            <div style={{padding:"10px 14px 14px"}}>
+             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+              <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+              <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
              </div>
-            );
-           })()}
-                      {activeTab==="chart"&&(
+             <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
+              <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+             </div>
+             <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+              <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
+              {sd?(
+               <div>
+                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                 <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
+                 {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
+                </div>
+                {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
+                {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+                 {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
+                  <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
+                   <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+                   <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+                  </div>
+                 ))}
+                </div>}
+                <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
+               </div>
+              ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
+             </div>
+             {CHECKLIST.map(item=>{
+              const isAuto=allCk.includes(item.id);
+              return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
+               <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+               </div>
+               <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
+                 <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
+                 {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
+                </div>
+                <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+               </div>
+              </div>);
+             })}
+            </div>
+           )}
+           {activeTab==="chart"&&(
             <div style={{padding:"8px 10px 10px"}}>
              <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
@@ -2349,7 +2212,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
              </div>
              <iframe
               src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
-              style={{width:"100%",height:280,border:"none",borderRadius:4,display:"block"}}
+              style={{width:"100%",height:290,border:"none",borderRadius:4,display:"block"}}
               allowTransparency={true}
              />
             </div>
@@ -2360,7 +2223,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
        </div>
       );
      };
-     return(
+          return(
       <>
        {newHits.length>0&&(
         <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
@@ -2369,7 +2232,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
           <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
           <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
          </div>
-         {newHits.map(renderCard)}
+         {newHits.map(h=>renderScreenerCard(h,false))}
         </div>
        )}
        {tracked.length>0&&(
@@ -2379,7 +2242,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
           <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
           <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
          </div>
-         {tracked.map(renderTrackedCard)}
+         {tracked.map(h=>renderScreenerCard(h,true))}
         </div>
        )}
       </>

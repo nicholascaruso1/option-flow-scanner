@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 const T = {
  bg:"#080E1C", surface:"#0F1B2E", border:"#1A2C45", border2:"#243850",
  textPri:"#E8EEF8", textSec:"#7A92B0", textDim:"#3A5270",
@@ -894,30 +894,31 @@ const allSetups = [...SETUPS.map(ovl), ...aiSetupList.filter(a=>a&&a.symbol&&!SE
 const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
  const everythingData=evAsset==="all"?[...SETUPS.map(ovl),...CRYPTO.map(ovl),...COMMODITIES.map(ovl),...INDICES.map(ovl)]:ASSET_MAP[evAsset]||[];
 
- // ── Alignment score: ranks setups by actionability using real framework
- // fields only — phase, checklist completion, invalidation state, and
- // proximity to a key level. Higher = closer to actionable entry.
- const alignmentScore = (s) => {
-  const hist = memoryData[s.symbol]||[];
-  const last = hist[hist.length-1];
-  // Invalidated setups sink to the bottom regardless of anything else
-  if (last && last.invalidated) return -100;
-  const phaseRank = {READY:50,RETRACEMENT:35,EXPANSION:25,WATCH_REVERSAL:15,MANAGING:10,CONSOLIDATION:5}[s.phase]||0;
-  // Checklist: manual checks + auto checks, each worth 4 pts
-  const ck = new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])]);
-  const ckScore = ck.size * 4;
-  // Key-level proximity: if live price is within 3% of any key level, +15
-  const ld = liveData[s.symbol];
-  const p = ld?.price || s.price;
-  let proxScore = 0;
-  if (s.keyLevels && p) {
-   for (const lvl of s.keyLevels) {
-    const lp = parseFloat(String(lvl.p||"").replace(/[$,]/g,""));
-    if (lp && Math.abs((p-lp)/lp) < 0.03) { proxScore = 15; break; }
+ // ── Alignment scores: computed once per render, memoized on deps ──
+ const alignmentScores = useMemo(() => {
+  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
+  const map = {};
+  for (const s of all) {
+   const hist = memoryData[s.symbol]||[];
+   const last = hist[hist.length-1];
+   if (last && last.invalidated) { map[s.symbol] = -100; continue; }
+   const phaseRank = {READY:50,RETRACEMENT:35,EXPANSION:25,WATCH_REVERSAL:15,MANAGING:10,CONSOLIDATION:5}[s.phase]||0;
+   const ck = new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])]);
+   const ckScore = ck.size * 4;
+   const ld = liveData[s.symbol];
+   const p = ld?.price || s.price;
+   let proxScore = 0;
+   if (s.keyLevels && p) {
+    for (const lvl of s.keyLevels) {
+     const lp = parseFloat(String(lvl.p||"").replace(/[$,]/g,""));
+     if (lp && Math.abs((p-lp)/lp) < 0.03) { proxScore = 15; break; }
+    }
    }
+   map[s.symbol] = phaseRank + ckScore + proxScore;
   }
-  return phaseRank + ckScore + proxScore;
- };
+  return map;
+ }, [memoryData, checks, liveData]);
+ const alignmentScore = (s) => alignmentScores[s.symbol] ?? 0;
 
  const visible = isEverything ? everythingData.filter(s=>{
  if(evPhase!=="all"&&s.phase!==evPhase)return false;

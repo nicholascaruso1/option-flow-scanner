@@ -285,12 +285,6 @@ function detectC123(candles, direction="bull") {
   return { detected:false, stage:"UNKNOWN_DIRECTION" };
 }
 
-function pnlCalc(ep,price,strike,dir){
- if(!ep||!price)return null;
- const intrinsic=dir==="call"?Math.max(0,price-strike):Math.max(0,strike-price);
- const est=Math.max(intrinsic,ep*0.05);
- return{est,pct:((est-ep)/ep)*100,intrinsic};
-}
 const PHASES={
  EXPANSION:{label:"Exp.",icon:"↑",color:T.blue},
  CONSOLIDATION:{label:"Consolidating",icon:"—",color:T.gold},
@@ -354,8 +348,8 @@ const CHECKLIST=[
 ];
 const SETUPS=[
  {symbol:"ABCL",company:"AbCellera Biologics",price:7.60,chg:-1.17,vol:"8.0M",mcap:"$2.03B",capSize:"Small",
- direction:"call",phase:"MANAGING",tier:"Tier 1",isActive:true,
- contract:"$5 Call · Jul 17 · Both",entryPremium:0.27,strike:5,expiryDate:"2026-07-17",
+ direction:"call",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,
+ contract:null,entryPremium:null,strike:null,expiryDate:null,
  earningsDate:"2026-08-06",earningsLabel:"Aug 6",accountFit:["IRA ($200)","Individual ($3-5)"],
  autoChecks:["close","fib50","dte","budget","topdown"],retailTrap:true,
  narrative:"🔴 Bearish — clinical losses (-$146M). Retail skeptical. C1 = downtrend from $11→$2.75.",
@@ -371,8 +365,8 @@ const SETUPS=[
  mtf:[["12M","bull","Basing"],["6M","bull","Exp."],["3M","bull","Momentum"],["Monthly","bull","Breakout"],["Weekly","bull","Fractal exp."],["Daily","bull","Above levels"]],
  },
  {symbol:"ATAI",company:"AtaiBeckley Inc.",price:4.88,chg:-6.24,vol:"8.2M",mcap:"$1.94B",capSize:"Small",
- direction:"call",phase:"MANAGING",tier:"Tier 1",isActive:true,
- contract:"Call · Jul 17 · IRA",entryPremium:0.27,strike:3,expiryDate:"2026-07-17",
+ direction:"call",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,
+ contract:null,entryPremium:null,strike:null,expiryDate:null,
  earningsDate:"2026-08-12",earningsLabel:"Aug 12",accountFit:["IRA ($200)"],
  autoChecks:["close","fib50","dte","budget","topdown"],retailTrap:true,
  narrative:"🔴 Bearish — psychedelic biotech, $660M losses. C1 = downtrend from $20+→$2.15. Retail skeptical.",
@@ -709,12 +703,11 @@ export default function OptionsScanner() {
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
- const [closedTrades, setClosedTrades] = useState([]);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,cl,c1d,jnl,pfc] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_closed_trades",[]),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{})]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setClosedTrades(cl||[]); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{});
+ const [f,c,t,ai,mem,c1d,jnl,pfc] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{})]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{});
  })();
  }, []);
  useEffect(()=>{
@@ -809,6 +802,8 @@ export default function OptionsScanner() {
  // Auto-refresh every 15 minutes
  useEffect(() => {
  const interval = setInterval(() => {
+ const sess=getSessionProfile().session;
+ if(sess==="Closed"||sess==="Asia") return;
  doRefresh();
  }, 5 * 60 * 1000); // 5-min interval — stays under Finnhub 60 req/min
  return () => clearInterval(interval);
@@ -889,7 +884,7 @@ export default function OptionsScanner() {
  const setTab = (sym,t) => setTabs(p=>({...p,[sym]:t}));
  const getTab = (sym) => tabs[sym]||"narrative";
  const cc = (v) => v>0?T.blue:v<0?T.rose:T.textSec;
- const ovl = (x) => aiCards[x.symbol] ? {...x, ...aiCards[x.symbol], isActive:x.isActive, contract:x.contract} : x;
+ const ovl = (x) => aiCards[x.symbol] ? {...x, ...aiCards[x.symbol]} : x;
 const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
  const isAltView=["crypto","commodities","indices"].includes(view);
  const isEverything=view==="everything";
@@ -944,10 +939,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  : isAltView ? altData.filter(s=>phase==="all"||s.phase===phase)
  .sort((a,b)=>phase==="all"?PHASE_ORDER.indexOf(a.phase)-PHASE_ORDER.indexOf(b.phase):0)
  : allSetups.filter(s => {
- if (view==="managing") return s.isActive;
  if (view==="favorites") return favs.includes(s.symbol);
  if (view==="closed") return false;
- if (s.isActive) return false;
  if (dir==="calls" && s.direction!=="call") return false;
  if (dir==="puts" && s.direction!=="put") return false;
  if (dir==="watch" && s.direction!=="watch") return false;
@@ -975,48 +968,12 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {panelOpen&&(
  <div style={{position:"absolute",top:40,right:0,width:320,background:T.surface,border:"1px solid "+T.border2,borderRadius:6,boxShadow:"0 8px 24px #00000055",zIndex:100,overflow:"hidden"}}>
  <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
- {[["managing","📊 Positions"],["budget","💰 Budget"]].map(([v,l])=>(
+ {[["budget","💰 Budget"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={{flex:1,padding:"9px 8px",fontSize:10,background:view===v?T.bg:"transparent",border:"none",borderBottom:view===v?"2px solid "+T.sage:"2px solid transparent",color:view===v?T.sage:T.textDim,cursor:"pointer",fontFamily:FM}}>
  {l}
  </button>
  ))}
  </div>
- {view==="managing"&&(
- <div style={{padding:"12px 14px",maxHeight:400,overflowY:"auto"}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>ACTIVE POSITIONS · {AS_OF.toUpperCase()}</div>
- {SETUPS.filter(s=>s.isActive).map(s=>{
- const pl=pnlCalc(s.entryPremium,s.price,s.strike,s.direction);
- const dtD=s.expiryDate?daysUntil(s.expiryDate):null;
- const earnD=s.earningsDate?daysUntil(s.earningsDate):null;
- const earnC=earnD!=null?(earnD<=14?T.rose:earnD<=30?T.gold:T.sage):null;
- return(
- <div key={s.symbol} style={{marginBottom:10,padding:"10px 12px",background:T.bg,borderRadius:4,border:"1px solid "+T.border,borderLeft:"2px solid "+T.teal}}>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:4}}>
- <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri}}>{s.symbol}</span>
- <span style={{fontFamily:FD,fontSize:12,color:s.chg>0?T.blue:T.rose}}>{s.chg>0?"+":""}{s.chg.toFixed(1)}%</span>
- </div>
- <div style={{fontSize:9,color:T.textDim,marginBottom:6}}>{s.contract}</div>
- {pl&&(
- <div>
- <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
- <span style={{fontSize:9,color:T.textSec}}>Entry ${s.entryPremium.toFixed(2)} → Est. ~${pl.est.toFixed(2)}</span>
- <span style={{fontSize:11,fontWeight:700,color:pl.pct>=0?T.sage:T.rose,fontFamily:FD}}>{pl.pct>=0?"+":""}{pl.pct.toFixed(0)}%</span>
- </div>
- <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",borderRadius:2,background:pl.pct>=0?T.teal:T.rose,width:Math.min(100,Math.max(0,pl.pct))+"%"}}/>
- </div>
- <div style={{fontSize:9,color:T.textDim,marginTop:3}}>Intrinsic ${pl.intrinsic.toFixed(2)}</div>
- </div>
- )}
- <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
- {dtD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:(dtD<=7?T.rose:T.border2)+"18",border:"1px solid "+(dtD<=7?T.rose:T.border2)+"44",borderRadius:3,color:dtD<=7?T.rose:T.textDim}}>Exp {dtD}d</span>}
- {earnD!=null&&<span style={{fontSize:8,padding:"1px 6px",background:earnC+"18",border:"1px solid "+earnC+"44",borderRadius:3,color:earnC}}>Earnings {s.earningsLabel} · {earnD}d</span>}
- </div>
- </div>
- );
- })}
- </div>
- )}
  {view==="budget"&&(()=>{
  const ira=parseFloat(iraB)||0, ind=parseFloat(indB)||0;
  const iraMax=ira>0?(ira*0.05).toFixed(2):null, indMax=ind>0?(ind*0.05).toFixed(2):null;
@@ -1113,7 +1070,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
  const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
  const _readyS=screenerHits.filter(h=>h.met>=4);
- const _topAll=[...SETUPS.filter(s=>!s.isActive)].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
+ const _topAll=[...SETUPS].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
  const _top=_topAll[0];
  const _earn=SETUPS.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
  const _ne=_earn[0];
@@ -1142,7 +1099,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
  <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:"auto",padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["closed","Closed"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -1184,7 +1141,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  )}
 
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
- {view==="managing"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:13,color:T.textSec}}>No active positions</div></div>)}
  {(isAltView||isEverything)&&(
  <div style={{padding:"10px 20px"}}>
  {visible.map((s)=>{
@@ -1333,7 +1289,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const hist=memoryData[s.symbol]||[];
  const last=hist[hist.length-1];
  if(last&&last.invalidated)return{s,pScore:-999,al:0,earnD:null,reasons:[]};
- if(!s.phase||s.isActive)return{s,pScore:-100,al:0,earnD:null,reasons:[]};
+ if(!s.phase)return{s,pScore:-100,al:0,earnD:null,reasons:[]};
  let pScore=0;
  const reasons=[];
  if(s.phase==="READY"){pScore+=50;reasons.push("READY");}
@@ -1353,9 +1309,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  if(earnD!=null&&earnD<=7)pScore-=20;
  return{s,pScore,al,earnD,reasons};
  }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
- const readyCount=SETUPS.filter(s=>s.phase==="READY"&&!s.isActive).length;
- const watchCount=SETUPS.filter(s=>!s.isActive&&s.phase!=="READY"&&s.phase!=="MANAGING").length;
- const managingCount=SETUPS.filter(s=>s.isActive).length;
+ const readyCount=SETUPS.filter(s=>s.phase==="READY").length;
+ const watchCount=SETUPS.filter(s=>s.phase!=="READY"&&s.phase!=="MANAGING").length;
  const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
  const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
  const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
@@ -1368,11 +1323,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  return{l:"Monitor",c:T.textDim};
  };
  const NUMS=["①","②","③"];
- const openCloseModal=(s)=>{
-  const hit=screenerHits.find(h=>h.ticker===s.symbol);
-  setCloseModal({ticker:s.symbol,entryPhase:s.phase,score:hit?.met??null});
-  setCloseExitPrice(""); setClosePnlPct(""); setCloseExitReason("TARGET_HIT");
- };
  return(
  <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
@@ -1385,11 +1335,10 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <span style={{fontSize:8,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
  <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
  <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
- <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Managing <span style={{color:T.teal,fontWeight:700}}>{managingCount}</span></span>
  </div>
  </div>
  {focusData.length===0?(
- <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. "+(managingCount>0?"All candidates in MANAGING or monitoring phases.":"All candidates in monitoring phases.")}</div>
+ <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
  ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
  const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
  const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
@@ -1442,7 +1391,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const pfMtfCount=pfMtfRows.filter(r=>r[1]===pfDirBias).length;
  const pfMtfOk=pfMtfRows.length>=4&&pfMtfCount>=4;
  const pfSessOk=sessionProfile.actionable;
- const pfNow=new Date(),pfUtc=pfNow.getTime()+pfNow.getTimezoneOffset()*60000,pfEst=new Date(pfUtc-18000000),pfEstDay=pfEst.getDay();
+ const pfEstDay=new Date().getDay(); // weeklyProfile already DST-aware; use local day as proxy
  const pfDayOk=pfEstDay!==1;
  const pfDayNote=pfEstDay===3?"Wed — Primary entry day":pfEstDay===4?"Thu — Second opportunity":pfEstDay===1?"Mon — Monday Rule: avoid":pfEstDay===5?"Fri — TGIF setups only":"Valid entry day";
  const pfC1ok=!!(pfC1data.c1&&pfC1data.c1.confirmed);
@@ -1460,7 +1409,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const isFav=favs.includes(s.symbol);
  const ck=checks[s.symbol]||[];
  const tab=getTab(s.symbol);
- const pl=s.isActive&&s.entryPremium?pnlCalc(s.entryPremium,dispPrice,s.strike,s.direction):null;
  const earnD=s.earningsDate?daysUntil(s.earningsDate):null;
  const earnC=earnD!=null?(earnD<=14?T.rose:earnD<=30?T.gold:T.sage):null;
  const dteD=s.expiryDate?daysUntil(s.expiryDate):null;
@@ -1495,7 +1443,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
  <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
- {s.isActive&&<span style={pill(T.teal)}>● Active</span>}
  </div>
  <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0,flexWrap:"wrap"}}>
  {(()=>{
@@ -1517,7 +1464,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
  {s.retailTrap&&<span style={pill(T.purple)}>🪜 Divergence</span>}
- {vIdx===0&&!invAlert&&!s.isActive&&view!=="managing"&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
+ {vIdx===0&&!invAlert&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
  </div>
  {(earnD!=null||dteD!=null||allCk.length>0)&&(
  <div style={{display:"flex",flexWrap:"wrap",gap:10,marginTop:5,alignItems:"center"}}>
@@ -1529,18 +1476,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {invAlert&&(
  <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:4,fontSize:10,color:T.rose}}>
  {invAlert}
- </div>
- )}
- {pl&&(
- <div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"8px 0",borderTop:"1px solid "+T.border,flexWrap:"wrap"}}>
- <span style={{fontSize:9,color:T.textDim}}>Entry ${s.entryPremium.toFixed(2)} →</span>
- <span style={{fontSize:10,color:T.teal,fontFamily:FD}}>~${pl.est.toFixed(2)}</span>
- <span style={{fontSize:13,fontWeight:700,color:pl.pct>=0?T.sage:T.rose,fontFamily:FD}}>{pl.pct>=0?"+":""}{pl.pct.toFixed(0)}%</span>
- <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden",maxWidth:60}}>
- <div style={{height:"100%",borderRadius:2,background:pl.pct>=0?T.teal:T.rose,width:Math.min(100,Math.max(0,pl.pct))+"%"}}/>
- </div>
- <span style={{fontSize:9,color:T.textDim}}>Intrinsic ${pl.intrinsic.toFixed(2)}</span>
- <button onClick={()=>openCloseModal(s)} style={{marginLeft:"auto",padding:"4px 10px",background:T.rose+"18",border:"1px solid "+T.rose+"50",borderRadius:3,color:T.rose,fontSize:9,cursor:"pointer",fontFamily:FM,flexShrink:0}}>Close Trade</button>
  </div>
  )}
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
@@ -1802,7 +1737,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  })()}
  {tab==="entry"&&(
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>{s.isActive?"Position Management":"Entry — 3-Candle Swing · 4pm Close"}</div>
+ <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>"Entry — 3-Candle Swing · 4pm Close"</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
  <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:4,overflow:"hidden"}}>
   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
@@ -1999,7 +1934,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {view==="screener"&&(
  <div style={{padding:16}}>
   {(()=>{
-   const topQ=[...SETUPS].filter(s=>!s.isActive).sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
+   const topQ=[...SETUPS].sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
    if(!topQ.length)return null;
    return(
     <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
@@ -2454,7 +2389,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  </div>
 )}
 
- {(view==="all"||view==="managing"||view==="everything")&&(
+ {(view==="all"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
  <span style={{fontSize:9,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology{!fwOpen?" — Private":""}</span>

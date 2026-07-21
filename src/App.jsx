@@ -1931,32 +1931,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  })}
  {view==="screener"&&(
  <div style={{padding:16}}>
-  {(()=>{
-   const topQ=[...allSetups].sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
-   if(!topQ.length)return null;
-   return(
-    <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
-     <div style={{padding:"7px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
-      <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>⚡ Action Queue</span>
-      <span style={{fontSize:9,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>Top 3 by alignment</span>
-     </div>
-     {topQ.map((s,i)=>{
-      const ph=PHASES[s.phase];
-      const urgency=s.phase==="READY"?"🔴 Enter":s.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building";
-      return(
-       <div key={s.symbol} style={{padding:"8px 14px",borderBottom:i<topQ.length-1?"1px solid "+T.border:"none",display:"flex",gap:10,alignItems:"center"}}>
-        <div style={{minWidth:50}}>
-         <div style={{fontSize:12,fontWeight:700,color:i===0?T.gold:T.textPri,fontFamily:FM}}>{s.symbol}</div>
-         <div style={{fontSize:8,color:ph?.color||T.textDim,fontFamily:FD,textTransform:"uppercase",letterSpacing:"0.05em"}}>{ph?.label||s.phase}</div>
-        </div>
-        <div style={{flex:1,fontSize:9,color:T.textSec,fontFamily:FD,lineHeight:1.4}}>{s.phaseNote||s.structure?.slice(0,70)||"—"}</div>
-        <div style={{fontSize:8,color:s.phase==="READY"?T.rose:s.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD,flexShrink:0}}>{urgency}</div>
-       </div>
-      );
-     })}
-    </div>
-   );
-  })()}
   {screenerLoading&&(
    <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
   )}

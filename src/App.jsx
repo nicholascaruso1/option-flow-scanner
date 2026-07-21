@@ -884,7 +884,7 @@ const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indic
  const aiSetupList = Object.values(aiCards);
 const allSetups = aiSetupList;
 const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
- const everythingData=evAsset==="all"?[...SETUPS.map(ovl),...CRYPTO.map(ovl),...COMMODITIES.map(ovl),...INDICES.map(ovl)]:ASSET_MAP[evAsset]||[];
+ const everythingData=evAsset==="all"?[...allSetups,...CRYPTO.map(ovl),...COMMODITIES.map(ovl),...INDICES.map(ovl)]:ASSET_MAP[evAsset]||[];
 
  // ── Alignment scores: computed once per render, memoized on deps ──
  const alignmentScores = useMemo(() => {

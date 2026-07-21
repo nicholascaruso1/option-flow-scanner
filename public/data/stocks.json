@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-16T06:06:58.684467+00:00",
+  "generated_at": "2026-07-21T00:57:06.816214+00:00",
   "universe_size": 120,
   "min_met": 4,
   "candidates": [
     {
-      "ticker": "NKE",
-      "price": 42.77,
+      "ticker": "NFLX",
+      "price": 67.6,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -17,18 +17,41 @@
         "liquid": true
       },
       "details": {
-        "sma20": 42.96,
-        "sma50": 43.44,
-        "sma200": 55.44,
-        "avg_vol_m": 29.44,
-        "retr_pct": 16.1,
-        "exp_date": "2026-07-01",
+        "sma20": 73.39,
+        "sma50": 80.15,
+        "sma200": 93.48,
+        "avg_vol_m": 53.37,
+        "retr_pct": 42.9,
+        "exp_date": "2026-07-17",
         "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "high",
+          "price": 91.48,
+          "date": "2026-05-19",
+          "bars_ago": 41
+        },
+        "draw_target": {
+          "type": "low",
+          "price": 70.86,
+          "date": "2026-06-25",
+          "bars_ago": 16
+        },
+        "draw_pct": -4.8,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     },
     {
-      "ticker": "WFC",
-      "price": 87.51,
+      "ticker": "UNH",
+      "price": 421.55,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -40,112 +63,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 85.21,
-        "sma50": 80.88,
-        "sma200": 83.86,
-        "avg_vol_m": 17.09,
-        "retr_pct": 24.1,
-        "exp_date": "2026-07-14",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "MS",
-      "price": 228.55,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 220.27,
-        "sma50": 209.2,
-        "sma200": 179.82,
-        "avg_vol_m": 6.34,
-        "retr_pct": 33.5,
-        "exp_date": "2026-07-15",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "TSLA",
-      "price": 394.46,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 399.31,
-        "sma50": 410.0,
-        "sma200": 417.61,
-        "avg_vol_m": 43.08,
-        "retr_pct": 12.0,
-        "exp_date": "2026-07-02",
+        "sma20": 421.22,
+        "sma50": 402.81,
+        "sma200": 338.26,
+        "avg_vol_m": 6.29,
+        "retr_pct": 2.9,
+        "exp_date": "2026-07-16",
         "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "XLF",
-      "price": 56.56,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
       },
-      "details": {
-        "sma20": 54.73,
-        "sma50": 52.84,
-        "sma200": 52.27,
-        "avg_vol_m": 35.31,
-        "retr_pct": 19.8,
-        "exp_date": "2026-07-14",
-        "exp_dir": "BULL"
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 372.59,
+          "date": "2026-06-02",
+          "bars_ago": 32
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 401.85,
+          "date": "2026-05-13",
+          "bars_ago": 45
+        },
+        "draw_pct": -4.7,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     },
     {
-      "ticker": "RXRX",
-      "price": 3.31,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 3.48,
-        "sma50": 3.34,
-        "sma200": 4.05,
-        "avg_vol_m": 23.93,
-        "retr_pct": 181.4,
-        "exp_date": "2026-07-06",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "C",
-      "price": 134.89,
+      "ticker": "ACHR",
+      "price": 5.31,
       "bias": "MIXED",
-      "direction": "BEAR",
+      "direction": "BULL",
       "met": 4,
       "conditions": {
         "topdown_bias": false,
@@ -155,18 +109,41 @@
         "liquid": true
       },
       "details": {
-        "sma20": 141.23,
-        "sma50": 133.68,
-        "sma200": 116.11,
-        "avg_vol_m": 15.0,
-        "retr_pct": 22.5,
-        "exp_date": "2026-07-14",
-        "exp_dir": "BEAR"
+        "sma20": 4.89,
+        "sma50": 5.59,
+        "sma200": 7.3,
+        "avg_vol_m": 34.86,
+        "retr_pct": 14.6,
+        "exp_date": "2026-07-20",
+        "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 5.47,
+          "date": "2026-04-29",
+          "bars_ago": 55
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 7.09,
+          "date": "2026-05-28",
+          "bars_ago": 35
+        },
+        "draw_pct": 33.5,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     },
     {
-      "ticker": "CRWD",
-      "price": 206.77,
+      "ticker": "BAC",
+      "price": 60.42,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -178,18 +155,41 @@
         "liquid": true
       },
       "details": {
-        "sma20": 185.19,
-        "sma50": 168.56,
-        "sma200": 128.74,
-        "avg_vol_m": 11.18,
-        "retr_pct": 19.6,
+        "sma20": 59.14,
+        "sma50": 55.15,
+        "sma200": 52.59,
+        "avg_vol_m": 34.75,
+        "retr_pct": 31.1,
         "exp_date": "2026-07-14",
         "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 49.05,
+          "date": "2026-05-15",
+          "bars_ago": 43
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 53.92,
+          "date": "2026-05-06",
+          "bars_ago": 50
+        },
+        "draw_pct": -10.8,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     },
     {
-      "ticker": "MRNA",
-      "price": 68.28,
+      "ticker": "JPM",
+      "price": 338.87,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -201,64 +201,41 @@
         "liquid": true
       },
       "details": {
-        "sma20": 68.19,
-        "sma50": 56.47,
-        "sma200": 43.02,
-        "avg_vol_m": 10.24,
-        "retr_pct": 10.3,
-        "exp_date": "2026-07-10",
-        "exp_dir": "BEAR"
+        "sma20": 335.1,
+        "sma50": 317.6,
+        "sma200": 307.11,
+        "avg_vol_m": 10.44,
+        "retr_pct": 30.9,
+        "exp_date": "2026-07-14",
+        "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 292.35,
+          "date": "2026-05-20",
+          "bars_ago": 40
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 341.91,
+          "date": "2026-06-25",
+          "bars_ago": 16
+        },
+        "draw_pct": 0.9,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     },
     {
       "ticker": "OXY",
-      "price": 53.77,
-      "bias": "MIXED",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": false,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 51.6,
-        "sma50": 54.94,
-        "sma200": 49.23,
-        "avg_vol_m": 10.14,
-        "retr_pct": 46.3,
-        "exp_date": "2026-07-08",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "TGT",
-      "price": 138.29,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 133.13,
-        "sma50": 128.61,
-        "sma200": 109.79,
-        "avg_vol_m": 4.72,
-        "retr_pct": 25.3,
-        "exp_date": "2026-07-15",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "GS",
-      "price": 1152.07,
+      "price": 55.19,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -270,13 +247,174 @@
         "liquid": true
       },
       "details": {
-        "sma20": 1064.9,
-        "sma50": 1020.18,
-        "sma200": 894.05,
-        "avg_vol_m": 2.22,
-        "retr_pct": -13.3,
-        "exp_date": "2026-07-14",
+        "sma20": 51.86,
+        "sma50": 54.73,
+        "sma200": 49.34,
+        "avg_vol_m": 9.66,
+        "retr_pct": -12.4,
+        "exp_date": "2026-07-08",
         "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 47.77,
+          "date": "2026-07-01",
+          "bars_ago": 12
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 60.96,
+          "date": "2026-05-20",
+          "bars_ago": 40
+        },
+        "draw_pct": 10.5,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
+      }
+    },
+    {
+      "ticker": "TGT",
+      "price": 139.59,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 134.5,
+        "sma50": 129.33,
+        "sma200": 110.59,
+        "avg_vol_m": 4.62,
+        "retr_pct": 4.6,
+        "exp_date": "2026-07-15",
+        "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 124.7,
+          "date": "2026-07-06",
+          "bars_ago": 10
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 142.82,
+          "date": "2026-06-25",
+          "bars_ago": 16
+        },
+        "draw_pct": 2.3,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
+      }
+    },
+    {
+      "ticker": "AMGN",
+      "price": 364.17,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 360.9,
+        "sma50": 346.86,
+        "sma200": 336.66,
+        "avg_vol_m": 2.26,
+        "retr_pct": 14.6,
+        "exp_date": "2026-07-17",
+        "exp_dir": "BEAR"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 334.05,
+          "date": "2026-06-18",
+          "bars_ago": 20
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 356.76,
+          "date": "2026-04-09",
+          "bars_ago": 69
+        },
+        "draw_pct": -2.0,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
+      }
+    },
+    {
+      "ticker": "LMT",
+      "price": 509.54,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 515.27,
+        "sma50": 519.67,
+        "sma200": 537.46,
+        "avg_vol_m": 1.16,
+        "retr_pct": 9.5,
+        "exp_date": "2026-07-17",
+        "exp_dir": "BEAR"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "high",
+          "price": 550.99,
+          "date": "2026-06-11",
+          "bars_ago": 25
+        },
+        "draw_target": {
+          "type": "low",
+          "price": 490.05,
+          "date": "2026-06-22",
+          "bars_ago": 19
+        },
+        "draw_pct": 3.8,
+        "profile": {
+          "label": "Classic Expansion",
+          "note": "Tuesday trend day. Price typically expands in primary direction from weekly open.",
+          "next_day": "Tuesday Jul 21"
+        },
+        "gate_reaction": true,
+        "gate_profile": true,
+        "both_gates": true
       }
     }
   ]

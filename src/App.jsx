@@ -710,7 +710,7 @@ export default function OptionsScanner() {
  },[]);
  useEffect(()=>{(async()=>{const ac=await ls("of_ai_cards",{});setAiCards(ac||{});})();},[]);
  const updateMarketMemory = useCallback(async (freshPrices) => {
- const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
+ const all = [...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const key = todayKey();
  setMemoryData(prevMem => {
  const next = {...prevMem};
@@ -1062,14 +1062,14 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const _avg=(_spy+_qqq+_iwm)/3;
  const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
  // Note: spy/qqq/iwm also computed in sticky bar above — future refactor: extract to useMemo
- const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
+ const _readyT=allSetups.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
  const _readyS=screenerHits.filter(h=>h.met>=4);
  const _topAll=[...allSetups].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
  const _top=_topAll[0];
- const _earn=SETUPS.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
+ const _earn=allSetups.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
  const _ne=_earn[0];
  const _nd=_ne?daysUntil(_ne.earningsDate):null;
- const _inv=SETUPS.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
+ const _inv=allSetups.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
  const _cell=(lbl,val,col,sub)=>(
   <div style={{padding:"6px 10px",borderRight:"1px solid "+T.border,flex:"1 0 auto",minWidth:75}}>
    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{lbl}</div>
@@ -1507,7 +1507,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
  <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(()=>{
- const sameDir=SETUPS.filter(x=>!x.isActive&&x.direction===s.direction&&x.symbol!==s.symbol);
+ const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol);
  const rsLeader=sameDir.length>0?[...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;
  return(
  <div>
@@ -1585,7 +1585,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {tab==="phase"&&(()=>{
  const ci=TL_STEPS.indexOf(s.phase);
  
- const sameDir=SETUPS.filter(x=>!x.isActive&&x.direction===s.direction&&x.symbol!==s.symbol&&x.phase!=="EXPANSION");
+ const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol&&x.phase!=="EXPANSION");
  return(
  <div>
  <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>

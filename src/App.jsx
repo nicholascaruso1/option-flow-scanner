@@ -1389,14 +1389,18 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const pfEstDay=new Date().getDay(); // weeklyProfile already DST-aware; use local day as proxy
  const pfDayOk=pfEstDay!==1;
  const pfDayNote=pfEstDay===3?"Wed — Primary entry day":pfEstDay===4?"Thu — Second opportunity":pfEstDay===1?"Mon — Monday Rule: avoid":pfEstDay===5?"Fri — TGIF setups only":"Valid entry day";
- const pfC1ok=!!(pfC1data.c1&&pfC1data.c1.confirmed);
- const pfC2ok=!!(pfC1data.c2&&pfC1data.c2.confirmed);
- const pfC3ok=!!(pfC1data.c3&&pfC1data.c3.confirmed);
- const pfAutoPass=[pfMtfOk,pfSessOk,pfDayOk,pfC1ok,pfC2ok,pfC3ok].filter(Boolean).length;
- const pfManPass=["g_ote","g_oi","g_swing","g_cal"].filter(id=>pfChecks2.includes(id)).length;
- const pfTotal=10;
+ const pfCd=candleData[pfSym]?.daily||null;
+ const STAGE_RANK_PF={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
+ const pfStageRank=pfCd?(STAGE_RANK_PF[pfCd.stage]??-1):-1;
+ const pfC123ok=pfStageRank>=2;
+ const pfLivePrice=liveData[pfSym]?.price||s.price||0;
+ const pfOteOk=!!(pfCd?.ote_low!=null&&pfCd?.ote_high!=null&&pfLivePrice>=pfCd.ote_low&&pfLivePrice<=pfCd.ote_high);
+ const pfSwingOk=pfCd?.protected_swing!=null?(s.direction==="call"?pfLivePrice>pfCd.protected_swing:pfLivePrice<pfCd.protected_swing):false;
+ const pfAutoPass=[pfMtfOk,pfSessOk,pfDayOk,pfC123ok,pfOteOk,pfSwingOk].filter(Boolean).length;
+ const pfManPass=["g_oi","g_cal"].filter(id=>pfChecks2.includes(id)).length;
+ const pfTotal=8;
  const pfPassing=pfAutoPass+pfManPass;
- const pfVerdict=pfPassing===pfTotal?"GO":pfPassing>=7?"CAUTION":"NO-GO";
+ const pfVerdict=pfPassing===pfTotal?"GO":pfPassing>=6?"CAUTION":"NO-GO";
  const pfVColor=pfVerdict==="GO"?T.sage:pfVerdict==="CAUTION"?T.gold:T.rose;
  const pfIsPfOpen=pfOpen[pfSym]!==false;
  const ac=ph.color;

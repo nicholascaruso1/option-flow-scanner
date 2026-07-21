@@ -1195,6 +1195,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
  <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
  <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
  </button>
@@ -1487,6 +1488,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
  <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
  <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
  </button>

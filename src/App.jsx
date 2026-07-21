@@ -1276,7 +1276,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  })}
  </div>
  )}
- {!isAltView&&!isEverything&&view!=="budget"&&view!=="screener"&&(
+ {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
  {view==="all"&&(()=>{
  const focusData=[...SETUPS].map(s=>{

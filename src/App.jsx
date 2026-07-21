@@ -1756,9 +1756,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
     {id:"g_mtf",label:"MTF Aligned (4+ timeframes)",ok:pfMtfOk,note:pfMtfRows.length===0?"No MTF data — populate Multi-TF tab":pfMtfCount+"/"+pfMtfRows.length+" timeframes aligned "+pfDirBias},
     {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:pfSessOk,note:sessionProfile.profile},
     {id:"g_day",label:"Valid Profile Day",ok:pfDayOk,note:pfDayNote},
-    {id:"g_c1",label:"C1 — Direction candle confirmed",ok:pfC1ok,note:pfC1ok?"Confirmed "+(pfC1data.c1&&pfC1data.c1.ts||""): "Not yet — mark in Journal tab"},
-    {id:"g_c2",label:"C2 — Failure swing confirmed",ok:pfC2ok,note:pfC2ok?"Confirmed "+(pfC1data.c2&&pfC1data.c2.ts||""): "Not yet — mark in Journal tab"},
-    {id:"g_c3",label:"C3 — CISD body close confirmed",ok:pfC3ok,note:pfC3ok?"Confirmed "+(pfC1data.c3&&pfC1data.c3.ts||""): "Not yet — mark in Journal tab"},
+    {id:"g_c123",label:"C1/C2/C3 structure ≥ C2 confirmed",ok:pfC123ok,note:pfC123ok?"Stage: "+(pfCd?.stage||"").replace(/_/g," "):"Stage: "+(pfCd?.stage||"LOADING").replace(/_/g," ")+" — need C2_CONFIRMED or better"},
+    {id:"g_ote_auto",label:"Price in OTE zone (0–50% Fib)",ok:pfOteOk,note:pfOteOk?"$"+pfLivePrice.toFixed(2)+" inside OTE $"+(pfCd?.ote_low||0).toFixed(2)+"–$"+(pfCd?.ote_high||0).toFixed(2):"$"+pfLivePrice.toFixed(2)+" outside OTE $"+(pfCd?.ote_low||0).toFixed(2)+"–$"+(pfCd?.ote_high||0).toFixed(2)},
+    {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfCd?.protected_swing||0).toFixed(2):"⚠ Price "+(s.direction==="call"?"below":"above")+" protected swing $"+(pfCd?.protected_swing||0).toFixed(2)},
    ].map(g=>(
    <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
     <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
@@ -1770,9 +1770,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
    ))}
    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6,marginTop:10}}>Manual Confirmation</div>
    {[
-    {id:"g_ote",label:"Price in 0–50% OTE Zone",desc:"Confirm price between 0–50% Fib retracement from C1 anchor swing"},
     {id:"g_oi",label:"OI > 500 on target strike",desc:"Check options chain before entry. Low OI = wide spreads."},
-    {id:"g_swing",label:"Protected swing intact",desc:"Body close has NOT crossed the protected swing / invalidation level"},
     {id:"g_cal",label:"Economic calendar clear",desc:"No red folder events in next 2 hrs (FOMC, NFP, CPI, PPI, JOLTS)"},
    ].map(g=>{
     const ck2=pfChecks2.includes(g.id);

@@ -882,7 +882,7 @@ const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indic
  const isEverything=view==="everything";
  const altData=altMap[view]||[];
  const aiSetupList = Object.values(aiCards);
-const allSetups = [...SETUPS.map(ovl), ...aiSetupList.filter(a=>a&&a.symbol&&!SETUPS.some(s=>s.symbol===a.symbol))];
+const allSetups = aiSetupList;
 const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"indices":INDICES};
  const everythingData=evAsset==="all"?[...SETUPS.map(ovl),...CRYPTO.map(ovl),...COMMODITIES.map(ovl),...INDICES.map(ovl)]:ASSET_MAP[evAsset]||[];
 

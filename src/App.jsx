@@ -331,20 +331,12 @@ function PhasePipeline({phase}){
 }
 const CAP_COLORS={Mega:T.blue,Large:T.sage,Mid:T.amber,Small:T.gold,Micro:T.purple};
 const CHECKLIST=[
- {id:"swing", label:"C2 closure confirmed (failure swing)", desc:"C2 = middle candle making the extreme. C2 body closing through the level is the entry trigger. C1 = prior direction candle. Wick-only does not count."},
- {id:"cisd", label:"C3 CISD body close confirmed", desc:"CISD = price closes through the series of candles that CREATED the move into the level. After C2 closure, drop to lower TF — must see CISD there or setup is invalid. Missing CISD = skip the trade even if C2 looks clean on the higher TF."},
- {id:"range", label:"Not in a range (no failure swings both sides)",desc:"If failure swings exist on BOTH sides with no confirmed reaction, price is ranging. Do not trade inside. Wait for price to reach the external boundary."},
- {id:"ob", label:"Order Block identified + Mean Threshold", desc:"OB = series of last opposite-color candles before expansion. Anchor Fib from OB body. Mark Mean Threshold = 50% of OB body (Fib 0.5 body low to body high). OB valid while price holds above/below the mean threshold. OB invalidated only if price CLOSES beyond the mean threshold — not just touches it."},
- {id:"fib50", label:"Price inside 0–50% Fib zone", desc:"Retracement held above (call) or below (put) the 50% Fib level, anchored from the Order Block."},
- {id:"iv", label:"IV Rank below 30", desc:"Buying premium — don't overpay. Check Market Chameleon."},
- {id:"dte", label:"DTE 21+ days minimum", desc:"Farthest affordable expiry. Avoid <21 DTE on entry."},
- {id:"budget", label:"Within account budget (5%)", desc:"IRA ≤$200 · Individual ≤$5 per contract."},
- {id:"oi", label:"OI > 500 on target strike", desc:"Confirms liquidity. Check bid/ask spread < 10% of mid."},
- {id:"topdown", label:"Top-down bias aligned", desc:"Monthly/weekly direction confirms daily setup direction."},
- {id:"c123_daily", label:"C1/C2/C3 detected — daily OHLC", desc:"Auto-detected via 30-candle Polygon OHLC lookback. C1 = last bearish candle in leg. C2 = failure swing (wick + body close). C3/CISD = body close through candles that created the move."},
- {id:"cisd_daily", label:"CISD body close confirmed — daily", desc:"Auto-detected: C3 body closed through the bearish leg origin open. Highest-conviction signal = this fires simultaneously with IC-CISD on 5-min."},
- {id:"ob_mean", label:"Price at or above OB mean threshold", desc:"Auto-detected: current close ≥ OB mean (50% of C1 body). OB = last bearish candle before expansion. Body close through OB mean = invalidation."},
- {id:"ic_cisd", label:"IC-CISD confirmed — 5-min intraday", desc:"Auto-detected via 5-min OHLC (78 bars). Fractal C1/C2/C3 CISD on intraday aligning to daily setup = highest-conviction confirmation."},
+ {id:"c123_daily", label:"C1/C2/C3 structure confirmed", auto:true, desc:"C1 = directional candle establishing the leg. C2 = failure swing with wick + body close through the level. C3/CISD = body close through candles that created the move. All three required — wick-only C2 does not count."},
+ {id:"cisd_daily", label:"CISD body close confirmed — daily", auto:true, desc:"C3 body closed through the bearish (or bullish) leg origin open on the daily. Highest-conviction signal = this fires simultaneously with IC-CISD on the 5-min chart."},
+ {id:"ob_mean", label:"Price at or inside OB mean threshold", auto:true, desc:"Current price ≥ OB mean (50% of C1 body) for calls, ≤ OB mean for puts. Body close through OB mean = OB invalidated, skip trade."},
+ {id:"fib50", label:"Price in 0–50% OTE retracement zone", auto:true, desc:"Retracement held above (call) or below (put) the 50% Fib level anchored from the Order Block swing. Price beyond 50% = outside OTE zone, wait or skip."},
+ {id:"topdown", label:"Top-down bias aligned (monthly/weekly/daily)", auto:true, desc:"Monthly and weekly bias confirms daily setup direction. If higher timeframes conflict, wait for alignment or skip."},
+ {id:"budget", label:"Calendar clear + OI > 500 + within budget", auto:false, desc:"No red-folder events within 24hrs. OI > 500 on target strike, bid/ask spread < 10% of mid. Position ≤$200 IRA · ≤$5 Individual. IV Rank < 30 preferred."},
 ];
 const SETUPS=[
  {symbol:"ABCL",company:"AbCellera Biologics",price:7.60,chg:-1.17,vol:"8.0M",mcap:"$2.03B",capSize:"Small",

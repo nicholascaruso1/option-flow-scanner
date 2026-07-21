@@ -869,7 +869,7 @@ export default function OptionsScanner() {
   const willOpen = !open[sym];
   setOpen(p=>({...p,[sym]:!p[sym]}));
   if (willOpen) {
-   const setup = SETUPS.find(s=>s.symbol===sym);
+   const setup = allSetups.find(s=>s.symbol===sym);
    if (setup) fetchCandleAnalysis(sym, setup.direction);
   }
  };
@@ -1305,7 +1305,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  return{s,pScore,al,earnD,reasons};
  }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
  const readyCount=allSetups.filter(s=>s.phase==="READY").length;
- const watchCount=SETUPS.filter(s=>s.phase!=="READY").length;
+ const watchCount=allSetups.filter(s=>s.phase!=="READY").length;
  const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
  const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
  const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;

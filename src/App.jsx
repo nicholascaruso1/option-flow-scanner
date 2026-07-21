@@ -888,7 +888,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
 
  // ── Alignment scores: computed once per render, memoized on deps ──
  const alignmentScores = useMemo(() => {
-  const all = [...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
+  const all = [...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
   const map = {};
   for (const s of all) {
    const hist = memoryData[s.symbol]||[];
@@ -1009,7 +1009,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
  {liveError&&<span style={{fontSize:9,color:T.rose}}>{liveError}</span>}
  {Object.entries(liveData).filter(([sym,d])=>{
- const all=[...SETUPS,...CRYPTO,...COMMODITIES,...INDICES];
+ const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const s=all.find(x=>x.symbol===sym);
  if(!s||!d.price)return false;
  const levels=(s.keyLevels||s.levels||[]);
@@ -1304,7 +1304,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  if(earnD!=null&&earnD<=7)pScore-=20;
  return{s,pScore,al,earnD,reasons};
  }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
- const readyCount=SETUPS.filter(s=>s.phase==="READY").length;
+ const readyCount=allSetups.filter(s=>s.phase==="READY").length;
  const watchCount=SETUPS.filter(s=>s.phase!=="READY").length;
  const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
  const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;

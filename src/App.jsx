@@ -1064,7 +1064,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  // Note: spy/qqq/iwm also computed in sticky bar above — future refactor: extract to useMemo
  const _readyT=SETUPS.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
  const _readyS=screenerHits.filter(h=>h.met>=4);
- const _topAll=[...SETUPS].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
+ const _topAll=[...allSetups].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
  const _top=_topAll[0];
  const _earn=SETUPS.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
  const _ne=_earn[0];

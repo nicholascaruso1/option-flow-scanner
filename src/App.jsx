@@ -1204,7 +1204,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
  {[["narrative","Narrative"],["phase","Phase"],["entry","Entry"],["levels","Levels & Catalysts"]].map(([t,l])=>(
- <button key={t} onClick={()=>setTab(s.symbol,t)} style={tbtn(tab===t,ac)}>{l}</button>
+ <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction);}} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
@@ -1501,7 +1501,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
  {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"],["journal","Journal"]].map(([t,l])=>(
- <button key={t} onClick={()=>setTab(s.symbol,t)} style={tbtn(tab===t,ac)}>{l}</button>
+ <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction);}} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>

@@ -1280,7 +1280,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {!isAltView&&!isEverything&&view!=="budget"&&(
  <div style={{padding:"10px 20px"}}>
  {view==="all"&&(()=>{
- const focusData=[...SETUPS].map(s=>{
+ const focusData=[...allSetups].map(s=>{
  const hist=memoryData[s.symbol]||[];
  const last=hist[hist.length-1];
  if(last&&last.invalidated)return{s,pScore:-999,al:0,earnD:null,reasons:[]};
@@ -1932,7 +1932,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {view==="screener"&&(
  <div style={{padding:16}}>
   {(()=>{
-   const topQ=[...SETUPS].sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
+   const topQ=[...allSetups].sort((a,b)=>alignmentScore(b)-alignmentScore(a)).slice(0,3);
    if(!topQ.length)return null;
    return(
     <div style={{marginBottom:14,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>

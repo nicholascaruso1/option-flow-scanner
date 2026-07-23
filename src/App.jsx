@@ -696,10 +696,12 @@ export default function OptionsScanner() {
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(false);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
+const [initDone, setInitDone] = useState(false);
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,c1d,jnl,pfc] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{})]);
+ const [f,c,t,ai,mem,c1d,jnl,pfc,ac] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{}),ls("of_ai_cards",{})]);
  setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{});
+setAiCards(ac||{}); setInitDone(true);
  })();
  }, []);
  useEffect(()=>{
@@ -708,7 +710,7 @@ export default function OptionsScanner() {
  .then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);})
  .catch(()=>setScreenerLoading(false));
  },[]);
- useEffect(()=>{(async()=>{const ac=await ls("of_ai_cards",{});setAiCards(ac||{});})();},[]);
+ 
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const key = todayKey();
@@ -803,7 +805,7 @@ export default function OptionsScanner() {
  // Fire live data refresh once on mount (useRef avoids infinite-loop from dep array)
  const _doRefreshRef = useRef(null);
  useEffect(() => { _doRefreshRef.current = doRefresh; }, [doRefresh]);
- useEffect(() => { _doRefreshRef.current?.(); }, []);
+ useEffect(() => { if (initDone) _doRefreshRef.current?.(); }, [initDone]);
  const toggleFav = useCallback((sym) => {
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
  }, []);
@@ -841,8 +843,12 @@ export default function OptionsScanner() {
  const analyzeHit = useCallback(async (h) => {
   setAnalyzing(p=>({...p,[h.ticker]:true}));
   try {
+   const existing = h.existingCard||null;
+   const prevHistory = existing?.analysisHistory||[];
+   const prevLog = existing?.logEntry?[{ts:existing.dataAsOf||"prior",note:existing.logEntry.note}]:[];
+   const histCtx = [...prevHistory,...prevLog].slice(-3);
    const resp = await fetch(WORKER+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({ticker:h.ticker,price:h.price,bias:h.bias,retracement:h.details?.retr_pct,conditions:h.conditions,details:h.details})});
+    body:JSON.stringify({ticker:h.ticker,price:h.price,bias:h.bias,retracement:h.details?.retr_pct,conditions:h.conditions,details:h.details,historyContext:histCtx.length?histCtx:undefined})});
    const json = await resp.json();
    if(!json.ok) throw new Error(json.error||"analyze failed");
    const a = json.analysis||{};
@@ -857,6 +863,7 @@ export default function OptionsScanner() {
     earningsDate:a.earningsDate&&a.earningsDate!=="null"?a.earningsDate:null,
     earningsLabel:a.earningsLabel&&a.earningsLabel!=="null"?a.earningsLabel:null,
     keyLevels:(a.keyLevels||[]).map(k=>({p:k.p,l:k.l,c:KIND_C[k.kind]||T.gold})),
+    analysisHistory:[...prevHistory,...prevLog].slice(-5),
    };
    if(!card.symbol) throw new Error("no symbol in analysis");
    setAiCards(prev=>{const n={...prev,[card.symbol]:card};ss("of_ai_cards",n);return n;});
@@ -864,7 +871,11 @@ export default function OptionsScanner() {
   } catch(e){ alert("Analysis failed: "+e.message); }
   setAnalyzing(p=>({...p,[h.ticker]:false}));
  }, [WORKER]);
- const regenCard = (s) => analyzeHit({ticker:s.symbol, price:s.price, bias:s.direction==="put"?"BEAR":"BULL", retracement:null, conditions:{}, details:{}});
+ const regenCard = (s) => {
+  const existing = aiCards[s.symbol];
+  const lp = liveData[s.symbol]?.price||s.price;
+  analyzeHit({ticker:s.symbol,price:lp,bias:(s.direction||s.dir)==="put"?"BEAR":"BULL",retracement:null,conditions:{},details:{},existingCard:existing||null});
+};
  const tog = (sym) => {
   const willOpen = !open[sym];
   setOpen(p=>({...p,[sym]:!p[sym]}));
@@ -1194,7 +1205,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  </div>
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
- <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
  {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
  <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
@@ -1491,7 +1502,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  </div>
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
- <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"}</button>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
  {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
  <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
  {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>

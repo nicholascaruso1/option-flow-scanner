@@ -1405,8 +1405,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const pfStageRank=pfCd?(STAGE_RANK_PF[pfCd.stage]??-1):-1;
  const pfC123ok=pfStageRank>=2;
  const pfLivePrice=liveData[pfSym]?.price||s.price||0;
- const pfOteOk=!!(pfCd?.ote_low!=null&&pfCd?.ote_high!=null&&pfLivePrice>=pfCd.ote_low&&pfLivePrice<=pfCd.ote_high);
- const pfSwingOk=pfCd?.protected_swing!=null?(s.direction==="call"?pfLivePrice>pfCd.protected_swing:pfLivePrice<pfCd.protected_swing):false;
+ const pfOteOk=!!(pfOte_low!=null&&pfOte_high!=null&&pfLivePrice>=pfOte_low&&pfLivePrice<=pfOte_high);
+ const pfSwingOk=pfSwing!=null?(s.direction==="call"?pfLivePrice>pfSwing:pfLivePrice<pfSwing):false;
  const pfAutoPass=[pfMtfOk,pfSessOk,pfDayOk,pfC123ok,pfOteOk,pfSwingOk].filter(Boolean).length;
  const pfManPass=["g_oi","g_cal"].filter(id=>pfChecks2.includes(id)).length;
  const pfTotal=8;
@@ -1772,8 +1772,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
     {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:pfSessOk,note:sessionProfile.profile},
     {id:"g_day",label:"Valid Profile Day",ok:pfDayOk,note:pfDayNote},
     {id:"g_c123",label:"C1/C2/C3 structure ≥ C2 confirmed",ok:pfC123ok,note:pfC123ok?"Stage: "+(pfCd?.stage||"").replace(/_/g," "):"Stage: "+(pfCd?.stage||"LOADING").replace(/_/g," ")+" — need C2_CONFIRMED or better"},
-    {id:"g_ote_auto",label:"Price in OTE zone (0–50% Fib)",ok:pfOteOk,note:pfOteOk?"$"+pfLivePrice.toFixed(2)+" inside OTE $"+(pfCd?.ote_low||0).toFixed(2)+"–$"+(pfCd?.ote_high||0).toFixed(2):"$"+pfLivePrice.toFixed(2)+" outside OTE $"+(pfCd?.ote_low||0).toFixed(2)+"–$"+(pfCd?.ote_high||0).toFixed(2)},
-    {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfCd?.protected_swing||0).toFixed(2):"⚠ Price "+(s.direction==="call"?"below":"above")+" protected swing $"+(pfCd?.protected_swing||0).toFixed(2)},
+    {id:"g_ote_auto",label:"Price in OTE zone (0–50% Fib)",ok:pfOteOk,note:pfOteOk?"$"+pfLivePrice.toFixed(2)+" inside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2):"$"+pfLivePrice.toFixed(2)+" outside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2)},
+    {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfSwing||0).toFixed(2):"⚠ Price "+(s.direction==="call"?"below":"above")+" protected swing $"+(pfSwing||0).toFixed(2)},
    ].map(g=>(
    <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
     <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>

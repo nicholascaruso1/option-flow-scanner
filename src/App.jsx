@@ -1401,6 +1401,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const pfDayOk=pfEstDay!==1;
  const pfDayNote=pfEstDay===3?"Wed — Primary entry day":pfEstDay===4?"Thu — Second opportunity":pfEstDay===1?"Mon — Monday Rule: avoid":pfEstDay===5?"Fri — TGIF setups only":"Valid entry day";
  const pfCd=candleData[pfSym]?.daily||null;
+const pfOte_low=(pfCd?.ote_low??aiCards[pfSym]?.ote_low)??null;
+const pfOte_high=(pfCd?.ote_high??aiCards[pfSym]?.ote_high)??null;
+const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const STAGE_RANK_PF={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
  const pfStageRank=pfCd?(STAGE_RANK_PF[pfCd.stage]??-1):-1;
  const pfC123ok=pfStageRank>=2;

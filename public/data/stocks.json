@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-22T00:14:20.257934+00:00",
+  "generated_at": "2026-07-23T06:41:41.658162+00:00",
   "universe_size": 120,
   "min_met": 4,
   "candidates": [
     {
       "ticker": "NFLX",
-      "price": 68.67,
+      "price": 68.53,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -17,11 +17,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 73.18,
-        "sma50": 79.76,
-        "sma200": 93.23,
-        "avg_vol_m": 52.13,
-        "retr_pct": 18.6,
+        "sma20": 72.97,
+        "sma50": 79.38,
+        "sma200": 93.0,
+        "avg_vol_m": 51.85,
+        "retr_pct": 21.8,
         "exp_date": "2026-07-17",
         "exp_dir": "BULL"
       },
@@ -30,19 +30,19 @@
           "type": "high",
           "price": 91.48,
           "date": "2026-05-19",
-          "bars_ago": 42
+          "bars_ago": 43
         },
         "draw_target": {
           "type": "low",
           "price": 70.86,
           "date": "2026-06-25",
-          "bars_ago": 17
+          "bars_ago": 18
         },
-        "draw_pct": -3.2,
+        "draw_pct": -3.4,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -51,7 +51,7 @@
     },
     {
       "ticker": "UNH",
-      "price": 436.35,
+      "price": 431.31,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -63,11 +63,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 422.7,
-        "sma50": 404.19,
-        "sma200": 338.74,
-        "avg_vol_m": 6.2,
-        "retr_pct": 38.7,
+        "sma20": 423.81,
+        "sma50": 405.26,
+        "sma200": 339.16,
+        "avg_vol_m": 6.22,
+        "retr_pct": 26.5,
         "exp_date": "2026-07-16",
         "exp_dir": "BEAR"
       },
@@ -76,19 +76,19 @@
           "type": "low",
           "price": 372.59,
           "date": "2026-06-02",
-          "bars_ago": 33
+          "bars_ago": 34
         },
         "draw_target": {
           "type": "high",
           "price": 401.85,
           "date": "2026-05-13",
-          "bars_ago": 46
+          "bars_ago": 47
         },
-        "draw_pct": -7.9,
+        "draw_pct": -6.8,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -96,45 +96,45 @@
       }
     },
     {
-      "ticker": "NOC",
-      "price": 512.29,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 5,
+      "ticker": "SMCI",
+      "price": 30.56,
+      "bias": "MIXED",
+      "direction": "BULL",
+      "met": 4,
       "conditions": {
-        "topdown_bias": true,
+        "topdown_bias": false,
         "expansion": true,
         "in_zone": true,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 523.79,
-        "sma50": 536.69,
-        "sma200": 605.96,
-        "avg_vol_m": 1.06,
-        "retr_pct": 5.3,
-        "exp_date": "2026-07-21",
+        "sma20": 27.81,
+        "sma50": 32.84,
+        "sma200": 33.7,
+        "avg_vol_m": 46.62,
+        "retr_pct": 45.5,
+        "exp_date": "2026-07-22",
         "exp_dir": "BULL"
       },
       "am_projection": {
         "reaction_swing": {
-          "type": "high",
-          "price": 552.63,
-          "date": "2026-07-07",
-          "bars_ago": 10
+          "type": "low",
+          "price": 25.46,
+          "date": "2026-04-29",
+          "bars_ago": 57
         },
         "draw_target": {
-          "type": "low",
-          "price": 493.84,
-          "date": "2026-06-29",
-          "bars_ago": 15
+          "type": "high",
+          "price": 51.4,
+          "date": "2026-06-02",
+          "bars_ago": 34
         },
-        "draw_pct": 3.6,
+        "draw_pct": 68.2,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -143,7 +143,7 @@
     },
     {
       "ticker": "ACHR",
-      "price": 5.28,
+      "price": 5.18,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -156,10 +156,10 @@
       },
       "details": {
         "sma20": 4.88,
-        "sma50": 5.57,
-        "sma200": 7.28,
-        "avg_vol_m": 35.77,
-        "retr_pct": 18.1,
+        "sma50": 5.55,
+        "sma200": 7.26,
+        "avg_vol_m": 35.87,
+        "retr_pct": 30.1,
         "exp_date": "2026-07-20",
         "exp_dir": "BULL"
       },
@@ -168,19 +168,19 @@
           "type": "low",
           "price": 5.47,
           "date": "2026-04-29",
-          "bars_ago": 56
+          "bars_ago": 57
         },
         "draw_target": {
           "type": "high",
           "price": 7.09,
           "date": "2026-05-28",
-          "bars_ago": 36
+          "bars_ago": 37
         },
-        "draw_pct": 34.3,
+        "draw_pct": 36.9,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -189,7 +189,7 @@
     },
     {
       "ticker": "CLSK",
-      "price": 15.38,
+      "price": 15.32,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -201,32 +201,32 @@
         "liquid": true
       },
       "details": {
-        "sma20": 14.08,
-        "sma50": 15.26,
+        "sma20": 13.99,
+        "sma50": 15.28,
         "sma200": 13.29,
-        "avg_vol_m": 23.35,
-        "retr_pct": 112.2,
+        "avg_vol_m": 23.12,
+        "retr_pct": 109.8,
         "exp_date": "2026-07-14",
         "exp_dir": "BEAR"
       },
       "am_projection": {
         "reaction_swing": {
           "type": "low",
-          "price": 14.06,
-          "date": "2026-06-05",
-          "bars_ago": 30
+          "price": 11.94,
+          "date": "2026-07-08",
+          "bars_ago": 10
         },
         "draw_target": {
           "type": "high",
           "price": 19.05,
           "date": "2026-06-22",
-          "bars_ago": 20
+          "bars_ago": 21
         },
-        "draw_pct": 23.9,
+        "draw_pct": 24.3,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -234,45 +234,45 @@
       }
     },
     {
-      "ticker": "WFC",
-      "price": 87.74,
-      "bias": "BULL",
+      "ticker": "RIOT",
+      "price": 23.38,
+      "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
       "conditions": {
-        "topdown_bias": true,
+        "topdown_bias": false,
         "expansion": true,
         "in_zone": true,
-        "vol_confirm": false,
+        "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 85.95,
-        "sma50": 81.54,
-        "sma200": 83.96,
-        "avg_vol_m": 16.41,
-        "retr_pct": 37.7,
-        "exp_date": "2026-07-17",
-        "exp_dir": "BEAR"
+        "sma20": 22.74,
+        "sma50": 24.7,
+        "sma200": 18.53,
+        "avg_vol_m": 17.48,
+        "retr_pct": 9.3,
+        "exp_date": "2026-07-22",
+        "exp_dir": "BULL"
       },
       "am_projection": {
         "reaction_swing": {
           "type": "low",
-          "price": 72.78,
-          "date": "2026-05-15",
-          "bars_ago": 44
+          "price": 23.67,
+          "date": "2026-06-10",
+          "bars_ago": 28
         },
         "draw_target": {
           "type": "high",
-          "price": 87.08,
-          "date": "2026-06-17",
-          "bars_ago": 22
+          "price": 30.32,
+          "date": "2026-06-22",
+          "bars_ago": 21
         },
-        "draw_pct": -0.8,
+        "draw_pct": 29.7,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -281,7 +281,7 @@
     },
     {
       "ticker": "C",
-      "price": 132.84,
+      "price": 132.25,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -293,11 +293,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 138.59,
-        "sma50": 133.92,
-        "sma200": 116.72,
-        "avg_vol_m": 14.05,
-        "retr_pct": 5.6,
+        "sma20": 137.95,
+        "sma50": 134.06,
+        "sma200": 116.9,
+        "avg_vol_m": 13.91,
+        "retr_pct": 0.7,
         "exp_date": "2026-07-14",
         "exp_dir": "BEAR"
       },
@@ -306,19 +306,19 @@
           "type": "high",
           "price": 147.96,
           "date": "2026-06-18",
-          "bars_ago": 21
+          "bars_ago": 22
         },
         "draw_target": {
           "type": "low",
           "price": 119.76,
           "date": "2026-05-19",
-          "bars_ago": 42
+          "bars_ago": 43
         },
-        "draw_pct": 9.8,
+        "draw_pct": 9.4,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -327,7 +327,7 @@
     },
     {
       "ticker": "SCHW",
-      "price": 99.96,
+      "price": 100.8,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -339,11 +339,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 98.13,
-        "sma50": 93.04,
-        "sma200": 94.71,
-        "avg_vol_m": 10.05,
-        "retr_pct": 5.0,
+        "sma20": 98.52,
+        "sma50": 93.28,
+        "sma200": 94.75,
+        "avg_vol_m": 9.99,
+        "retr_pct": 22.9,
         "exp_date": "2026-07-21",
         "exp_dir": "BEAR"
       },
@@ -352,65 +352,19 @@
           "type": "low",
           "price": 87.63,
           "date": "2026-06-26",
-          "bars_ago": 16
+          "bars_ago": 17
         },
         "draw_target": {
           "type": "high",
           "price": 93.43,
           "date": "2026-05-18",
-          "bars_ago": 43
+          "bars_ago": 44
         },
-        "draw_pct": -6.5,
+        "draw_pct": -7.3,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "OXY",
-      "price": 56.5,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 52.08,
-        "sma50": 54.79,
-        "sma200": 49.39,
-        "avg_vol_m": 9.57,
-        "retr_pct": -66.5,
-        "exp_date": "2026-07-08",
-        "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 47.77,
-          "date": "2026-07-01",
-          "bars_ago": 13
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 60.96,
-          "date": "2026-05-20",
-          "bars_ago": 41
-        },
-        "draw_pct": 7.9,
-        "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -419,7 +373,7 @@
     },
     {
       "ticker": "USO",
-      "price": 128.85,
+      "price": 131.68,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -431,11 +385,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 112.66,
-        "sma50": 125.56,
-        "sma200": 97.89,
-        "avg_vol_m": 6.08,
-        "retr_pct": -133.5,
+        "sma20": 113.68,
+        "sma50": 125.52,
+        "sma200": 98.19,
+        "avg_vol_m": 6.25,
+        "retr_pct": -172.1,
         "exp_date": "2026-07-13",
         "exp_dir": "BULL"
       },
@@ -444,19 +398,19 @@
           "type": "low",
           "price": 102.42,
           "date": "2026-07-02",
-          "bars_ago": 12
+          "bars_ago": 13
         },
         "draw_target": {
           "type": "high",
           "price": 154.08,
           "date": "2026-05-18",
-          "bars_ago": 43
+          "bars_ago": 44
         },
-        "draw_pct": 19.6,
+        "draw_pct": 17.0,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -465,7 +419,7 @@
     },
     {
       "ticker": "TGT",
-      "price": 138.48,
+      "price": 137.92,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -477,11 +431,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 134.94,
-        "sma50": 129.61,
-        "sma200": 110.85,
-        "avg_vol_m": 4.54,
-        "retr_pct": 22.3,
+        "sma20": 135.13,
+        "sma50": 129.89,
+        "sma200": 111.11,
+        "avg_vol_m": 4.45,
+        "retr_pct": 31.2,
         "exp_date": "2026-07-15",
         "exp_dir": "BULL"
       },
@@ -490,19 +444,19 @@
           "type": "low",
           "price": 124.7,
           "date": "2026-07-06",
-          "bars_ago": 11
+          "bars_ago": 12
         },
         "draw_target": {
           "type": "high",
           "price": 142.82,
           "date": "2026-06-25",
-          "bars_ago": 17
+          "bars_ago": 18
         },
-        "draw_pct": 3.1,
+        "draw_pct": 3.6,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -511,7 +465,7 @@
     },
     {
       "ticker": "AMGN",
-      "price": 366.24,
+      "price": 366.05,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -523,11 +477,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 361.98,
-        "sma50": 347.66,
-        "sma200": 337.03,
-        "avg_vol_m": 2.26,
-        "retr_pct": 26.9,
+        "sma20": 362.93,
+        "sma50": 348.39,
+        "sma200": 337.4,
+        "avg_vol_m": 2.25,
+        "retr_pct": 25.7,
         "exp_date": "2026-07-17",
         "exp_dir": "BEAR"
       },
@@ -536,19 +490,19 @@
           "type": "low",
           "price": 334.05,
           "date": "2026-06-18",
-          "bars_ago": 21
+          "bars_ago": 22
         },
         "draw_target": {
           "type": "high",
           "price": 356.76,
           "date": "2026-04-09",
-          "bars_ago": 70
+          "bars_ago": 71
         },
-        "draw_pct": -2.6,
+        "draw_pct": -2.5,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,
@@ -556,10 +510,10 @@
       }
     },
     {
-      "ticker": "LMT",
-      "price": 507.09,
-      "bias": "BEAR",
-      "direction": "BEAR",
+      "ticker": "GS",
+      "price": 1098.2,
+      "bias": "BULL",
+      "direction": "BULL",
       "met": 4,
       "conditions": {
         "topdown_bias": true,
@@ -569,32 +523,32 @@
         "liquid": true
       },
       "details": {
-        "sma20": 515.94,
-        "sma50": 519.63,
-        "sma200": 537.55,
-        "avg_vol_m": 1.13,
-        "retr_pct": 3.2,
-        "exp_date": "2026-07-21",
-        "exp_dir": "BULL"
+        "sma20": 1060.52,
+        "sma50": 1036.13,
+        "sma200": 901.5,
+        "avg_vol_m": 2.07,
+        "retr_pct": 14.5,
+        "exp_date": "2026-07-16",
+        "exp_dir": "BEAR"
       },
       "am_projection": {
         "reaction_swing": {
-          "type": "high",
-          "price": 547.47,
-          "date": "2026-07-07",
-          "bars_ago": 10
+          "type": "low",
+          "price": 1003.0,
+          "date": "2026-07-01",
+          "bars_ago": 14
         },
         "draw_target": {
-          "type": "low",
-          "price": 490.05,
-          "date": "2026-06-22",
-          "bars_ago": 20
+          "type": "high",
+          "price": 1125.0,
+          "date": "2026-06-18",
+          "bars_ago": 22
         },
-        "draw_pct": 3.4,
+        "draw_pct": 2.4,
         "profile": {
-          "label": "Continuation or Counter",
-          "note": "Thursday: continuation of expansion OR early setup for Friday TGIF.",
-          "next_day": "Thursday Jul 23"
+          "label": "TGIF Setup",
+          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
+          "next_day": "Friday Jul 24"
         },
         "gate_reaction": true,
         "gate_profile": true,

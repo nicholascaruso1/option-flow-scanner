@@ -1153,7 +1153,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- const invAlert=getInvalidationAlert(memHistory);
+ const _invP=liveData[s.symbol]?.price||s.price;
+ const _invCk=checkInvalidation(s,_invP);
+ const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:getInvalidationAlert(memHistory);
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const tab=getTab(s.symbol);
@@ -1381,7 +1383,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- const invAlert=getInvalidationAlert(memHistory);
+ const _invP=liveData[s.symbol]?.price||s.price;
+ const _invCk=checkInvalidation(s,_invP);
+ const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:getInvalidationAlert(memHistory);
  const ld=liveData[s.symbol];
  const ms=ld?.marketState;
  const dispPrice=ms==="PRE"&&ld?.preMarket?ld.preMarket:(ld?.price||s.price);

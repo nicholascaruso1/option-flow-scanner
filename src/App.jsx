@@ -338,160 +338,6 @@ const CHECKLIST=[
  {id:"topdown", label:"Top-down bias aligned (monthly/weekly/daily)", auto:true, desc:"Monthly and weekly bias confirms daily setup direction. If higher timeframes conflict, wait for alignment or skip."},
  {id:"budget", label:"Calendar clear + OI > 500 + within budget", auto:false, desc:"No red-folder events within 24hrs. OI > 500 on target strike, bid/ask spread < 10% of mid. Position ≤$200 IRA · ≤$5 Individual. IV Rank < 30 preferred."},
 ];
-const SETUPS=[
- {symbol:"ABCL",company:"AbCellera Biologics",price:7.60,chg:-1.17,vol:"8.0M",mcap:"$2.03B",capSize:"Small",
- direction:"call",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,
- contract:null,entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-06",earningsLabel:"Aug 6",accountFit:["IRA ($200)","Individual ($3-5)"],
- autoChecks:["close","fib50","dte","budget","topdown"],retailTrap:true,
- narrative:"🔴 Bearish — clinical losses (-$146M). Retail skeptical. C1 = downtrend from $11→$2.75.",
- structure:"🟢 Bullish — 52-wk high at $7.39 on record volume. C2 closed through $6.86 OB. C3 CISD confirmed. Weekly fractal expansion.",
- divergence:"AMD: Accumulation $2.75–$5 base. Manipulation = $6.66 AH dip trapping bears. Distribution = expansion toward $8.84–$11. Retail selling into record-volume weekly candle.",
- phaseNote:"RETRACEMENT — Watching for C2 failure swing at $6.66–$6.86 OB zone. Body close back above $6.86 = C3 CISD call entry. Protected swing = $6.66. Body close below $6.66 = invalidation.",
- entryNote:"$5 call intrinsic ~$1.66 at $6.66. Monitor Monday open. If holds above $6.66 with C3 CISD body close, IRA continues. Body close below $6.66 = exit IRA same day.",
- nestedFib:"OB: $6.86 (last down-close before Jun 27 expansion). Anchor Fib from OB body high to swing low. Mean Threshold = 50% of OB body. -1 extension = next target.",
- invalidation:"Daily body close below $6.66 (Order Block / protected swing violated)",
- logEntry:{ts:"Jul 19, 2026",note:"Jul 17 call expired. Watching retracement to $6.66–$6.86 OB zone for new C2 failure swing. ABCL635 Phase 2 data expected Q3 2026 = primary catalyst. Earnings Aug 6."},
- keyLevels:[{p:"$7.44",l:"52-wk high / swing high watch",c:T.gold},{p:"$7.39",l:"Prior close",c:T.teal},{p:"$6.86",l:"OB / Fib anchor · Mean Threshold $6.76",c:T.gold},{p:"$6.66",l:"Order Block / Protected Swing — body close below = exit IRA",c:T.rose},{p:"$5.00",l:"Strike",c:T.textDim}],
- catalysts:["Record volume 52-wk high close","ABCL635 Phase 2 data Q3 2026","Jazz Pharma TCE partnership","Cantor Fitz OW + $7 PT","EPS beat · Revenue 2x YoY","⚠ Earnings Aug 6 — after expiry, consider rolling"],
- mtf:[["12M","bull","Basing"],["6M","bull","Exp."],["3M","bull","Momentum"],["Monthly","bull","Breakout"],["Weekly","bull","Fractal exp."],["Daily","bull","Above levels"]],
- },
- {symbol:"ATAI",company:"AtaiBeckley Inc.",price:4.88,chg:-6.24,vol:"8.2M",mcap:"$1.94B",capSize:"Small",
- direction:"call",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,
- contract:null,entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-12",earningsLabel:"Aug 12",accountFit:["IRA ($200)"],
- autoChecks:["close","fib50","dte","budget","topdown"],retailTrap:true,
- narrative:"🔴 Bearish — psychedelic biotech, $660M losses. C1 = downtrend from $20+→$2.15. Retail skeptical.",
- structure:"🟢 Bullish — +15.94% today on 63M volume. C2 closed through $4.30 OB. C3 CISD confirmed. Russell add tomorrow.",
- divergence:"Classic AMD: Accumulation $3.78–$4.30 (3 weeks). Manipulation = Jun 23 wick below $3.78 trapping shorts. Distribution = +15.94% expansion. Retail bearish = exit liquidity.",
- phaseNote:"RETRACEMENT — Watch retrace to $4.00–$4.30 OB zone. C2 failure swing + C3 body close above = call entry. Protected swing = $3.78. Body close below $3.78 = invalidation.",
- entryNote:"No new entries. If retrace to $4.00–$4.30 holds and C2/C3 develops, confirms next leg. Protected swing = $3.78 (C2 low). Body close below $3.78 = full invalidation.",
- nestedFib:"OB: ~$4.00 (last down-close before Jun 22 expansion). Anchor nested Fib from $5.31 to swing low on retrace. Mean Threshold = 50% of OB body. -1 = next target.",
- invalidation:"Daily body close below $3.78 (protected swing / OB violated)",
- logEntry:{ts:"Jul 19, 2026",note:"Jul 17 call rolled. Watching $4.00–$4.30 OB zone for C2 failure swing. C3 body close above = call entry. Protected swing = $3.78. Earnings Aug 12."},
- keyLevels:[{p:"$6.75",l:"52-wk high / macro target",c:T.sage},{p:"$5.31",l:"Current / expansion close",c:T.teal},{p:"$4.30",l:"Prior OB / support",c:T.gold},{p:"$4.00",l:"OB range floor · Mean Threshold ~$4.08",c:T.gold},{p:"$3.78",l:"Protected Swing / C2 low — body close below = full invalidation",c:T.rose}],
- catalysts:["Russell 2000 + 3000 add Jun 29","BPL-003 Phase 3 · VLS-01 Phase 2b Q4","White House EO tailwind","Q1 EPS beat · Rev 4x · $209.9M runway","⚠ Earnings Aug 12 — after expiry, consider rolling"],
- mtf:[["12M","bear","Down"],["6M","neut","Basing"],["3M","bull","Recov."],["Monthly","bull","Breakout"],["Weekly","bull","Conf."],["Daily","bull","Above levels"]],
- },
- {symbol:"SMCI",company:"Super Micro Computer",price:27.65,chg:-9.19,vol:"52.0M",mcap:"$20.5B",capSize:"Large",
- direction:"call",phase:"WATCH_REVERSAL",tier:"Tier 1",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-11",earningsLabel:"Aug 11",accountFit:["IRA ($200)"],
- autoChecks:["budget"],retailTrap:true,
- narrative:"🔴 Bearish — class action lawsuits, AI oversupply, cash flow. NEW: Taiwan offices raided Jun 29 (Nvidia chip smuggling allegations). C1 = bearish leg $51→$27.",
- structure:"🔴 Bearish — Prior call setup INVALIDATED. $27.65 is a body close below $29.38 protected swing. Taiwan raid catalyst Jun 29 = new bearish C2 forming. Watch for dead-cat bounce to $29-$31 Bearish OB before put entry.",
- divergence:"AMD: Accumulation below $27. Manipulation = $27.13 wick Jun 15 stopping out retail shorts. Distribution = Jun 22 expansion + pending C3 confirmation. Retail still selling = your call entry liquidity.",
- phaseNote:"WATCH REVERSAL — Call setup INVALIDATED at $29.38 (body close below = violated). Taiwan office raids Jun 29 created a new bearish catalyst. Watch for bounce to $29–$31 (prior OB). If C2 failure swing forms and C3 CISD body close below = put entry thesis begins. Earnings Aug 11 = risk event.",
- entryNote:"Entry: 4pm BODY close above $31.64 OB. Anchor nested Fib $43.80→C2 low. Mean Threshold of OB = $30.51. -1 = first target. Protected swing = C2 body low. Delta 0.35–0.45, Aug/Sep DTE.",
- nestedFib:"OB = $31.64 (last resistance before expansion). Mean Threshold = $30.51. Fib from $43.80 to C2 low. -1 ext = first target. Protected swing = C2 wick low — body close below = exit.",
- invalidation:"Daily body close below $29.38 (OB / protected swing violated — wick through does NOT count)",
- logEntry:{ts:"Jul 1, 2026",note:"INVALIDATED — $27.65 body close below $29.38 protected swing. Taiwan offices raided Jun 29 (alleged Nvidia chip smuggling) — new bearish catalyst. Prior call thesis canceled. Watch for dead-cat bounce to $29-$31 OB for potential put setup."},
- keyLevels:[{p:"$56.00",l:"-2 ext (weekly target)",c:T.sage},{p:"$43.80",l:"-1 ext / first target",c:T.sage},{p:"$31.64",l:"Bullish OB / C2 trigger · Mean Threshold $30.51",c:T.gold},{p:"$30.59",l:"Current — in 0–50% zone",c:T.teal},{p:"$29.38",l:"50% Fib / Protected Swing — body close below = invalidation",c:T.rose}],
- catalysts:["Earnings Aug 11","GF Securities Buy @ $48 PT","Nvidia Vera Rubin partnership Jun 22","36% EPS beat"],
- mtf:[["12M","bear","Decline"],["6M","bear","Down"],["3M","neut","Basing"],["Monthly","bull","Reclaim"],["Weekly","bull","Exp."],["Daily","bull","Entry zone"]],
- },
- {symbol:"SPCX",company:"Space Exploration Tech",price:157.54,chg:2.94,vol:"65.4M",mcap:"$2.0T",capSize:"Mega",
- direction:"put",phase:"RETRACEMENT",tier:"Tier 1",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-06",earningsLabel:"Aug 6",accountFit:["IRA ($200)"],
- autoChecks:["topdown","budget"],retailTrap:true,
- narrative:"🟢 Bullish — SpaceX IPO hype, Nasdaq 100 add Jul 7, Elon brand. Max FOMO. C1 = IPO hype candle $135→$225.64 ATH.",
- structure:"🔴 Bearish — ATH $225.64 is the C1 high. Bearish leg $225.64→$147.11 = C2 expansion. Now retracing to Bearish OB at $173.14.",
- divergence:"AMD reverse: Short accumulation at $173–$181 OB. Manipulation = Nasdaq add Jul 7 spikes INTO OB, trapping retail longs. Distribution = put expansion from $173 toward $147+.",
- phaseNote:"RETRACEMENT — Bouncing from $147 toward Bearish OB $173.14. C2 at $173–$181.58, C3 body close below = put entry. Nasdaq add Jul 7 may fuel spike into OB.",
- entryNote:"Wait for bounce to $173–$181.58 (Bearish OB). C2 wick above $173, C3 body close below = put entry. Protected swing = C2 wick high. Body close above $181.58 = invalidation.",
- nestedFib:"Bearish OB = $173.14. Mean Threshold = $168 (50% of OB body). Fib from $225.64 ATH to C2 low for extensions. -1 = first put target.",
- invalidation:"Daily body close above $181.58 (Bearish OB / 50% Fib violated — wick through ≠ invalidation)",
- logEntry:{ts:"Jun 28, 2026",note:"Bearish expansion from ATH $225.64 reclaimed. Bouncing from ATL $147.11. Nasdaq 100 add Jul 7 may spike into $173–$18..."},
- keyLevels:[{p:"$181.58",l:"0.5 Fib / invalidation",c:T.rose},{p:"$173.14",l:"Bearish OB — C3 body close below = put entry · Mean Threshold $168",c:T.gold},{p:"$153.23",l:"Current — retracing up",c:T.teal},{p:"$139.39",l:"-2 ext target",c:T.sage},{p:"$105.00",l:"-4 macro target",c:T.sage}],
- catalysts:["Nasdaq 100 add Jul 7 — bounce fuel INTO resistance","Earnings Aug 6","$4.9B net loss · Post-IPO distribution"],
- mtf:[["12M","n/a","No history"],["6M","n/a","No history"],["3M","bear","From ATH"],["Monthly","bear","H&S complete"],["Weekly","bear","Cont."],["Daily","bear","Ret. to OB"]],
- },
- {symbol:"MLYS",company:"Mineralys Therapeutics",price:23.76,chg:-17.64,vol:"3.9M",mcap:"$1.96B",capSize:"Small",
- direction:"put",phase:"EXPANSION",tier:"Tier 2",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:null,earningsLabel:null,accountFit:["IRA ($200)"],
- autoChecks:["budget"],retailTrap:true,
- narrative:"🟢 Bullish (retail) — biotech seen as oversold after -17.64%. C1 = prior uptrend into Jun 26 catalyst.",
- structure:"🔴 Bearish — Jun 26 -17.64% IS the C2 expansion through prior base. Bearish OB = last up-close before drop (~$28.50 open).",
- divergence:"AMD: Institutional short accumulation above $28.50. Manipulation = initial catalyst spike trapping longs. Distribution = -17.64% C2. Retail dip-buyers = exit liquidity. Wait for dead-cat bounce to fade.",
- phaseNote:"EXPANSION — C2 occurred. Waiting for bounce to Bearish OB ($26.13–$28.50). C2 wick above OB, C3 body close below = put entry.",
- entryNote:"Wait for bounce to $26–$28.50 (Bearish OB). C2 failure swing: wick above OB, C3 CISD body close back below = put entry. Protected swing = C2 bounce wick high. OI must be > 500.",
- nestedFib:"Bearish OB = $28.50. Mean Threshold = $26.13 (50% of OB body). Fib $28.50→$23.76. After entry, nest Fib from C2 bounce high for extension targets.",
- invalidation:"Daily body close above $28.50 (Bearish OB reclaimed = thesis invalidated)",
- logEntry:{ts:"Jun 28, 2026",note:"-17.64% expansion Jun 26. Bearish OB ceiling at ~$28.50. Waiting 1-3 days for dead-cat bounce. Need C2 failure swing ..."},
- keyLevels:[{p:"$28.50",l:"Bearish OB / range ceiling · Mean Threshold $26.13",c:T.gold},{p:"$26.13",l:"50% Fib / OB Mean Threshold — invalidation on bounce",c:T.rose},{p:"$23.76",l:"Current / C2 expansion low",c:T.teal},{p:"$18–$20",l:"-1 extension target",c:T.sage}],
- catalysts:["Clinical/regulatory catalyst Jun 26 — verify","Biotech sector pressure"],
- mtf:[["12M","bear","Down"],["6M","bear","Cont."],["3M","neut","Prior cons."],["Monthly","neut","Neutral"],["Weekly","bear","Level break"],["Daily","bear","-17.64% exp."]],
- },
- {symbol:"ILLR",company:"Triller Group Inc",price:4.46,chg:46.0,vol:"Low",mcap:"$13.6M",capSize:"Micro",
- direction:"watch",phase:"EXPANSION",tier:"Tier 2",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:null,earningsLabel:null,accountFit:["Individual ($3-5)","IRA ($200)"],
- autoChecks:[],retailTrap:true,
- narrative:"🟢 Bullish (retail) — SpaceX-linked treasury + Elon FOMO. C1 undefined — pre-spike sub-$0.25 (reverse split). Momentum/news event.",
- structure:"⚪ Undefined — Jun 26 +46% IS the C2 expansion. OB = $3.05 (open of that candle). Body close above $3.05 = OB as support, call setup. Body close below $3.05 = Bearish OB forms, put setup.",
- divergence:"AMD in watch mode: Accumulation unclear. Manipulation = announcement spike trapping momentum buyers at $4.46. Distribution direction = undecided until $3.05 confirmed or violated on a daily body close.",
- phaseNote:"EXPANSION — C2 occurred Jun 26. $3.05 OB = direction decider. CALL: retrace to $3.75, C2, C3 close up = entry. PUT: body close below $3.05 → retrace → C2 → C3 close down = entry.",
- entryNote:"No entry yet. Both scenarios: C2 failure swing + C3 CISD body close. CALL: body close above $3.75. PUT: body close below $3.05 first. Protected swing = $3.05 OB. OI must be > 300.",
- nestedFib:"CALL: Fib from $3.05 OB to C2 low. PUT: Fib from $4.46 high to C2 bounce high. Extensions = targets.",
- invalidation:"CALL: body close below $3.05. PUT: body close above $4.50.",
- logEntry:{ts:"Jun 30, 2026",note:"⚠ Nasdaq compliance deadline TODAY. Price $4.46 vs $1 minimum requirement — well above threshold. Watch today's 4pm close. $4.46 is now the OB/direction decider. C2/C3 setup still developing."},
- keyLevels:[{p:"$4.46",l:"C2 expansion high",c:T.teal},{p:"$3.75",l:"50% Fib (call hold zone)",c:T.gold},{p:"$3.05",l:"OB / direction decider — body close above or below",c:T.rose}],
- catalysts:["$411M SpaceX-linked treasury","57M volume — 15x average","⚠ Nasdaq compliance deadline Jun 30"],
- mtf:[["12M","n/a","No history"],["6M","n/a","No history"],["3M","n/a","No history"],["Monthly","n/a","No history"],["Weekly","n/a","Micro only"],["Daily","neut","$3.05 key"]],
- },
- // ── PFE — Screener candidate Jul 2 2026 ─────────────────────────
- {symbol:"PFE",company:"Pfizer Inc",price:24.30,chg:-0.96,vol:"49.3M",mcap:"$137B",capSize:"Large",
- direction:"put",phase:"RETRACEMENT",tier:"Tier 2",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-04",earningsLabel:"Aug 4",accountFit:["IRA ($200)"],
- autoChecks:["topdown","budget"],retailTrap:true,
- narrative:"🔴 Bearish — 55% off 2021 ATH ($61.25), COVID revenue collapse ongoing. All 3 SMAs bearish (price below 20/50/200). Jun 24 expansion candle = C2 bearish continuation. Price now in 31% retracement of that expansion leg.",
- structure:"🔴 Bearish — Multi-year downtrend. Jun 24 expansion confirmed by volume (49M vs 38M avg). Resistance cluster $25.50–$26.21 (multiple MAs converging). Screener confirmed 5/5 pre-conditions met Jul 2.",
- divergence:"Retail trap: 7.14% dividend yield attracting value buyers into a structural downtrend. Smart money (institutions) not accumulating — insider buys are phantom stock units (compensation), not open-market conviction. SigVie-002 Phase 3 MISSED Jun 22 = new bearish catalyst.",
- phaseNote:"RETRACEMENT — 31% into retracement of Jun 24 expansion leg. Resistance at $25.50–$26.21 (MA cluster). Need to see C2 failure swing form at or below resistance, then C3 body close through candles that created the Jun 24 move. Earnings Aug 4 = hard deadline for any position.",
- entryNote:"Wait for bounce into $25.50–$26.21 resistance zone (Bearish OB cluster). C2 wick above $26.21, C3 body close below $25.50 = put entry. Protected swing = C2 wick high. DTE minimum 45 days from entry to clear Aug 4 earnings. Budget: Sep/Oct expiry puts.",
- nestedFib:"C1 = ATH $61.25 to multi-year low. C2 expansion = Jun 24 bearish candle. -1 extension target ~$21–$22 range. Mean threshold of OB = $25.85.",
- invalidation:"Daily body close above $27.14 (above all key moving averages — uptrend reversal confirmed, put thesis invalid)",
- logEntry:{ts:"Jul 2, 2026",note:"Screener flagged 5/5 pre-conditions Jul 2. PFE $24.30 confirmed bearish: below all 3 SMAs, Jun 24 expansion with volume, currently 31% into retracement zone. SigVie-002 Phase 3 miss Jun 22 = fresh bearish catalyst. Earnings Aug 4. Watching for bounce to $25.50–$26.21 OB cluster."},
- keyLevels:[
-  {p:"$27.14",l:"Above all MAs — invalidation",c:"#EF4444"},
-  {p:"$26.21",l:"Resistance cluster top / OB upper bound",c:"#F59E0B"},
-  {p:"$25.50",l:"Bearish OB zone / MA convergence — C3 body close below = entry",c:"#F59E0B"},
-  {p:"$24.30",l:"Current price",c:"#14B8A6"},
-  {p:"$23.67",l:"Jun 2026 recent low",c:"#64748B"},
-  {p:"$21.25",l:"-1 Fib extension target",c:"#10B981"},
- ],
- catalysts:["SigVie-002 Phase 3 MISSED Jun 22 (lung cancer ADC) — fresh bearish catalyst","Earnings Aug 4 — EPS est $0.68 (vs $0.75 last quarter)","Vyndamax patent settled through 2031 — removes one bear thesis but not enough to reverse trend","China clinical trial scrutiny ongoing","Ex-dividend Jul 24 ($0.43) — short-term support floor, then fades"],
- mtf:[["12M","bear","Multi-year downtrend from ATH"],["6M","bear","Below all MAs"],["3M","bear","SigVie miss Jun 22"],["Monthly","bear","Lower highs"],["Weekly","bear","Resistance $25.50–$26.21"],["Daily","neut","Retracing 31% into OB zone"]],
- },
- // ── BEAM — Screener candidate Jul 2 2026 ─────────────────────────
- {symbol:"BEAM",company:"Beam Therapeutics",price:34.30,chg:-1.33,vol:"2.5M",mcap:"$3.5B",capSize:"Small",
- direction:"call",phase:"RETRACEMENT",tier:"Tier 2",isActive:false,contract:null,
- entryPremium:null,strike:null,expiryDate:null,
- earningsDate:"2026-08-11",earningsLabel:"Aug 11",accountFit:["IRA ($200)"],
- autoChecks:["topdown","budget"],retailTrap:true,
- narrative:"🟢 Bullish — Base editing biotech. $1.2B cash, $500M secured credit facility Feb 2026. BEAM-302 accelerated FDA approval path confirmed. Risto-cel BLA submission H2 2026. 14 Buy / 2 Hold / 0 Sell analyst consensus. Median PT $43.50 (+27% from current).",
- structure:"🟢 Bullish — Jun 23 expansion candle on bullish bias (price above 20/50/200 SMAs). Currently 39% into retracement of that expansion = inside the 0–50% entry zone. Screener confirmed 5/5 pre-conditions. ATH $138.52 (Jul 2021). Current price ~$34 represents 75% off ATH — classic biotech reset with pipeline recovery catalyst.",
- divergence:"Retail trap: massive analyst spread ($22–$80 PT range) creates confusion. Bears focus on $94M quarterly net loss. Bulls focus on $1.2B cash runway + BLA path. The divergence is the binary data risk — BEAM-302 accelerated approval in 2026 = major re-rating event. Options volume will expand significantly into any FDA announcement.",
- phaseNote:"RETRACEMENT — 39% into Jun 23 expansion leg. Sitting comfortably in 0–50% zone. Need C2 failure swing (a down candle that makes a new low vs recent structure), then C3 body close back up through candles that created the Jun 23 expansion. Drop to 4H after C2 to confirm CISD before entry. Earnings Aug 11.",
- entryNote:"Price in 0–50% zone now ($30–$37 range). C2 = next pullback candle that makes a swing low. C3 body close above = call entry. Look for entry in the $31–$34 OB zone. Protected swing = C2 wick low — body close below = invalidation. Budget: $200 IRA, target Aug/Sep DTE to clear earnings Aug 11. IV will expand into FDA catalysts — enter when IV rank below 30.",
- nestedFib:"Jun 23 expansion leg: approximate high ~$38, low ~$28. OB = last bearish candle before Jun 23 move. -1 extension target ~$44–$46 range. Median analyst PT $43.50 cross-references -1 extension.",
- invalidation:"Daily body close below $28.50 (below Jun 23 expansion origin — C2 structure violated, prior bullish candles reclaimed by bears)",
- logEntry:{ts:"Jul 2, 2026",note:"Screener flagged 5/5 pre-conditions Jul 2. BEAM $34.30, bullish SMA alignment, Jun 23 expansion, currently 39% in retracement zone. $1.2B cash confirmed Feb 2026. BEAM-302 accelerated approval path H2 2026 = primary catalyst. 14 Buy ratings, median PT $43.50. Watching for C2 pullback to $31–$34 OB zone then C3 body close = call entry."},
- keyLevels:[
-  {p:"$48.00",l:"ATH retracement resistance zone",c:"#EF4444"},
-  {p:"$43.50",l:"Analyst median PT / -1 Fib extension target",c:"#F59E0B"},
-  {p:"$38.00",l:"Jun 23 expansion high — C3 breakout confirms",c:"#F59E0B"},
-  {p:"$34.30",l:"Current price — inside 0–50% zone",c:"#14B8A6"},
-  {p:"$31.00",l:"OB zone lower bound — C2 target / entry zone",c:"#10B981"},
-  {p:"$28.50",l:"Jun 23 expansion origin — invalidation below",c:"#EF4444"},
- ],
- catalysts:["BEAM-302 FDA accelerated approval path H2 2026 — primary re-rating catalyst","Risto-cel BLA submission H2 2026 (sickle cell disease)","$1.2B cash + $500M credit facility — no dilution risk near term","14 Buy / 0 Sell analyst consensus — strong institutional support","Earnings Aug 11 — beat Q4 2025 by $3.34 EPS (massive beat)","Japan partnership announced Mar 2026 (milestone payments)"],
- mtf:[["12M","bull","Recovering from $13 ATL"],["6M","bull","Above 20/50/200 SMAs"],["3M","bull","BEAM-302 data positive"],["Monthly","bull","Higher lows forming"],["Weekly","bull","Jun 23 expansion"],["Daily","neut","Retracing 39% — in zone"]],
- },
-];
 const CRYPTO=[
  {symbol:"BTC",name:"Bitcoin",price:107250,chg:1.24,vol:"High",cap:"Mega",phase:"CONSOLIDATION",dir:"watch",
  narrative:"🔴 Risk-off macro session Jun 27 — equities sold -1.7% to -2.4%. BTC tracking correlation. C1 = prior bullish expansion from $58k to $72k. Retail narrative still bullish (halving cycle).",
@@ -935,7 +781,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  if(evSort==="symbol") return (a.symbol||"").localeCompare(b.symbol||"");
  if(evSort==="align") return alignmentScore(b)-alignmentScore(a);
  if(evSort==="asset"){
- const rank=s=>SETUPS.includes(s)?0:CRYPTO.includes(s)?1:COMMODITIES.includes(s)?2:3;
+ const rank=s=>allSetups.includes(s)?0:CRYPTO.includes(s)?1:COMMODITIES.includes(s)?2:3;
  return rank(a)-rank(b);
  }
  return 0;
@@ -981,7 +827,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {view==="budget"&&(()=>{
  const ira=parseFloat(iraB)||0, ind=parseFloat(indB)||0;
  const iraMax=ira>0?(ira*0.05).toFixed(2):null, indMax=ind>0?(ind*0.05).toFixed(2):null;
- const activeP=SETUPS.filter(s=>s.isActive);
+ const activeP=allSetups.filter(s=>s.isActive);
  const iraUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("IRA"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium*100:0),0);
  const indUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("Ind"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium:0),0);
  const inp={background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"7px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box"};
@@ -1988,7 +1834,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).length} shown</span>
     </div>
     {(()=>{ try{
-     const allSyms=new Set([...SETUPS,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
+     const allSyms=new Set([...allSetups,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
      const filtered=scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias);
      const sorted=[...filtered].sort((a,b)=>{
       if(scrSort==="score") return b.met-a.met;
@@ -2000,7 +1846,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      const STAGE_RANK_FE={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
      const biasColor=b=>b==="BULL"?T.sage:T.rose;
      const renderScreenerCard=(h,isTracked=false)=>{
-      const match=SETUPS.find(s=>s.symbol===h.ticker);
+      const match=allSetups.find(s=>s.symbol===h.ticker);
       const expanded=scrExpand[h.ticker];
       const mPh=match?PHASES[match.phase]:null;
       const urgency=match?(match.phase==="READY"?"🔴 Enter":match.phase==="RETRACEMENT"?"🟡 Watch C2":"⬜ Building"):null;

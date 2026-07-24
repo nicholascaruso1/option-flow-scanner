@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-23T06:41:41.658162+00:00",
+  "generated_at": "2026-07-24T06:41:04.556522+00:00",
   "universe_size": 120,
   "min_met": 4,
   "candidates": [
     {
       "ticker": "NFLX",
-      "price": 68.53,
+      "price": 68.89,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -17,11 +17,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 72.97,
-        "sma50": 79.38,
-        "sma200": 93.0,
-        "avg_vol_m": 51.85,
-        "retr_pct": 21.8,
+        "sma20": 72.82,
+        "sma50": 79.05,
+        "sma200": 92.76,
+        "avg_vol_m": 51.7,
+        "retr_pct": 13.6,
         "exp_date": "2026-07-17",
         "exp_dir": "BULL"
       },
@@ -30,28 +30,28 @@
           "type": "high",
           "price": 91.48,
           "date": "2026-05-19",
-          "bars_ago": 43
+          "bars_ago": 44
         },
         "draw_target": {
           "type": "low",
           "price": 70.86,
           "date": "2026-06-25",
-          "bars_ago": 18
+          "bars_ago": 19
         },
-        "draw_pct": -3.4,
+        "draw_pct": -2.9,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
-      "ticker": "UNH",
-      "price": 431.31,
+      "ticker": "RTX",
+      "price": 209.16,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -63,41 +63,87 @@
         "liquid": true
       },
       "details": {
-        "sma20": 423.81,
-        "sma50": 405.26,
-        "sma200": 339.16,
-        "avg_vol_m": 6.22,
-        "retr_pct": 26.5,
-        "exp_date": "2026-07-16",
-        "exp_dir": "BEAR"
+        "sma20": 194.83,
+        "sma50": 185.52,
+        "sma200": 185.3,
+        "avg_vol_m": 4.64,
+        "retr_pct": 39.4,
+        "exp_date": "2026-07-23",
+        "exp_dir": "BULL"
       },
       "am_projection": {
         "reaction_swing": {
           "type": "low",
-          "price": 372.59,
-          "date": "2026-06-02",
-          "bars_ago": 34
+          "price": 170.07,
+          "date": "2026-05-15",
+          "bars_ago": 46
         },
         "draw_target": {
           "type": "high",
-          "price": 401.85,
-          "date": "2026-05-13",
-          "bars_ago": 47
+          "price": 203.94,
+          "date": "2026-07-07",
+          "bars_ago": 12
         },
-        "draw_pct": -6.8,
+        "draw_pct": -2.5,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
+      }
+    },
+    {
+      "ticker": "LMT",
+      "price": 568.59,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 5,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 520.33,
+        "sma50": 521.04,
+        "sma200": 538.04,
+        "avg_vol_m": 1.26,
+        "retr_pct": 23.9,
+        "exp_date": "2026-07-23",
+        "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 490.05,
+          "date": "2026-06-22",
+          "bars_ago": 22
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 547.47,
+          "date": "2026-07-07",
+          "bars_ago": 12
+        },
+        "draw_pct": -3.7,
+        "profile": {
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
+        },
+        "gate_reaction": true,
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
       "ticker": "SMCI",
-      "price": 30.56,
+      "price": 31.2,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -109,11 +155,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 27.81,
-        "sma50": 32.84,
-        "sma200": 33.7,
-        "avg_vol_m": 46.62,
-        "retr_pct": 45.5,
+        "sma20": 27.75,
+        "sma50": 32.79,
+        "sma200": 33.59,
+        "avg_vol_m": 48.37,
+        "retr_pct": 28.6,
         "exp_date": "2026-07-22",
         "exp_dir": "BULL"
       },
@@ -122,28 +168,28 @@
           "type": "low",
           "price": 25.46,
           "date": "2026-04-29",
-          "bars_ago": 57
+          "bars_ago": 58
         },
         "draw_target": {
           "type": "high",
           "price": 51.4,
           "date": "2026-06-02",
-          "bars_ago": 34
+          "bars_ago": 35
         },
-        "draw_pct": 68.2,
+        "draw_pct": 64.7,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
       "ticker": "ACHR",
-      "price": 5.18,
+      "price": 5.11,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -156,10 +202,10 @@
       },
       "details": {
         "sma20": 4.88,
-        "sma50": 5.55,
-        "sma200": 7.26,
-        "avg_vol_m": 35.87,
-        "retr_pct": 30.1,
+        "sma50": 5.52,
+        "sma200": 7.22,
+        "avg_vol_m": 35.34,
+        "retr_pct": 38.6,
         "exp_date": "2026-07-20",
         "exp_dir": "BULL"
       },
@@ -168,28 +214,28 @@
           "type": "low",
           "price": 5.47,
           "date": "2026-04-29",
-          "bars_ago": 57
+          "bars_ago": 58
         },
         "draw_target": {
           "type": "high",
           "price": 7.09,
           "date": "2026-05-28",
-          "bars_ago": 37
+          "bars_ago": 38
         },
-        "draw_pct": 36.9,
+        "draw_pct": 38.7,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
       "ticker": "CLSK",
-      "price": 15.32,
+      "price": 15.61,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -201,11 +247,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 13.99,
-        "sma50": 15.28,
+        "sma20": 13.95,
+        "sma50": 15.31,
         "sma200": 13.29,
-        "avg_vol_m": 23.12,
-        "retr_pct": 109.8,
+        "avg_vol_m": 23.35,
+        "retr_pct": 122.2,
         "exp_date": "2026-07-14",
         "exp_dir": "BEAR"
       },
@@ -214,74 +260,120 @@
           "type": "low",
           "price": 11.94,
           "date": "2026-07-08",
-          "bars_ago": 10
+          "bars_ago": 11
         },
         "draw_target": {
           "type": "high",
           "price": 19.05,
           "date": "2026-06-22",
-          "bars_ago": 21
+          "bars_ago": 22
         },
-        "draw_pct": 24.3,
+        "draw_pct": 22.0,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
-      "ticker": "RIOT",
-      "price": 23.38,
-      "bias": "MIXED",
+      "ticker": "SCHW",
+      "price": 101.61,
+      "bias": "BULL",
       "direction": "BULL",
       "met": 4,
       "conditions": {
-        "topdown_bias": false,
+        "topdown_bias": true,
         "expansion": true,
         "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 99.03,
+        "sma50": 93.56,
+        "sma200": 94.79,
+        "avg_vol_m": 9.76,
+        "retr_pct": 39.8,
+        "exp_date": "2026-07-21",
+        "exp_dir": "BEAR"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 87.63,
+          "date": "2026-06-26",
+          "bars_ago": 18
+        },
+        "draw_target": {
+          "type": "high",
+          "price": 93.43,
+          "date": "2026-05-18",
+          "bars_ago": 45
+        },
+        "draw_pct": -8.1,
+        "profile": {
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
+        },
+        "gate_reaction": true,
+        "gate_profile": false,
+        "both_gates": false
+      }
+    },
+    {
+      "ticker": "USO",
+      "price": 139.49,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 22.74,
-        "sma50": 24.7,
-        "sma200": 18.53,
-        "avg_vol_m": 17.48,
-        "retr_pct": 9.3,
-        "exp_date": "2026-07-22",
+        "sma20": 115.34,
+        "sma50": 125.54,
+        "sma200": 98.53,
+        "avg_vol_m": 6.64,
+        "retr_pct": -278.5,
+        "exp_date": "2026-07-13",
         "exp_dir": "BULL"
       },
       "am_projection": {
         "reaction_swing": {
           "type": "low",
-          "price": 23.67,
-          "date": "2026-06-10",
-          "bars_ago": 28
+          "price": 102.42,
+          "date": "2026-07-02",
+          "bars_ago": 14
         },
         "draw_target": {
           "type": "high",
-          "price": 30.32,
-          "date": "2026-06-22",
-          "bars_ago": 21
+          "price": 154.08,
+          "date": "2026-05-18",
+          "bars_ago": 45
         },
-        "draw_pct": 29.7,
+        "draw_pct": 10.5,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     },
     {
-      "ticker": "C",
-      "price": 132.25,
+      "ticker": "UNH",
+      "price": 423.56,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -293,266 +385,82 @@
         "liquid": true
       },
       "details": {
-        "sma20": 137.95,
-        "sma50": 134.06,
-        "sma200": 116.9,
-        "avg_vol_m": 13.91,
-        "retr_pct": 0.7,
-        "exp_date": "2026-07-14",
-        "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "high",
-          "price": 147.96,
-          "date": "2026-06-18",
-          "bars_ago": 22
-        },
-        "draw_target": {
-          "type": "low",
-          "price": 119.76,
-          "date": "2026-05-19",
-          "bars_ago": 43
-        },
-        "draw_pct": 9.4,
-        "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "SCHW",
-      "price": 100.8,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 98.52,
-        "sma50": 93.28,
-        "sma200": 94.75,
-        "avg_vol_m": 9.99,
-        "retr_pct": 22.9,
-        "exp_date": "2026-07-21",
-        "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 87.63,
-          "date": "2026-06-26",
-          "bars_ago": 17
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 93.43,
-          "date": "2026-05-18",
-          "bars_ago": 44
-        },
-        "draw_pct": -7.3,
-        "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "USO",
-      "price": 131.68,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 113.68,
-        "sma50": 125.52,
-        "sma200": 98.19,
-        "avg_vol_m": 6.25,
-        "retr_pct": -172.1,
-        "exp_date": "2026-07-13",
-        "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 102.42,
-          "date": "2026-07-02",
-          "bars_ago": 13
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 154.08,
-          "date": "2026-05-18",
-          "bars_ago": 44
-        },
-        "draw_pct": 17.0,
-        "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "TGT",
-      "price": 137.92,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 135.13,
-        "sma50": 129.89,
-        "sma200": 111.11,
-        "avg_vol_m": 4.45,
-        "retr_pct": 31.2,
-        "exp_date": "2026-07-15",
-        "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 124.7,
-          "date": "2026-07-06",
-          "bars_ago": 12
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 142.82,
-          "date": "2026-06-25",
-          "bars_ago": 18
-        },
-        "draw_pct": 3.6,
-        "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "AMGN",
-      "price": 366.05,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 362.93,
-        "sma50": 348.39,
-        "sma200": 337.4,
-        "avg_vol_m": 2.25,
-        "retr_pct": 25.7,
-        "exp_date": "2026-07-17",
-        "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 334.05,
-          "date": "2026-06-18",
-          "bars_ago": 22
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 356.76,
-          "date": "2026-04-09",
-          "bars_ago": 71
-        },
-        "draw_pct": -2.5,
-        "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
-        },
-        "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
-      }
-    },
-    {
-      "ticker": "GS",
-      "price": 1098.2,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 1060.52,
-        "sma50": 1036.13,
-        "sma200": 901.5,
-        "avg_vol_m": 2.07,
-        "retr_pct": 14.5,
+        "sma20": 424.69,
+        "sma50": 406.08,
+        "sma200": 339.51,
+        "avg_vol_m": 6.12,
+        "retr_pct": 7.7,
         "exp_date": "2026-07-16",
         "exp_dir": "BEAR"
       },
       "am_projection": {
         "reaction_swing": {
+          "type": "high",
+          "price": 401.85,
+          "date": "2026-05-13",
+          "bars_ago": 48
+        },
+        "draw_target": {
           "type": "low",
-          "price": 1003.0,
-          "date": "2026-07-01",
-          "bars_ago": 14
+          "price": 372.59,
+          "date": "2026-06-02",
+          "bars_ago": 35
+        },
+        "draw_pct": 12.0,
+        "profile": {
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
+        },
+        "gate_reaction": true,
+        "gate_profile": false,
+        "both_gates": false
+      }
+    },
+    {
+      "ticker": "HON",
+      "price": 246.27,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 228.51,
+        "sma50": 231.8,
+        "sma200": 224.57,
+        "avg_vol_m": 5.01,
+        "retr_pct": 31.8,
+        "exp_date": "2026-07-23",
+        "exp_dir": "BULL"
+      },
+      "am_projection": {
+        "reaction_swing": {
+          "type": "low",
+          "price": 218.1,
+          "date": "2026-07-09",
+          "bars_ago": 10
         },
         "draw_target": {
           "type": "high",
-          "price": 1125.0,
-          "date": "2026-06-18",
-          "bars_ago": 22
+          "price": 252.0,
+          "date": "2026-06-29",
+          "bars_ago": 17
         },
-        "draw_pct": 2.4,
+        "draw_pct": 2.3,
         "profile": {
-          "label": "TGIF Setup",
-          "note": "Friday: fade the week move. Watch for reversal into close at prior swing.",
-          "next_day": "Friday Jul 24"
+          "label": "Monday Rule \u2014 Avoid",
+          "note": "No trades Monday per AM protocol. Observe structure and plan.",
+          "next_day": "Monday Jul 27"
         },
         "gate_reaction": true,
-        "gate_profile": true,
-        "both_gates": true
+        "gate_profile": false,
+        "both_gates": false
       }
     }
   ]

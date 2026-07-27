@@ -547,7 +547,22 @@ const [initDone, setInitDone] = useState(false);
  (async () => {
  const [f,c,t,ai,mem,c1d,jnl,pfc,ac] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{}),ls("of_ai_cards",{})]);
  setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{});
-setAiCards(ac||{}); setInitDone(true);
+setAiCards(ac||{});
+try {
+  const kvR = await fetch("https://market.electronmailbag.workers.dev/user-data");
+  if(kvR.ok){
+    const kv=await kvR.json();
+    if(kv.of_favs?.length){setFavs(kv.of_favs);ss("of_favs",kv.of_favs);}
+    if(kv.of_checks&&Object.keys(kv.of_checks).length){setChecks(kv.of_checks);ss("of_checks",kv.of_checks);}
+    if(kv.of_ai_updates&&Object.keys(kv.of_ai_updates).length){setAiUpdates(kv.of_ai_updates);ss("of_ai_updates",kv.of_ai_updates);}
+    if(kv.of_ai_cards&&Object.keys(kv.of_ai_cards).length){setAiCards(kv.of_ai_cards);ss("of_ai_cards",kv.of_ai_cards);}
+    if(kv.of_c123&&Object.keys(kv.of_c123).length){setC123(kv.of_c123);ss("of_c123",kv.of_c123);}
+    if(kv.of_journal&&Object.keys(kv.of_journal).length){setJournalNotes(kv.of_journal);ss("of_journal",kv.of_journal);}
+    if(kv.of_preflight&&Object.keys(kv.of_preflight).length){setPfChecks(kv.of_preflight);ss("of_preflight",kv.of_preflight);}
+    if(kv.of_closed_trades?.length){setClosedTrades(kv.of_closed_trades);ss("of_closed_trades",kv.of_closed_trades);}
+  }
+}catch(e){/* KV unavailable — localStorage values already applied above */}
+setInitDone(true);
  })();
  }, []);
  useEffect(()=>{
@@ -665,7 +680,29 @@ setAiCards(ac||{}); setInitDone(true);
  const clearChecks = useCallback((sym) => {
  setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
  }, []);
- const WORKER = window.location.hostname === "localhost"
+ const kvSyncRef = useRef(null);
+useEffect(()=>{
+  if(!initDone) return;
+  clearTimeout(kvSyncRef.current);
+  kvSyncRef.current = setTimeout(()=>{
+    const payload={
+      of_favs:favs,
+      of_checks:checks,
+      of_ai_updates:aiUpdates,
+      of_ai_cards:aiCards,
+      of_c123:c123,
+      of_journal:journalNotes,
+      of_preflight:pfChecks,
+      ...(typeof closedTrades!=="undefined"?{of_closed_trades:closedTrades}:{})
+    };
+    fetch("https://market.electronmailbag.workers.dev/user-data",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
+    }).catch(()=>{});
+  },2000);
+},[favs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,initDone]);
+const WORKER = window.location.hostname === "localhost"
    ? "/worker"
    : "https://market.electronmailbag.workers.dev";
 

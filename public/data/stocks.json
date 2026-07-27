@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T06:07:36.155470+00:00",
+  "generated_at": "2026-07-27T01:43:38.184414+00:00",
   "universe_size": 120,
   "min_met": 4,
   "candidates": [
@@ -24,29 +24,6 @@
         "retr_pct": 13.6,
         "exp_date": "2026-07-17",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "high",
-          "price": 91.48,
-          "date": "2026-05-19",
-          "bars_ago": 44
-        },
-        "draw_target": {
-          "type": "low",
-          "price": 70.86,
-          "date": "2026-06-25",
-          "bars_ago": 19
-        },
-        "draw_pct": -2.9,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -70,29 +47,6 @@
         "retr_pct": 39.4,
         "exp_date": "2026-07-23",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 170.07,
-          "date": "2026-05-15",
-          "bars_ago": 46
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 203.94,
-          "date": "2026-07-07",
-          "bars_ago": 12
-        },
-        "draw_pct": -2.5,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -116,29 +70,6 @@
         "retr_pct": 23.9,
         "exp_date": "2026-07-23",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 490.05,
-          "date": "2026-06-22",
-          "bars_ago": 22
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 547.47,
-          "date": "2026-07-07",
-          "bars_ago": 12
-        },
-        "draw_pct": -3.7,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -162,29 +93,6 @@
         "retr_pct": 28.6,
         "exp_date": "2026-07-22",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 25.46,
-          "date": "2026-04-29",
-          "bars_ago": 58
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 51.4,
-          "date": "2026-06-02",
-          "bars_ago": 35
-        },
-        "draw_pct": 64.7,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -208,29 +116,6 @@
         "retr_pct": 38.6,
         "exp_date": "2026-07-20",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 5.47,
-          "date": "2026-04-29",
-          "bars_ago": 58
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 7.09,
-          "date": "2026-05-28",
-          "bars_ago": 38
-        },
-        "draw_pct": 38.7,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -254,29 +139,6 @@
         "retr_pct": 122.2,
         "exp_date": "2026-07-14",
         "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 11.94,
-          "date": "2026-07-08",
-          "bars_ago": 11
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 19.05,
-          "date": "2026-06-22",
-          "bars_ago": 22
-        },
-        "draw_pct": 22.0,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -300,29 +162,6 @@
         "retr_pct": 39.8,
         "exp_date": "2026-07-21",
         "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 87.63,
-          "date": "2026-06-26",
-          "bars_ago": 18
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 93.43,
-          "date": "2026-05-18",
-          "bars_ago": 45
-        },
-        "draw_pct": -8.1,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -346,29 +185,6 @@
         "retr_pct": -278.5,
         "exp_date": "2026-07-13",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 102.42,
-          "date": "2026-07-02",
-          "bars_ago": 14
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 154.08,
-          "date": "2026-05-18",
-          "bars_ago": 45
-        },
-        "draw_pct": 10.5,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -392,29 +208,6 @@
         "retr_pct": 7.7,
         "exp_date": "2026-07-16",
         "exp_dir": "BEAR"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "high",
-          "price": 401.85,
-          "date": "2026-05-13",
-          "bars_ago": 48
-        },
-        "draw_target": {
-          "type": "low",
-          "price": 372.59,
-          "date": "2026-06-02",
-          "bars_ago": 35
-        },
-        "draw_pct": 12.0,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     },
     {
@@ -438,29 +231,6 @@
         "retr_pct": 31.8,
         "exp_date": "2026-07-23",
         "exp_dir": "BULL"
-      },
-      "am_projection": {
-        "reaction_swing": {
-          "type": "low",
-          "price": 218.1,
-          "date": "2026-07-09",
-          "bars_ago": 10
-        },
-        "draw_target": {
-          "type": "high",
-          "price": 252.0,
-          "date": "2026-06-29",
-          "bars_ago": 17
-        },
-        "draw_pct": 2.3,
-        "profile": {
-          "label": "Monday Rule \u2014 Avoid",
-          "note": "No trades Monday per AM protocol. Observe structure and plan.",
-          "next_day": "Monday Jul 27"
-        },
-        "gate_reaction": true,
-        "gate_profile": false,
-        "both_gates": false
       }
     }
   ]

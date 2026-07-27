@@ -48,7 +48,11 @@ DEFAULT_UNIVERSE = [
 def get_sp500_tickers():
     """Fetch current S&P 500 constituents from Wikipedia."""
     try:
-        tables = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
+        headers = {"User-Agent": "Mozilla/5.0 (compatible; option-flow-screener/1.0)"}
+        tables = pd.read_html(
+            "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+            storage_options={"headers": headers}
+        )
         syms = tables[0]["Symbol"].tolist()
         return [s.replace(".", "-") for s in syms]
     except Exception as e:

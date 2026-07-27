@@ -1,55 +1,43 @@
-name: Daily Screener
+name: Nightly Screener
 
 on:
-  # Runs at 9:00 AM ET (13:00 UTC) — pre-market, right before open
   schedule:
-    - cron: "30 21 * * 1-5"   # Mon–Fri only
-
-  # Also lets you trigger manually from the GitHub Actions tab
-  workflow_dispatch:
-    inputs:
-      sp500:
-        description: "Scan full S&P 500 instead of default universe"
-        required: false
-        default: "true"
-      min_met:
-        description: "Minimum conditions met (default 4)"
-        required: false
-        default: "4"
+    # 9:30 PM UTC = 5:30 PM ET (post-market, Mon–Fri)
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:  # allows manual run from GitHub Actions tab
 
 jobs:
-  run-screener:
+  screen:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit stocks.json back to main
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          # Need write access to commit data/stocks.json back
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       - name: Install dependencies
-        run: pip install yfinance pandas lxml
+        run: pip install yfinance pandas lxml html5lib beautifulsoup4
 
       - name: Run screener
         env:
-          # Use manual inputs if triggered via workflow_dispatch, else defaults
-          SCREENER_SP500:  ${{ github.event.inputs.sp500 || 'true' }}
-          SCREENER_MIN_MET: ${{ github.event.inputs.min_met || '4' }}
-          SCREENER_OUT:    public/data/stocks.json
-        run: python3 screener_ci.py
+          SCREENER_SP500: "true"        # merge S&P 500 + curated DEFAULT_UNIVERSE
+          SCREENER_MIN_MET: "4"         # minimum conditions met to surface a candidate
+          SCREENER_OUT: "public/data/stocks.json"
+        run: python screener_ci.py
 
       - name: Commit results
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add public/data/stocks.json
-          # Only commit if the file actually changed
-          git diff --staged --quiet || git commit -m "screener: $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push origin main
+          # Only commit if stocks.json actually changed
+          git diff --staged --quiet || git commit -m "chore: nightly screener update [skip ci]"
+          git push

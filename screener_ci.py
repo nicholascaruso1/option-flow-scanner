@@ -3,10 +3,14 @@
 Option Flow — CI Screener (GitHub Actions version)
 ====================================================
 Same 5 pre-condition checks as screener.py, but outputs JSON to
-data/stocks.json so the scanner frontend can fetch it on load.
+public/data/stocks.json so the scanner frontend can fetch it on load.
 
 Runs automatically via GitHub Actions on a schedule.
 Do NOT run this manually — use screener.py for local runs.
+
+Universe modes (set via env vars in screener.yml):
+  SCREENER_SP500=true   → S&P 500 + DEFAULT_UNIVERSE merged & deduplicated (~520 tickers)
+  SCREENER_SP500=false  → DEFAULT_UNIVERSE only (120 tickers, fast local testing)
 """
 
 import json
@@ -23,7 +27,9 @@ try:
 except ImportError:
     sys.exit("Missing deps — pip install yfinance pandas")
 
-# ── Universe (same as screener.py) ──────────────────────────────────────────
+# ── Curated universe ─────────────────────────────────────────────────────────
+# These are always included regardless of SCREENER_SP500 mode.
+# Covers speculative names, ETFs, and sector plays not reliably in S&P 500.
 DEFAULT_UNIVERSE = [
     "NVDA","AMD","AAPL","MSFT","GOOGL","AMZN","META","TSLA","AVGO","ORCL",
     "CRM","ADBE","NFLX","INTC","MU","QCOM","SMCI","PLTR","SNOW","CRWD",
@@ -40,15 +46,36 @@ DEFAULT_UNIVERSE = [
 ]
 
 def get_sp500_tickers():
+    """Fetch current S&P 500 constituents from Wikipedia."""
     try:
         tables = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
         syms = tables[0]["Symbol"].tolist()
         return [s.replace(".", "-") for s in syms]
     except Exception as e:
-        print(f"  ! S&P 500 fetch failed ({e})")
-        print(f"  ! FALLBACK ACTIVE — using DEFAULT_UNIVERSE ({len(DEFAULT_UNIVERSE)} tickers), NOT the S&P 500")
-        print(f"  ! Results this run may differ from expected. Check Wikipedia table format if this persists.")
+        print(f"  ! S&P 500 fetch failed ({e}), falling back to default universe")
+        return []
+
+def build_universe(use_sp500):
+    """
+    Merge S&P 500 + DEFAULT_UNIVERSE when use_sp500=True.
+    DEFAULT_UNIVERSE always included as the curated base.
+    Deduplication preserves order: S&P 500 first, then curated extras.
+    """
+    if not use_sp500:
         return DEFAULT_UNIVERSE
+
+    sp500 = get_sp500_tickers()
+    if not sp500:
+        # S&P 500 fetch failed — fall back to curated list only
+        print("  ! Falling back to DEFAULT_UNIVERSE only")
+        return DEFAULT_UNIVERSE
+
+    # Merge: S&P 500 base + any curated tickers not already in it
+    sp500_set = set(sp500)
+    extras = [t for t in DEFAULT_UNIVERSE if t not in sp500_set]
+    merged = sp500 + extras
+    print(f"  Universe: {len(sp500)} S&P 500 + {len(extras)} curated extras = {len(merged)} total")
+    return merged
 
 def analyze(df):
     if df is None or len(df) < 210:
@@ -101,10 +128,6 @@ def analyze(df):
     # Suggested direction: bias drives it, but expansion direction is tie-breaker
     direction = bias if bias in ("BULL", "BEAR") else exp_dir or "MIXED"
 
-    # AM Trades: detect swings + compute draw-on-liquidity projection
-    sw_high, sw_low = detect_swings(df)
-    projection      = am_projection(price, direction, sw_high, sw_low)
-
     return {
         "ticker":     None,          # filled in below
         "price":      round(price, 2),
@@ -127,75 +150,15 @@ def analyze(df):
             "exp_date": exp_day.strftime("%Y-%m-%d") if exp_day is not None else None,
             "exp_dir":  exp_dir,
         },
-        "am_projection": projection,
     }
-
-
-# ── AM Trades Framework: Swing Detection + Projection ───────────────────────
-
-def detect_swings(df, lookback=10):
-    highs = df["High"].values
-    lows  = df["Low"].values
-    dates = df.index
-    n = len(df)
-    swing_high = None
-    swing_low  = None
-    for i in range(n - lookback - 1, lookback - 1, -1):
-        if swing_high is None:
-            window_h = highs[i - lookback : i + lookback + 1]
-            if highs[i] == max(window_h):
-                swing_high = {"price": round(float(highs[i]), 2), "date": dates[i].strftime("%Y-%m-%d"), "bars_ago": n - 1 - i}
-        if swing_low is None:
-            window_l = lows[i - lookback : i + lookback + 1]
-            if lows[i] == min(window_l):
-                swing_low = {"price": round(float(lows[i]), 2), "date": dates[i].strftime("%Y-%m-%d"), "bars_ago": n - 1 - i}
-        if swing_high and swing_low:
-            break
-    return swing_high, swing_low
-
-
-def profile_guess():
-    from datetime import datetime, timedelta
-    tomorrow = datetime.now() + timedelta(days=1)
-    while tomorrow.weekday() >= 5:
-        tomorrow += timedelta(days=1)
-    wd = tomorrow.weekday()
-    profiles = {
-        0: ("Monday Rule — Avoid", "No trades Monday per AM protocol. Observe structure and plan."),
-        1: ("Classic Expansion", "Tuesday trend day. Price typically expands in primary direction from weekly open."),
-        2: ("Midweek Reversal Watch", "Wednesday pivot watch. If Mon-Tue trended, reversal risk increases at prior highs/lows."),
-        3: ("Continuation or Counter", "Thursday: continuation of expansion OR early setup for Friday TGIF."),
-        4: ("TGIF Setup", "Friday: fade the week move. Watch for reversal into close at prior swing."),
-    }
-    label, note = profiles.get(wd, ("Unknown", ""))
-    return {"label": label, "note": note, "next_day": tomorrow.strftime("%A %b %d")}
-
-
-def am_projection(price, direction, swing_high, swing_low):
-    reaction = None; target = None; draw_pct = None; gate_reaction = False
-    if direction == "BULL" and swing_low and swing_high:
-        reaction = {"type": "low",  **swing_low}
-        target   = {"type": "high", **swing_high}
-        draw_pct = round((swing_high["price"] - price) / price * 100, 1) if price > 0 else None
-        gate_reaction = True
-    elif direction == "BEAR" and swing_high and swing_low:
-        reaction = {"type": "high", **swing_high}
-        target   = {"type": "low",  **swing_low}
-        draw_pct = round((price - swing_low["price"]) / price * 100, 1) if price > 0 else None
-        gate_reaction = True
-    prof = profile_guess()
-    gate_profile = prof["label"] != "Monday Rule — Avoid"
-    return {"reaction_swing": reaction, "draw_target": target, "draw_pct": draw_pct,
-            "profile": prof, "gate_reaction": gate_reaction, "gate_profile": gate_profile,
-            "both_gates": gate_reaction and gate_profile}
 
 def main():
     # Config from env vars (set in GitHub Actions workflow)
     use_sp500 = os.environ.get("SCREENER_SP500", "false").lower() == "true"
     min_met   = int(os.environ.get("SCREENER_MIN_MET", "4"))
-    out_path  = os.environ.get("SCREENER_OUT", "data/stocks.json")
+    out_path  = os.environ.get("SCREENER_OUT", "public/data/stocks.json")
 
-    universe = get_sp500_tickers() if use_sp500 else DEFAULT_UNIVERSE
+    universe = build_universe(use_sp500)
     print(f"Screening {len(universe)} tickers (min-met={min_met})...")
 
     data = yf.download(

@@ -552,10 +552,28 @@ try {
   const kvR = await fetch("https://market.electronmailbag.workers.dev/user-data");
   if(kvR.ok){
     const kv=await kvR.json();
-    if(kv.of_favs?.length){setFavs(kv.of_favs);ss("of_favs",kv.of_favs);}
+    // MERGE (not replace) favs + cards so a stale device can never delete
+    // cards saved on another device. Union favs; per-symbol newest-wins cards.
+    if(kv.of_favs?.length){
+      const mergedFavs=[...new Set([...(f||[]),...kv.of_favs])];
+      setFavs(mergedFavs);ss("of_favs",mergedFavs);
+    }
     if(kv.of_checks&&Object.keys(kv.of_checks).length){setChecks(kv.of_checks);ss("of_checks",kv.of_checks);}
     if(kv.of_ai_updates&&Object.keys(kv.of_ai_updates).length){setAiUpdates(kv.of_ai_updates);ss("of_ai_updates",kv.of_ai_updates);}
-    if(kv.of_ai_cards&&Object.keys(kv.of_ai_cards).length){setAiCards(kv.of_ai_cards);ss("of_ai_cards",kv.of_ai_cards);}
+    if(kv.of_ai_cards&&Object.keys(kv.of_ai_cards).length){
+      const localCards=ac||{};
+      const mergedCards={...localCards};
+      for(const [sym,kvCard] of Object.entries(kv.of_ai_cards)){
+        const lc=localCards[sym];
+        if(!lc){mergedCards[sym]=kvCard;continue;}
+        const lcD=Date.parse(lc.dataAsOf||0)||0;
+        const kvD=Date.parse(kvCard.dataAsOf||0)||0;
+        mergedCards[sym]=kvD>=lcD?kvCard:lc;
+      }
+      setAiCards(mergedCards);ss("of_ai_cards",mergedCards);
+      const cardSyms=Object.keys(mergedCards);
+      setFavs(p=>{const n=[...new Set([...p,...cardSyms])];ss("of_favs",n);return n;});
+    }
     if(kv.of_c123&&Object.keys(kv.of_c123).length){setC123(kv.of_c123);ss("of_c123",kv.of_c123);}
     if(kv.of_journal&&Object.keys(kv.of_journal).length){setJournalNotes(kv.of_journal);ss("of_journal",kv.of_journal);}
     if(kv.of_preflight&&Object.keys(kv.of_preflight).length){setPfChecks(kv.of_preflight);ss("of_preflight",kv.of_preflight);}

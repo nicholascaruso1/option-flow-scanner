@@ -56,6 +56,6 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name  "github-actions-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          npx gh-pages -d dist -u "github-actions[bot] <github-actions[bot]@users.noreply.github.com>" -r "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          npx gh-pages -d dist -r "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"

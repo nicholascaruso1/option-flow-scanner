@@ -618,7 +618,8 @@ setInitDone(true);
   setLiveError(null);
 
   const BASE_SYMS = ["ATAI","SMCI","SPCX","MLYS","ILLR","GLD","SLV","CPER","PPLT","PALL","USO","UNG","SPY","QQQ","DIA","IWM"];
-  const EQUITY_SYMS = [...BASE_SYMS, ...Object.keys(aiCards).filter(s=>!BASE_SYMS.includes(s))];
+  const CRYPTO_EXCLUDE = ["BTC","ETH","SOL","LTC"];
+  const EQUITY_SYMS = [...BASE_SYMS, ...Object.keys(aiCards).filter(s=>!BASE_SYMS.includes(s)&&!CRYPTO_EXCLUDE.includes(s))];
   const CRYPTO_SYMS = ["BTC","ETH","SOL","LTC"];
 
   let allPrices = {};

@@ -10,7 +10,7 @@ jobs:
   screen:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to commit stocks.json back to main
+      contents: write   # needed to commit stocks.json and push gh-pages
 
     steps:
       - name: Checkout repo
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install yfinance pandas lxml html5lib beautifulsoup4
 
       - name: Run screener
@@ -41,3 +41,21 @@ jobs:
           # Only commit if stocks.json actually changed
           git diff --staged --quiet || git commit -m "chore: nightly screener update [skip ci]"
           git push
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npx gh-pages -d dist -u "github-actions[bot] <github-actions[bot]@users.noreply.github.com>" -r "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"

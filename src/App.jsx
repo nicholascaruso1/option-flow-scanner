@@ -1055,7 +1055,10 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- const _invP=liveData[s.symbol]?.price||s.price;
+ // Body-close rule: while the NY session is live the daily candle is still forming,
+ // so a live tick through the level is a wick (manipulation), not invalidation.
+ // Use the last confirmed close during the session; use live price when closed.
+ const _invP=(sessionProfile.actionable&&liveData[s.symbol]?.prevClose)||liveData[s.symbol]?.price||s.price;
  const _invCk=checkInvalidation(s,_invP);
  const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:(parseInvalidation(s.invalidation)?null:getInvalidationAlert(memHistory));
  const isOpen=open[s.symbol];
@@ -1285,7 +1288,10 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- const _invP=liveData[s.symbol]?.price||s.price;
+ // Body-close rule: while the NY session is live the daily candle is still forming,
+ // so a live tick through the level is a wick (manipulation), not invalidation.
+ // Use the last confirmed close during the session; use live price when closed.
+ const _invP=(sessionProfile.actionable&&liveData[s.symbol]?.prevClose)||liveData[s.symbol]?.price||s.price;
  const _invCk=checkInvalidation(s,_invP);
  const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:(parseInvalidation(s.invalidation)?null:getInvalidationAlert(memHistory));
  const ld=liveData[s.symbol];

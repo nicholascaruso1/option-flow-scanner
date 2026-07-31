@@ -1094,7 +1094,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.dir==="call"?"Long ↑":s.dir==="put"?"Short ↓":"Watch"}</span>
  {s.cap&&<span style={pill(CAP_COLORS[s.cap]||T.slate)}>{s.cap}</span>}
- {typeof alScore!=="undefined"&&alScore>0&&!invAlert&&<span style={pill(alScore>=70?T.sage:alScore>=35?T.gold:T.textDim)} title="Alignment score">Align {alScore}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
@@ -1345,7 +1344,6 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[]),...candleAutoChecks])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
- const alScore=alignmentScore(s);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
  if(compact&&!isOpen)return(
   <div key={s.symbol} onClick={()=>tog(s.symbol)} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid "+T.border,background:T.surface,cursor:"pointer",borderLeft:"2px solid "+ac}}>

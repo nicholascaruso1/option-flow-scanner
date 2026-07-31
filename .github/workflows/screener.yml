@@ -2,8 +2,13 @@ name: Nightly Screener
 
 on:
   schedule:
-    # 9:30 PM UTC = 5:30 PM ET (post-market, Mon–Fri)
-    - cron: "30 21 * * 1-5"
+    # Primary: 22:43 UTC = 6:43 PM ET (post-close, odd minute to dodge
+    # GitHub cron congestion — half-hour slots like 21:30 queue for hours)
+    - cron: "43 22 * * 1-5"
+    # Backup/self-heal: 3:13 AM UTC Tue–Sat = 11:13 PM ET Mon–Fri.
+    # If the evening run was badly delayed or failed, this catches it before
+    # morning. Duplicate data is harmless — the commit step skips no-op diffs.
+    - cron: "13 3 * * 2-6"
   workflow_dispatch:  # allows manual run from GitHub Actions tab
 
 jobs:

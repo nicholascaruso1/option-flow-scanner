@@ -169,11 +169,25 @@ def main():
     universe = build_universe(use_sp500)
     print(f"Screening {len(universe)} tickers (min-met={min_met})...")
 
-    data = yf.download(
-        universe, period="1y", interval="1d",
-        group_by="ticker", auto_adjust=True,
-        progress=False, threads=True,    # no progress bar in CI
-    )
+    # Hard ceiling on the bulk download: a hung connection inside yfinance can
+    # otherwise stall the CI job silently until GitHub's 6-hour kill. SIGALRM
+    # turns that into a loud failure. timeout=30 covers individual requests.
+    import signal
+    def _dl_timeout(signum, frame):
+        raise TimeoutError("yf.download exceeded 20-minute ceiling — aborting run")
+    signal.signal(signal.SIGALRM, _dl_timeout)
+    signal.alarm(20 * 60)
+    try:
+        data = yf.download(
+            universe, period="1y", interval="1d",
+            group_by="ticker", auto_adjust=True,
+            progress=False, threads=True, timeout=30,    # no progress bar in CI
+        )
+    finally:
+        signal.alarm(0)
+
+    if data is None or data.empty:
+        sys.exit("yf.download returned no data — aborting so stale stocks.json is not overwritten")
 
     rows = []
     for t in universe:

@@ -1173,7 +1173,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {tab==="levels"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Levels</div>
- {(s.levels||[]).map((l,i)=>(
+ {(s.keyLevels||s.levels||[]).map((l,i)=>(
  <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
  <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:70,flexShrink:0,fontFamily:FD}}>{l.p}</span>
  <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
@@ -1181,7 +1181,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  ))}
  <div style={{borderTop:"1px solid "+T.border,paddingTop:10,marginTop:6}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
- {(s.cats||[]).map((c,i)=>(
+ {(s.catalysts||s.cats||[]).map((c,i)=>(
  <div key={i} style={{display:"flex",gap:7,marginBottom:4}}><span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span><span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span></div>
  ))}
  </div>

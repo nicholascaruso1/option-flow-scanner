@@ -571,8 +571,6 @@ try {
         mergedCards[sym]=kvD>=lcD?kvCard:lc;
       }
       setAiCards(mergedCards);ss("of_ai_cards",mergedCards);
-      const cardSyms=Object.keys(mergedCards);
-      setFavs(p=>{const n=[...new Set([...p,...cardSyms])];ss("of_favs",n);return n;});
     }
     if(kv.of_c123&&Object.keys(kv.of_c123).length){setC123(kv.of_c123);ss("of_c123",kv.of_c123);}
     if(kv.of_journal&&Object.keys(kv.of_journal).length){setJournalNotes(kv.of_journal);ss("of_journal",kv.of_journal);}

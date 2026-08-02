@@ -540,7 +540,7 @@ export default function OptionsScanner() {
  const [scrTab, setScrTab] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
- const [compact, setCompact] = useState(false);
+ const [compact, setCompact] = useState(() => typeof window!=="undefined" && window.innerWidth < 768);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
 const [initDone, setInitDone] = useState(false);
  useEffect(() => {
@@ -846,6 +846,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  .sort((a,b)=>phase==="all"?PHASE_ORDER.indexOf(a.phase)-PHASE_ORDER.indexOf(b.phase):0)
  : allSetups.filter(s => {
  if (view==="favorites") return favs.includes(s.symbol);
+ if (view==="invalidated") { const _h=memoryData[s.symbol]||[]; const _l=_h[_h.length-1]; return _l&&_l.invalidated; }
  if (view==="closed") return false;
  if (dir==="calls" && s.direction!=="call") return false;
  if (dir==="puts" && s.direction!=="put") return false;
@@ -1012,7 +1013,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
    {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
    {_cell("IRA Cap","$200/trade",T.teal,"5% rule")}
+   <div onClick={()=>_inv>0&&setView("invalidated")} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
+  </div>
   </div>
  );
  })()}
@@ -1169,7 +1172,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:3,color:T.sage}}>✓ Entry Window</span>}
  </div>
  <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:4}}>{sessionProfile.profile}</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{sessionProfile.note}</div>
  </div>
  <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
  </div>
@@ -1533,7 +1535,6 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:3,color:T.sage}}>✓ Entry Window</span>}
  </div>
  <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:3}}>{sessionProfile.profile}</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{sessionProfile.note}</div>
  <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+sessionProfile.color+"20",fontSize:9,color:T.textDim}}>
  <span style={{color:sessionProfile.color,fontWeight:600}}>9:30 Rule: </span>
  {s.direction==="call"

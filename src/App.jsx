@@ -769,14 +769,14 @@ const WORKER = window.location.hostname === "localhost"
    };
    if(!card.symbol) throw new Error("no symbol in analysis");
    setAiCards(prev=>{const n={...prev,[card.symbol]:card};ss("of_ai_cards",n);return n;});
-   setFavs(p=>{const n=p.includes(card.symbol)?p:[...p,card.symbol];ss("of_favs",n);return n;});
+   if(!h.skipFav) setFavs(p=>{const n=p.includes(card.symbol)?p:[...p,card.symbol];ss("of_favs",n);return n;});
   } catch(e){ alert("Analysis failed: "+e.message); }
   setAnalyzing(p=>({...p,[h.ticker]:false}));
  }, [WORKER]);
  const regenCard = (s) => {
   const existing = aiCards[s.symbol];
   const lp = liveData[s.symbol]?.price||s.price;
-  analyzeHit({ticker:s.symbol,price:lp,bias:(s.direction||s.dir)==="put"?"BEAR":"BULL",retracement:null,conditions:{},details:{},existingCard:existing||null});
+  analyzeHit({ticker:s.symbol,price:lp,bias:(s.direction||s.dir)==="put"?"BEAR":"BULL",retracement:null,conditions:{},details:{},existingCard:existing||null,skipFav:true});
 };
  const tog = (sym) => {
   const willOpen = !open[sym];

@@ -1067,6 +1067,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  )}
 
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
+ {view==="invalidated"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.sage,marginBottom:10}}>✓</div><div style={{fontSize:13,color:T.textSec}}>No invalidated setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>All tracked setups are currently intact</div></div>)}
  {(isAltView||isEverything)&&(
  <div style={{padding:"10px 20px"}}>
  {visible.map((s)=>{

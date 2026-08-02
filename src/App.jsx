@@ -507,6 +507,7 @@ export default function OptionsScanner() {
  const [open, setOpen] = useState({});
  const [tabs, setTabs] = useState({});
  const [favs, setFavs] = useState([]);
+ const [removedFavs, setRemovedFavs] = useState([]);
  const [checks, setChecks] = useState({});
  const [ts, setTs] = useState(null);
  const [refreshing, setRefreshing] = useState(false);
@@ -545,8 +546,8 @@ export default function OptionsScanner() {
 const [initDone, setInitDone] = useState(false);
  useEffect(() => {
  (async () => {
- const [f,c,t,ai,mem,c1d,jnl,pfc,ac] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{}),ls("of_ai_cards",{})]);
- setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{});
+ const [f,c,t,ai,mem,c1d,jnl,pfc,ac,rf] = await Promise.all([ls("of_favs",[]),ls("of_checks",{}),ls("of_ts",null),ls("of_ai_updates",{}),ls("of_memory",{}),ls("of_c123",{}),ls("of_journal",{}),ls("of_preflight",{}),ls("of_ai_cards",{}),ls("of_favs_removed",[])]);
+ setFavs(f); setChecks(c); setTs(t||AS_OF); setAiUpdates(ai||{}); setMemoryData(mem||{}); setC123(c1d||{}); setJournalNotes(jnl||{}); setPfChecks(pfc||{}); setRemovedFavs(rf||[]);
 setAiCards(ac||{});
 try {
   const kvR = await fetch("https://market.electronmailbag.workers.dev/user-data");
@@ -554,8 +555,11 @@ try {
     const kv=await kvR.json();
     // MERGE (not replace) favs + cards so a stale device can never delete
     // cards saved on another device. Union favs; per-symbol newest-wins cards.
+    const kvRemoved=kv.of_favs_removed||[];
+    const mergedRemoved=[...new Set([...(rf||[]),...kvRemoved])];
+    setRemovedFavs(mergedRemoved);ss("of_favs_removed",mergedRemoved);
     if(kv.of_favs?.length){
-      const mergedFavs=[...new Set([...(f||[]),...kv.of_favs])];
+      const mergedFavs=[...new Set([...(f||[]),...kv.of_favs])].filter(s=>!mergedRemoved.includes(s));
       setFavs(mergedFavs);ss("of_favs",mergedFavs);
     }
     if(kv.of_checks&&Object.keys(kv.of_checks).length){setChecks(kv.of_checks);ss("of_checks",kv.of_checks);}
@@ -685,8 +689,10 @@ setInitDone(true);
  useEffect(() => { _doRefreshRef.current = doRefresh; }, [doRefresh]);
  useEffect(() => { if (initDone) _doRefreshRef.current?.(); }, [initDone]);
  const toggleFav = useCallback((sym) => {
+ const isRemoving=favs.includes(sym);
  setFavs(p => { const n=p.includes(sym)?p.filter(s=>s!==sym):[...p,sym]; ss("of_favs",n); return n; });
- }, []);
+ setRemovedFavs(p => { const n=isRemoving?[...new Set([...p,sym])]:p.filter(s=>s!==sym); ss("of_favs_removed",n); return n; });
+ }, [favs]);
  const toggleCheck = useCallback((sym, id) => {
  setChecks(p => {
  const sc=p[sym]||[];
@@ -704,6 +710,7 @@ useEffect(()=>{
   kvSyncRef.current = setTimeout(()=>{
     const payload={
       of_favs:favs,
+      of_favs_removed:removedFavs,
       of_checks:checks,
       of_ai_updates:aiUpdates,
       of_ai_cards:aiCards,

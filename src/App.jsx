@@ -920,18 +920,33 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO,"commodities":COMMODITIES,"
  {(liveTs||liveError)&&(
  <div style={{background:"#060b16",borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
  {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
- {liveError&&<span style={{fontSize:9,color:T.rose}}>{liveError}</span>}
- {Object.entries(liveData).filter(([sym,d])=>{
+ {liveError&&<span style={{fontSize:9,color:T.textDim}}>{liveError}</span>}
+ {(()=>{
  const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
+ const near=Object.entries(liveData).map(([sym,d])=>{
  const s=all.find(x=>x.symbol===sym);
- if(!s||!d.price)return false;
+ if(!s||!d.price)return null;
  const levels=(s.keyLevels||s.levels||[]);
- return levels.some(l=>{const lp=parseFloat((l.p||"").replace(/[$,]/g,""));return lp&&Math.abs((d.price-lp)/lp)<0.008;});
- }).map(([sym,d])=>(
+ let closestPct=null;
+ for(const l of levels){
+ const lp=parseFloat((l.p||"").replace(/[$,]/g,""));
+ if(!lp)continue;
+ const pct=Math.abs((d.price-lp)/lp);
+ if(pct<0.008&&(closestPct===null||pct<closestPct))closestPct=pct;
+ }
+ return closestPct===null?null:{sym,price:d.price,closestPct};
+ }).filter(Boolean).sort((a,b)=>a.closestPct-b.closestPct);
+ const shown=near.slice(0,3);
+ const rest=near.length-shown.length;
+ return <>
+ {shown.map(({sym,price})=>(
  <span key={sym} style={{fontSize:9,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"50",borderRadius:3,color:T.gold}}>
- ⚠ {sym} ${d.price} near key level
+ ⚠ {sym} ${price} near key level
  </span>
  ))}
+ {rest>0&&<span style={{fontSize:9,padding:"1px 6px",background:T.border+"40",border:"1px solid "+T.border2,borderRadius:3,color:T.textDim}}>+{rest} more</span>}
+ </>;
+ })()}
  {Object.entries(liveData).filter(([,d])=>d.marketState==="PRE"&&d.preMarket&&Math.abs(d.preMarketChg||0)>2).map(([sym,d])=>(
  <span key={sym} style={{fontSize:9,padding:"1px 6px",background:(d.preMarketChg>0?T.blue:T.rose)+"20",border:"1px solid "+(d.preMarketChg>0?T.blue:T.rose)+"50",borderRadius:3,color:d.preMarketChg>0?T.blue:T.rose}}>
  {sym} PM ${d.preMarket} ({d.preMarketChg>0?"+":""}{d.preMarketChg}%)

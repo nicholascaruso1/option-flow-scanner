@@ -795,6 +795,19 @@ const WORKER = window.location.hostname === "localhost"
  const getTab = (sym) => tabs[sym]||"narrative";
  const cc = (v) => v>0?T.blue:v<0?T.rose:T.textSec;
  const ovl = (x) => aiCards[x.symbol] ? {...x, ...aiCards[x.symbol]} : x;
+ const CORR_GROUPS = [["BTC","ETH"],["SPY","QQQ","IWM","DIA"],["GLD","SLV"],["PALL","PPLT"]];
+ const computeLiveDivergence = (sym) => {
+  const group = CORR_GROUPS.find(g => g.includes(sym));
+  if (!group) return null;
+  const members = group.map(m => ({sym:m, chg:liveData[m]?.chg})).filter(m => typeof m.chg === "number");
+  if (members.length < 2) return null;
+  const sorted = [...members].sort((a,b) => a.chg - b.chg);
+  const weakest = sorted[0], strongest = sorted[sorted.length-1];
+  const spread = strongest.chg - weakest.chg;
+  const memberStr = members.map(m => `${m.sym} ${m.chg>0?"+":""}${m.chg.toFixed(2)}%`).join(", ");
+  if (spread < 0.75) return `Live SMT check: ${memberStr} — correlated instruments moving in line, no meaningful divergence right now.`;
+  return `Live SMT Divergence: ${memberStr} — ${weakest.sym} is the weakest correlated instrument today, ${strongest.sym} showing relative strength. Per TTrades SMT, the weaker instrument in the direction of the move is the primary vehicle once C2/C3 confirms.`;
+ };
 const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
  const isAltView=["crypto","commodities","indices"].includes(view);
  const isEverything=view==="everything";
@@ -1163,7 +1176,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div>{s.narrative}</div></div>
  <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div>{s.structure}</div></div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple}}>{s.divergence}</div></div>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
  </div>
  )}
  {tab==="phase"&&(

@@ -1469,7 +1469,10 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(()=>{
  const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol);
- const rsLeader=sameDir.length>0?[...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;
+ const liveChg=(x)=>liveData[x.symbol]?.chg??x.chg;
+ const sameDirL=sameDir.map(x=>({...x,chg:liveChg(x)}));
+ const sL={...s,chg:liveChg(s)};
+ const rsLeader=sameDirL.length>0?[...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;
  return(
  <div>
  {memNarrative&&(
@@ -1497,7 +1500,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  {sameDir.length>0&&(
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Relative Strength · {s.direction==="call"?"Bullish":"Bearish"} Setups</div>
- {[s,...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map((x,i)=>(
+ {[sL,...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map((x,i)=>(
  <div key={x.symbol} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:3,background:x.symbol===s.symbol?T.sage+"10":"transparent",border:x.symbol===s.symbol?"1px solid "+T.sage+"30":"1px solid transparent"}}>
  <span style={{fontSize:9,fontWeight:700,color:x.symbol===s.symbol?T.sage:T.textSec,fontFamily:FD,minWidth:44}}>{x.symbol}</span>
  <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
@@ -1511,7 +1514,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{marginTop:6,fontSize:9,color:T.gold,lineHeight:1.6}}>⚡ {rsLeader.symbol} showing stronger momentum. If entering {s.direction==="call"?"calls":"puts"} today, consider {rsLeader.symbol} as the primary vehicle.</div>
  )}
  {sameDir.length>0&&(()=>{
- const sorted=[s,...sameDir].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
+ const sorted=[sL,...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
  const top=sorted[0], bot=sorted[sorted.length-1];
  const isDiverging=top.symbol!==bot.symbol&&Math.abs((top.chg||0)-(bot.chg||0))>5;
  return isDiverging?(

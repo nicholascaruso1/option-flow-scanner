@@ -336,7 +336,7 @@ const CHECKLIST=[
  {id:"ob_mean", label:"Price at or inside OB mean threshold", auto:true, desc:"Current price ≥ OB mean (50% of C1 body) for calls, ≤ OB mean for puts. Body close through OB mean = OB invalidated, skip trade."},
  {id:"fib50", label:"Price in 0–50% OTE retracement zone", auto:true, desc:"Retracement held above (call) or below (put) the 50% Fib level anchored from the Order Block swing. Price beyond 50% = outside OTE zone, wait or skip."},
  {id:"topdown", label:"Top-down bias aligned (monthly/weekly/daily)", auto:true, desc:"Monthly and weekly bias confirms daily setup direction. If higher timeframes conflict, wait for alignment or skip."},
- {id:"budget", label:"Calendar clear + OI > 500 + within budget", auto:false, desc:"No red-folder events within 24hrs. OI > 500 on target strike, bid/ask spread < 10% of mid. Position ≤$200 IRA · ≤$5 Individual. IV Rank < 30 preferred."},
+ {id:"budget", label:"Calendar clear + OI > 500", auto:false, desc:"No red-folder events within 24hrs. OI > 500 on target strike, bid/ask spread < 10% of mid. IV Rank < 30 preferred."},
 ];
 const CRYPTO=[
  {symbol:"BTC",name:"Bitcoin",price:107250,chg:1.24,vol:"High",cap:"Mega",phase:"CONSOLIDATION",dir:"watch",
@@ -502,8 +502,6 @@ export default function OptionsScanner() {
  const [dir, setDir] = useState("both");
  const [cap, setCap] = useState("all");
  const [phase, setPhase] = useState("all");
- const [iraB, setIraB] = useState("");
- const [indB, setIndB] = useState("");
  const [open, setOpen] = useState({});
  const [tabs, setTabs] = useState({});
  const [favs, setFavs] = useState([]);
@@ -766,7 +764,7 @@ const WORKER = window.location.hostname === "localhost"
     price:h.price, chg:0, vol:"\u2014",
     ...a,
     cap:a.capSize||"Mid", capSize:a.capSize||"Mid",
-    accountFit:a.accountFit||["IRA ($200)"],
+    accountFit:a.accountFit||[],
     earningsDate:a.earningsDate&&a.earningsDate!=="null"?a.earningsDate:null,
     earningsLabel:a.earningsLabel&&a.earningsLabel!=="null"?a.earningsLabel:null,
     keyLevels:(a.keyLevels||[]).map(k=>({p:k.p,l:k.l,c:KIND_C[k.kind]||T.gold})),
@@ -887,47 +885,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>
  <div style={{display:"flex",gap:6,alignItems:"center"}}>
- <div style={{position:"relative"}}>
- <button onClick={()=>setPanelOpen(p=>!p)} title="Portfolio & Budget" style={{display:"flex",alignItems:"center",justifyContent:"center",width:34,height:34,background:panelOpen?T.gold+"18":"transparent",border:"1px solid "+(panelOpen?T.gold:T.border2),borderRadius:4,cursor:"pointer",color:panelOpen?T.gold:T.textSec,fontSize:16,transition:"all 0.2s"}}>
- ⊞
- </button>
- {panelOpen&&(
- <div style={{position:"absolute",top:40,right:0,width:320,background:T.surface,border:"1px solid "+T.border2,borderRadius:6,boxShadow:"0 8px 24px #00000055",zIndex:100,overflow:"hidden"}}>
- <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
- {[["budget","💰 Budget"]].map(([v,l])=>(
- <button key={v} onClick={()=>setView(v)} style={{flex:1,padding:"9px 8px",fontSize:10,background:view===v?T.bg:"transparent",border:"none",borderBottom:view===v?"2px solid "+T.sage:"2px solid transparent",color:view===v?T.sage:T.textDim,cursor:"pointer",fontFamily:FM}}>
- {l}
- </button>
- ))}
- </div>
- {view==="budget"&&(()=>{
- const ira=parseFloat(iraB)||0, ind=parseFloat(indB)||0;
- const iraMax=ira>0?(ira*0.05).toFixed(2):null, indMax=ind>0?(ind*0.05).toFixed(2):null;
- const activeP=allSetups.filter(s=>s.isActive);
- const iraUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("IRA"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium*100:0),0);
- const indUsed=activeP.filter(s=>s.accountFit.some(a=>a.includes("Ind"))).reduce((sum,s)=>sum+(s.entryPremium?s.entryPremium:0),0);
- const inp={background:T.bg,border:"1px solid "+T.border,color:T.textPri,padding:"7px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",width:"100%",boxSizing:"border-box"};
- const row=(l,v,c)=>(<div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:9,color:T.textSec}}>{l}</span><span style={{fontSize:11,color:c||T.textPri,fontWeight:600,fontFamily:FD}}>{v}</span></div>);
- return(
- <div style={{padding:"12px 14px",maxHeight:400,overflowY:"auto"}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10,letterSpacing:"0.05em"}}>ACCOUNT TRACKER · 5% RULE</div>
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
- {[[iraB,setIraB,iraMax,iraUsed,ira,"IRA",T.teal,"IRA"],[indB,setIndB,indMax,indUsed,ind,"Individual",T.purple,"Ind"]].map(([bal,setBal,max,used,total,label,color,key])=>(
- <div key={key} style={{background:T.bg,border:"1px solid "+T.border,borderRadius:5,padding:"10px",borderTop:"2px solid "+color}}>
- <div style={{fontSize:10,fontWeight:600,color,marginBottom:8}}>{label}</div>
- <input type="number" placeholder={key==="IRA"?"4000":"67"} value={bal} onChange={e=>setBal(e.target.value)} style={inp}/>
- {max&&<div style={{marginTop:8}}>{row("Max/trade","$"+max,T.sage)}{row("Deployed","$"+used.toFixed(2),T.gold)}{row("Available","$"+(total-used).toFixed(2),(total-used)>0?T.sage:T.rose)}<div style={{height:2,background:T.border,borderRadius:2,marginTop:6,overflow:"hidden"}}><div style={{height:"100%",background:color,width:Math.min(100,(used/total)*100)+"%",borderRadius:2}}/></div></div>}
- {!max&&<div style={{fontSize:9,color:T.textDim,marginTop:6}}>Enter balance</div>}
- </div>
- ))}
- </div>
- <div style={{marginTop:10,fontSize:9,color:T.textDim,lineHeight:1.7}}>5% risk constant as account grows. IRA ≤$200/contract · Individual ≤$5/contract.</div>
- </div>
- );
- })()}
- </div>
- )}
- </div>
  <button onClick={doRefresh} disabled={refreshing} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",background:hint?T.sage+"18":"transparent",border:"1px solid "+(hint?T.sage:T.border2),borderRadius:4,cursor:refreshing?"not-allowed":"pointer",color:hint?T.sage:T.textSec,fontSize:11,fontFamily:FM,transition:"all 0.2s"}}>
  <span style={{display:"inline-block",animation:refreshing?"spin 0.8s linear infinite":"none",fontSize:13}}>↻</span>
  {refreshing?(refreshStatus||"Fetching…"):hint?"✓ Live Updated":"Refresh Data"}
@@ -1031,7 +988,6 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
    {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
-   {_cell("IRA Cap","$200/trade",T.teal,"5% rule")}
    <div onClick={()=>_inv>0&&setView("invalidated")} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
   </div>
@@ -1231,7 +1187,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  })}
  </div>
  )}
- {!isAltView&&!isEverything&&view!=="budget"&&(
+ {!isAltView&&!isEverything&&(
  <div style={{padding:"10px 20px"}}>
  {view==="all"&&(()=>{
  const focusData=[...allSetups].map(s=>{
@@ -1441,7 +1397,6 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
- {s.accountFit.map((a,i)=><span key={i} style={{fontSize:9,color:T.textDim}}>💼 {a}</span>)}
  </div>
  </div>
  {ai.alert&&(
@@ -1764,7 +1719,6 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  ))}
  </div>
  <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation} — body close only (wick through = manipulation, not invalidation)</div>
- <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{s.accountFit.join(" · ")}</div>
  </div>
  </div>
  )}
@@ -2203,7 +2157,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{color:T.purple}}>Narrative vs structure divergence = proprietary edge</div>
  <div style={{color:T.rose}}>Expansion → Expansion impossible · Entry lives in the middle phase</div>
  <div style={{color:T.textDim}}>Bias invalidation = potential directional flip — protected swing taken creates opposite opportunity</div>
- <div style={{color:T.textDim,marginTop:4}}>IRA: $200 max (5%) · Individual: $3–5 max (5%)</div>
+
  </div>
  )}
  </div>

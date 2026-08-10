@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { detectC123 } from "./lib/detectC123";
+import { parseInvalidation, checkInvalidation } from "./lib/invalidation";
 const T = {
  bg:"#080E1C", surface:"#0F1B2E", border:"#1A2C45", border2:"#243850",
  textPri:"#E8EEF8", textSec:"#7A92B0", textDim:"#3A5270",
@@ -74,29 +75,6 @@ function todayKey() {
  return est.toISOString().slice(0,10);
 }
 
-function parseInvalidation(invalidationStr) {
- if (!invalidationStr) return null;
- if (/inside range/i.test(invalidationStr)) return null;
- const thresholds = [];
- const re = /(below|above)\s+\$?([\d,]+(?:\.\d+)?)/gi;
- let m;
- while ((m = re.exec(invalidationStr)) !== null) {
- const direction = m[1].toLowerCase();
- const price = parseFloat(m[2].replace(/,/g,""));
- if (!isNaN(price)) thresholds.push({direction, price});
- }
- return thresholds.length ? thresholds : null;
-}
-
-function checkInvalidation(setup, price) {
- const thresholds = parseInvalidation(setup.invalidation);
- if (!thresholds || price==null) return {breached:false, thresholds:null};
- for (const t of thresholds) {
- if (t.direction==="below" && price < t.price) return {breached:true, threshold:t};
- if (t.direction==="above" && price > t.price) return {breached:true, threshold:t};
- }
- return {breached:false, thresholds};
-}
 
 function computeMarketState(setup, invalidationCheck) {
  if (invalidationCheck.breached) return "INVALIDATED";

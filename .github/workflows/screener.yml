@@ -23,6 +23,15 @@ jobs:
         with:
           ref: main
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,14 +56,12 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: nightly screener update [skip ci]"
           git push
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install Node dependencies
-        run: npm ci
+      - name: Tier 1 mechanical check (candle-based, isolated from screener/build)
+        # Runs detectC123 + invalidation check against all tracked AI cards,
+        # fires Tier 2 (Claude) only on meaningful structural change.
+        # continue-on-error so a Tier 1 failure never blocks the site build/deploy below.
+        continue-on-error: true
+        run: node scripts/tier1_check.mjs
 
       - name: Build site
         run: npm run build

@@ -1,7 +1,7 @@
 // scripts/tier1_check.mjs
 // Runs nightly (same workflow as screener_ci.py, as its own separate step).
 // For every symbol currently tracked in of_ai_cards:
-//   1. Fetch fresh daily candles from the Worker
+//   1. Fetch fresh daily candles from the Worker (throttled to stay under Polygon's free-tier rate limit)
 //   2. Run detectC123 (same pure function the browser uses)
 //   3. Run checkInvalidation against the card's live price (same logic + string parsing the browser's ⚠ badge uses)
 //   4. Compare new stage/confidence/invalidation against last known state (of_tier1_state in KV)
@@ -19,6 +19,11 @@ import { checkInvalidation } from "../src/lib/invalidation.js";
 
 const WORKER = "https://market.electronmailbag.workers.dev";
 
+// Polygon free tier is ~5 req/min. 13s between candle fetches keeps us safely under that
+// even accounting for jitter/retries. With ~19 symbols this adds ~4min to the nightly run —
+// trivial cost for a background job.
+const CANDLE_FETCH_DELAY_MS = 13000;
+
 const STAGE_RANK = {
   INSUFFICIENT_DATA: -1,
   NO_C1: -1,
@@ -32,6 +37,10 @@ const STAGE_RANK = {
 
 function rank(stage) {
   return STAGE_RANK[stage] ?? -1;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getUserData() {
@@ -118,9 +127,14 @@ async function main() {
   const tier2Fired = [];
   const errors = [];
 
-  for (const symbol of symbols) {
+  for (let idx = 0; idx < symbols.length; idx++) {
+    const symbol = symbols[idx];
     const card = aiCards[symbol];
     const direction = (card.direction || card.dir) === "put" ? "bear" : "bull";
+
+    if (idx > 0) {
+      await sleep(CANDLE_FETCH_DELAY_MS);
+    }
 
     try {
       const candles = await fetchCandles(symbol);

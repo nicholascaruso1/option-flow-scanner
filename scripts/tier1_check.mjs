@@ -50,12 +50,18 @@ async function getUserData() {
 }
 
 async function postUserData(payload) {
-  const r = await fetch(`${WORKER}/user-data`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!r.ok) throw new Error(`POST /user-data failed: ${r.status}`);
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const r = await fetch(`${WORKER}/user-data`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (r.ok) return;
+    const body = await r.text();
+    console.error(`Tier 1: POST /user-data attempt ${attempt} failed: ${r.status} — ${body}`);
+    if (attempt < 3) await new Promise(res => setTimeout(res, 5000));
+  }
+  throw new Error(`POST /user-data failed after 3 attempts`);
 }
 
 async function fetchCandles(symbol) {

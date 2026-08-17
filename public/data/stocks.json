@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-17T22:46:16.046137+00:00",
+  "generated_at": "2026-08-17T22:59:07.441218+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -983,10 +983,10 @@
         "liquid": true
       },
       "details": {
-        "sma20": 28.21,
-        "sma50": 27.19,
-        "sma200": 25.86,
-        "avg_vol_m": 3.89,
+        "sma20": 28.2,
+        "sma50": 27.15,
+        "sma200": 25.85,
+        "avg_vol_m": 3.85,
         "retr_pct": -25.3,
         "exp_date": "2026-08-06",
         "exp_dir": "BEAR"
@@ -1292,6 +1292,29 @@
       }
     },
     {
+      "ticker": "ARES",
+      "price": 141.34,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 132.65,
+        "sma50": 126.65,
+        "sma200": 131.77,
+        "avg_vol_m": 2.33,
+        "retr_pct": -20.6,
+        "exp_date": "2026-08-03",
+        "exp_dir": "BULL"
+      }
+    },
+    {
       "ticker": "TTWO",
       "price": 241.61,
       "bias": "MIXED",
@@ -1311,6 +1334,29 @@
         "avg_vol_m": 2.12,
         "retr_pct": 36.0,
         "exp_date": "2026-08-07",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "CDW",
+      "price": 135.3,
+      "bias": "MIXED",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 139.32,
+        "sma50": 136.19,
+        "sma200": 131.24,
+        "avg_vol_m": 1.91,
+        "retr_pct": 27.3,
+        "exp_date": "2026-08-05",
         "exp_dir": "BULL"
       }
     },
@@ -1356,29 +1402,6 @@
         "sma200": 49.21,
         "avg_vol_m": 1.88,
         "retr_pct": 120.3,
-        "exp_date": "2026-08-05",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "CDW",
-      "price": 135.3,
-      "bias": "MIXED",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": false,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 139.59,
-        "sma50": 136.11,
-        "sma200": 131.15,
-        "avg_vol_m": 1.88,
-        "retr_pct": 27.3,
         "exp_date": "2026-08-05",
         "exp_dir": "BULL"
       }
@@ -1627,10 +1650,10 @@
         "liquid": true
       },
       "details": {
-        "sma20": 84.24,
-        "sma50": 80.37,
-        "sma200": 76.03,
-        "avg_vol_m": 1.25,
+        "sma20": 84.0,
+        "sma50": 80.34,
+        "sma200": 75.97,
+        "avg_vol_m": 1.26,
         "retr_pct": 59.0,
         "exp_date": "2026-08-06",
         "exp_dir": "BEAR"

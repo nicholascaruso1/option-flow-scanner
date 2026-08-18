@@ -16,6 +16,11 @@
 
 import { detectC123 } from "../src/lib/detectC123.js";
 import { checkInvalidation } from "../src/lib/invalidation.js";
+import { readFileSync, writeFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const STATE_FILE = join(dirname(fileURLToPath(import.meta.url)), "tier1_state.json");
 
 const WORKER = "https://market.electronmailbag.workers.dev";
 
@@ -47,21 +52,6 @@ async function getUserData() {
   const r = await fetch(`${WORKER}/user-data`);
   if (!r.ok) throw new Error(`GET /user-data failed: ${r.status}`);
   return r.json();
-}
-
-async function postUserData(payload) {
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    const r = await fetch(`${WORKER}/user-data`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (r.ok) return;
-    const body = await r.text();
-    console.error(`Tier 1: POST /user-data attempt ${attempt} failed: ${r.status} — ${body}`);
-    if (attempt < 3) await new Promise(res => setTimeout(res, 5000));
-  }
-  throw new Error(`POST /user-data failed after 3 attempts`);
 }
 
 async function fetchCandles(symbol) {
@@ -119,7 +109,12 @@ async function main() {
   console.log("Tier 1: fetching current KV state...");
   const kv = await getUserData();
   const aiCards = kv.of_ai_cards || {};
-  const tier1State = kv.of_tier1_state || {};
+  let tier1State = {};
+  try {
+    tier1State = JSON.parse(readFileSync(STATE_FILE, "utf8"));
+  } catch {
+    tier1State = {};
+  }
 
   const symbols = Object.keys(aiCards);
   console.log(`Tier 1: ${symbols.length} tracked symbol(s): ${symbols.join(", ") || "(none)"}`);
@@ -178,8 +173,8 @@ async function main() {
     }
   }
 
-  console.log("Tier 1: persisting updated state to KV...");
-  await postUserData({ ...kv, of_tier1_state: nextState });
+  console.log("Tier 1: persisting updated state to file...");
+  writeFileSync(STATE_FILE, JSON.stringify(nextState, null, 2));
 
   console.log(`\nTier 1 summary: ${symbols.length} checked, ${tier2Fired.length} Tier 2 trigger(s), ${errors.length} error(s)`);
   if (tier2Fired.length) console.log("Tier 2 fired for:", tier2Fired.map((t) => `${t.symbol} (${t.reason})`).join("; "));

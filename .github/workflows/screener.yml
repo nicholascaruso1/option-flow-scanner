@@ -63,6 +63,12 @@ jobs:
         continue-on-error: true
         run: node scripts/tier1_check.mjs
 
+      - name: Commit Tier 1 state
+        run: |
+          git add scripts/tier1_state.json
+          git diff --staged --quiet || git commit -m "chore: tier1 state update [skip ci]"
+          git push
+
       - name: Build site
         run: npm run build
 

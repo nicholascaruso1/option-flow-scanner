@@ -1329,37 +1329,46 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
  <div style={{color:T.purple,fontSize:10}}>{s.divergence}</div>
  </div>
- {sameDir.length>0&&(
+ {(()=>{
+ const allSetupsL=allSetups.map(x=>({...x,chg:liveData[x.symbol]?.chg??x.chg})).sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
+ const maxAbsChg=Math.max(...allSetupsL.map(x=>Math.abs(x.chg||0)),1);
+ const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
+ const corrMembers=corrGroup?corrGroup.map(m=>({sym:m,chg:liveData[m]?.chg})).filter(m=>typeof m.chg==="number"):[];
+ const corrDiv=computeLiveDivergence(s.symbol);
+ return(<div>
+ {allSetupsL.length>0&&(
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Relative Strength · {s.direction==="call"?"Bullish":"Bearish"} Setups</div>
- {[sL,...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map((x,i)=>(
+ <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>📊 Momentum Leaderboard — Active Setups</div>
+ {allSetupsL.map((x,i)=>(
  <div key={x.symbol} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:3,background:x.symbol===s.symbol?T.sage+"10":"transparent",border:x.symbol===s.symbol?"1px solid "+T.sage+"30":"1px solid transparent"}}>
  <span style={{fontSize:9,fontWeight:700,color:x.symbol===s.symbol?T.sage:T.textSec,fontFamily:FD,minWidth:44}}>{x.symbol}</span>
+ <span style={{fontSize:7,padding:"1px 4px",background:x.direction==="call"?T.blue+"20":T.rose+"20",border:"1px solid "+(x.direction==="call"?T.blue:T.rose)+"40",borderRadius:2,color:x.direction==="call"?T.blue:T.rose,minWidth:22,textAlign:"center"}}>{x.direction==="call"?"C":"P"}</span>
  <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",background:x.symbol===s.symbol?T.sage:T.border2,width:Math.min(100,Math.abs(x.chg||0)*3)+"%",borderRadius:2}}/>
+ <div style={{height:"100%",background:x.symbol===s.symbol?T.sage:(x.direction==="call"?T.blue:T.rose),width:Math.min(100,(Math.abs(x.chg||0)/maxAbsChg)*100)+"%",borderRadius:2}}/>
  </div>
- <span style={{fontSize:9,color:x.chg>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{x.chg>0?"+":""}{typeof x.chg==="number"?x.chg.toFixed(1):"—"}%</span>
- {i===0&&<span style={{fontSize:7,padding:"1px 4px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>leader</span>}
+ <span style={{fontSize:9,color:(x.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(x.chg||0)>0?"+":""}{typeof x.chg==="number"?x.chg.toFixed(1):"—"}%</span>
+ {i===0&&<span style={{fontSize:7,padding:"1px 4px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>top</span>}
  </div>
  ))}
- {rsLeader&&rsLeader.symbol!==s.symbol&&(
- <div style={{marginTop:6,fontSize:9,color:T.gold,lineHeight:1.6}}>⚡ {rsLeader.symbol} showing stronger momentum. If entering {s.direction==="call"?"calls":"puts"} today, consider {rsLeader.symbol} as the primary vehicle.</div>
+ </div>
  )}
- {sameDir.length>0&&(()=>{
- const sorted=[sL,...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
- const top=sorted[0], bot=sorted[sorted.length-1];
- const isDiverging=top.symbol!==bot.symbol&&Math.abs((top.chg||0)-(bot.chg||0))>5;
- return isDiverging?(
- <div style={{marginTop:6,padding:"6px 8px",background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:3}}>
- <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>⚡ SMT Divergence — Confluence Only</div>
- <div style={{fontSize:9,color:T.purple,lineHeight:1.6}}>
- {top.symbol} ({top.chg>0?"+":""}{(top.chg||0).toFixed(1)}%) and {bot.symbol} ({bot.chg>0?"+":""}{(bot.chg||0).toFixed(1)}%) are diverging by {Math.abs((top.chg||0)-(bot.chg||0)).toFixed(1)}%. If they are correlated, the weaker ({bot.symbol}) signals the real direction. Per TTrades: SMT is confluence, not the trade foundation. Confirm C2 closure and CISD on the weaker asset before entering. The weaker instrument in a divergence = the primary vehicle once the fractal is confirmed.
+ {corrGroup&&corrMembers.length>=2&&(
+ <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
+ {[...corrMembers].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map(m=>(
+ <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:3,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
+ <span style={{fontSize:9,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
+ <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
+ <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:2}}/>
  </div>
+ <span style={{fontSize:9,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
  </div>
- ):null;
+ ))}
+ {corrDiv&&<div style={{marginTop:6,fontSize:9,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
+ </div>
+ )}
+ </div>);
  })()}
- </div>
- )}
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
  {ai.logEntry&&(

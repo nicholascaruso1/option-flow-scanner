@@ -54,6 +54,18 @@ async function getUserData() {
   return r.json();
 }
 
+async function postUserData(payload) {
+  const r = await fetch(`${WORKER}/user-data`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!r.ok) {
+    const body = await r.text();
+    throw new Error(`POST /user-data failed: ${r.status} — ${body}`);
+  }
+}
+
 async function fetchCandles(symbol) {
   const r = await fetch(`${WORKER}/candles?symbol=${symbol}&resolution=daily&bars=30`);
   const json = await r.json();
@@ -162,7 +174,25 @@ async function main() {
       console.log(`  ${symbol}: ${prev ? prev.stage : "(new)"} → ${next.stage} — ${changed ? "TRIGGER TIER 2" : "no change"} (${reason})`);
 
       if (changed) {
-        await triggerTier2(symbol, card, lastClose ?? card.price);
+        const analysis = await triggerTier2(symbol, card, lastClose ?? card.price);
+        if (analysis) {
+          const updatedCard = {
+            ...card,
+            ...analysis,
+            tier: "Tier 2", isActive: false, aiGenerated: true,
+            dataAsOf: new Date().toLocaleDateString("en-US", {month:"short",day:"numeric",year:"numeric"}),
+            price: lastClose ?? card.price,
+            chg: 0, vol: "—",
+            cap: analysis.capSize || card.cap || "Mid",
+            capSize: analysis.capSize || card.capSize || "Mid",
+            accountFit: analysis.accountFit || card.accountFit || [],
+            earningsDate: analysis.earningsDate && analysis.earningsDate !== "null" ? analysis.earningsDate : null,
+            earningsLabel: analysis.earningsLabel && analysis.earningsLabel !== "null" ? analysis.earningsLabel : null,
+            analysisHistory: [...(card.analysisHistory || []), ...(card.logEntry ? [{ts: card.dataAsOf || "prior", note: card.logEntry.note}] : [])].slice(-5),
+          };
+          aiCards[symbol] = updatedCard;
+          console.log(`  ${symbol}: Tier 2 card saved (dataAsOf: ${updatedCard.dataAsOf})`);
+        }
         tier2Fired.push({ symbol, reason });
       }
 
@@ -175,6 +205,12 @@ async function main() {
 
   console.log("Tier 1: persisting updated state to file...");
   writeFileSync(STATE_FILE, JSON.stringify(nextState, null, 2));
+
+  if (tier2Fired.length > 0) {
+    console.log("Tier 1: saving updated AI cards to KV...");
+    await postUserData({ ...kv, of_ai_cards: aiCards });
+    console.log("Tier 1: KV save complete.");
+  }
 
   console.log(`\nTier 1 summary: ${symbols.length} checked, ${tier2Fired.length} Tier 2 trigger(s), ${errors.length} error(s)`);
   if (tier2Fired.length) console.log("Tier 2 fired for:", tier2Fired.map((t) => `${t.symbol} (${t.reason})`).join("; "));

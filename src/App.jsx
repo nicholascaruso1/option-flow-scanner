@@ -579,6 +579,7 @@ setInitDone(true);
  setChecks(p => { const n={...p,[sym]:[]}; ss("of_checks",n); return n; });
  }, []);
  const kvSyncRef = useRef(null);
+const lastKvPayloadRef = useRef(null);
 useEffect(()=>{
   if(!initDone) return;
   clearTimeout(kvSyncRef.current);
@@ -594,12 +595,16 @@ useEffect(()=>{
       of_preflight:pfChecks,
       ...(typeof closedTrades!=="undefined"?{of_closed_trades:closedTrades}:{})
     };
+    const serialized=JSON.stringify(payload);
+    // Skip the KV write entirely if nothing actually changed since the last
+    // successful sync — avoids burning daily KV put() quota on no-op re-renders.
+    if(serialized===lastKvPayloadRef.current) return;
     fetch("https://market.electronmailbag.workers.dev/user-data",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    }).catch(()=>{});
-  },2000);
+      body:serialized
+    }).then(r=>{ if(r.ok) lastKvPayloadRef.current=serialized; }).catch(()=>{});
+  },10000);
 },[favs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,initDone]);
 const WORKER = window.location.hostname === "localhost"
    ? "/worker"

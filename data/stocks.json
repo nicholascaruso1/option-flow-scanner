@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T22:46:01.395133+00:00",
+  "generated_at": "2026-08-24T23:00:26.377523+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -1016,6 +1016,29 @@
       }
     },
     {
+      "ticker": "GPN",
+      "price": 94.3,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 89.17,
+        "sma50": 80.08,
+        "sma200": 74.6,
+        "avg_vol_m": 3.19,
+        "retr_pct": 18.3,
+        "exp_date": "2026-08-13",
+        "exp_dir": "BULL"
+      }
+    },
+    {
       "ticker": "MA",
       "price": 599.86,
       "bias": "BULL",
@@ -1035,29 +1058,6 @@
         "avg_vol_m": 3.11,
         "retr_pct": 0.8,
         "exp_date": "2026-08-24",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "GPN",
-      "price": 94.3,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 88.7,
-        "sma50": 79.14,
-        "sma200": 74.5,
-        "avg_vol_m": 3.1,
-        "retr_pct": 18.3,
-        "exp_date": "2026-08-13",
         "exp_dir": "BULL"
       }
     },

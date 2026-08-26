@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-25T23:02:27.381842+00:00",
+  "generated_at": "2026-08-26T04:00:41.515936+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -66,7 +66,7 @@
         "sma20": 342.22,
         "sma50": 340.5,
         "sma200": 342.54,
-        "avg_vol_m": 3.86,
+        "avg_vol_m": 3.87,
         "retr_pct": 48.1,
         "exp_date": "2026-08-18",
         "exp_dir": "BULL"
@@ -710,7 +710,7 @@
         "sma20": 152.67,
         "sma50": 141.4,
         "sma200": 117.73,
-        "avg_vol_m": 4.72,
+        "avg_vol_m": 4.75,
         "retr_pct": -9.4,
         "exp_date": "2026-08-19",
         "exp_dir": "BULL"
@@ -734,7 +734,7 @@
         "sma50": 92.03,
         "sma200": 77.81,
         "avg_vol_m": 4.64,
-        "retr_pct": 8.6,
+        "retr_pct": 9.4,
         "exp_date": "2026-08-25",
         "exp_dir": "BULL"
       }
@@ -779,7 +779,7 @@
         "sma20": 86.02,
         "sma50": 89.92,
         "sma200": 90.48,
-        "avg_vol_m": 4.12,
+        "avg_vol_m": 4.13,
         "retr_pct": 26.4,
         "exp_date": "2026-08-21",
         "exp_dir": "BEAR"
@@ -848,7 +848,7 @@
         "sma20": 11.85,
         "sma50": 13.32,
         "sma200": 12.42,
-        "avg_vol_m": 3.51,
+        "avg_vol_m": 3.52,
         "retr_pct": -11.9,
         "exp_date": "2026-08-19",
         "exp_dir": "BULL"
@@ -871,7 +871,7 @@
         "sma20": 89.76,
         "sma50": 85.6,
         "sma200": 91.31,
-        "avg_vol_m": 3.49,
+        "avg_vol_m": 3.5,
         "retr_pct": -47.9,
         "exp_date": "2026-08-21",
         "exp_dir": "BULL"
@@ -1167,9 +1167,9 @@
         "liquid": true
       },
       "details": {
-        "sma20": 140.18,
-        "sma50": 136.62,
-        "sma200": 130.73,
+        "sma20": 139.55,
+        "sma50": 135.99,
+        "sma200": 130.11,
         "avg_vol_m": 2.01,
         "retr_pct": 1.8,
         "exp_date": "2026-08-25",
@@ -1240,9 +1240,9 @@
         "sma50": 547.91,
         "sma200": 533.73,
         "avg_vol_m": 1.81,
-        "retr_pct": 24.0,
-        "exp_date": "2026-08-20",
-        "exp_dir": "BULL"
+        "retr_pct": 34.9,
+        "exp_date": "2026-08-25",
+        "exp_dir": "BEAR"
       }
     },
     {
@@ -1701,6 +1701,29 @@
         "sma200": 208.89,
         "avg_vol_m": 0.96,
         "retr_pct": 22.8,
+        "exp_date": "2026-08-25",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "WSM",
+      "price": 234.74,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 241.59,
+        "sma50": 232.31,
+        "sma200": 201.67,
+        "avg_vol_m": 0.91,
+        "retr_pct": 42.7,
         "exp_date": "2026-08-25",
         "exp_dir": "BEAR"
       }

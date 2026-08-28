@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T22:46:16.426500+00:00",
+  "generated_at": "2026-08-28T06:20:40.065182+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -43,7 +43,7 @@
         "sma20": 574.7,
         "sma50": 591.94,
         "sma200": 622.26,
-        "avg_vol_m": 16.43,
+        "avg_vol_m": 16.44,
         "retr_pct": 29.3,
         "exp_date": "2026-08-26",
         "exp_dir": "BEAR"
@@ -90,7 +90,7 @@
         "sma50": 178.87,
         "sma200": 199.53,
         "avg_vol_m": 14.06,
-        "retr_pct": 10.3,
+        "retr_pct": 9.9,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
@@ -136,7 +136,7 @@
         "sma50": 49.6,
         "sma200": 48.15,
         "avg_vol_m": 9.69,
-        "retr_pct": 31.2,
+        "retr_pct": 31.3,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
@@ -181,7 +181,7 @@
         "sma20": 56.46,
         "sma50": 54.14,
         "sma200": 56.59,
-        "avg_vol_m": 7.33,
+        "avg_vol_m": 7.34,
         "retr_pct": 29.4,
         "exp_date": "2026-08-21",
         "exp_dir": "BULL"
@@ -228,7 +228,7 @@
         "sma50": 46.31,
         "sma200": 54.24,
         "avg_vol_m": 4.57,
-        "retr_pct": 13.3,
+        "retr_pct": 13.1,
         "exp_date": "2026-08-27",
         "exp_dir": "BEAR"
       }
@@ -297,7 +297,7 @@
         "sma50": 139.53,
         "sma200": 131.08,
         "avg_vol_m": 1.98,
-        "retr_pct": 26.5,
+        "retr_pct": 26.9,
         "exp_date": "2026-08-27",
         "exp_dir": "BEAR"
       }
@@ -365,7 +365,7 @@
         "sma20": 10.55,
         "sma50": 11.85,
         "sma200": 11.0,
-        "avg_vol_m": 48.41,
+        "avg_vol_m": 48.42,
         "retr_pct": 58.6,
         "exp_date": "2026-08-21",
         "exp_dir": "BEAR"
@@ -389,7 +389,7 @@
         "sma50": 427.27,
         "sma200": 429.34,
         "avg_vol_m": 30.08,
-        "retr_pct": 8.6,
+        "retr_pct": 8.7,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
@@ -434,7 +434,7 @@
         "sma20": 104.78,
         "sma50": 100.02,
         "sma200": 141.6,
-        "avg_vol_m": 24.64,
+        "avg_vol_m": 24.65,
         "retr_pct": 15.5,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
@@ -526,8 +526,8 @@
         "sma20": 33.73,
         "sma50": 33.85,
         "sma200": 34.34,
-        "avg_vol_m": 10.51,
-        "retr_pct": 23.5,
+        "avg_vol_m": 10.52,
+        "retr_pct": 23.6,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
@@ -618,7 +618,7 @@
         "sma20": 14.72,
         "sma50": 14.62,
         "sma200": 14.27,
-        "avg_vol_m": 7.43,
+        "avg_vol_m": 7.45,
         "retr_pct": 37.5,
         "exp_date": "2026-08-20",
         "exp_dir": "BULL"
@@ -848,7 +848,7 @@
         "sma20": 154.76,
         "sma50": 142.71,
         "sma200": 118.51,
-        "avg_vol_m": 4.95,
+        "avg_vol_m": 4.97,
         "retr_pct": -25.0,
         "exp_date": "2026-08-19",
         "exp_dir": "BULL"
@@ -875,29 +875,6 @@
         "retr_pct": 29.3,
         "exp_date": "2026-08-21",
         "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "FTNT",
-      "price": 172.78,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 159.83,
-        "sma50": 157.01,
-        "sma200": 107.69,
-        "avg_vol_m": 4.51,
-        "retr_pct": 7.9,
-        "exp_date": "2026-08-27",
-        "exp_dir": "BULL"
       }
     },
     {
@@ -1056,8 +1033,31 @@
         "sma50": 82.87,
         "sma200": 69.97,
         "avg_vol_m": 3.76,
-        "retr_pct": 13.8,
+        "retr_pct": 16.8,
         "exp_date": "2026-08-27",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "HD",
+      "price": 328.61,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 341.81,
+        "sma50": 340.43,
+        "sma200": 342.23,
+        "avg_vol_m": 3.75,
+        "retr_pct": 115.0,
+        "exp_date": "2026-08-18",
         "exp_dir": "BULL"
       }
     },
@@ -1108,29 +1108,6 @@
       }
     },
     {
-      "ticker": "HD",
-      "price": 328.61,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 341.81,
-        "sma50": 340.43,
-        "sma200": 342.23,
-        "avg_vol_m": 3.72,
-        "retr_pct": 115.0,
-        "exp_date": "2026-08-18",
-        "exp_dir": "BULL"
-      }
-    },
-    {
       "ticker": "EL",
       "price": 106.21,
       "bias": "BULL",
@@ -1147,7 +1124,7 @@
         "sma20": 91.87,
         "sma50": 86.27,
         "sma200": 91.5,
-        "avg_vol_m": 3.6,
+        "avg_vol_m": 3.61,
         "retr_pct": -70.4,
         "exp_date": "2026-08-21",
         "exp_dir": "BULL"
@@ -1216,7 +1193,7 @@
         "sma20": 216.3,
         "sma50": 214.56,
         "sma200": 234.87,
-        "avg_vol_m": 2.9,
+        "avg_vol_m": 2.91,
         "retr_pct": 142.1,
         "exp_date": "2026-08-19",
         "exp_dir": "BULL"
@@ -1378,7 +1355,7 @@
         "sma50": 205.18,
         "sma200": 198.98,
         "avg_vol_m": 1.96,
-        "retr_pct": 67.6,
+        "retr_pct": 65.8,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
@@ -1815,7 +1792,7 @@
         "sma50": 262.03,
         "sma200": 247.27,
         "avg_vol_m": 0.79,
-        "retr_pct": 25.5,
+        "retr_pct": 25.8,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }

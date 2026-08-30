@@ -44,6 +44,12 @@ function rank(stage) {
   return STAGE_RANK[stage] ?? -1;
 }
 
+const CONFIDENCE_DOWNGRADE = { HIGH: "MEDIUM", MEDIUM: "LOW", LOW: "LOW" };
+function downgradeConfidence(confidence) {
+  if (!confidence) return confidence;
+  return CONFIDENCE_DOWNGRADE[confidence] || confidence;
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -71,6 +77,29 @@ async function fetchCandles(symbol) {
   const json = await r.json();
   if (!json.ok) throw new Error(`candles fetch failed for ${symbol}: ${json.error || "unknown"}`);
   return json.candles;
+}
+
+async function fetchWeeklyCandles(symbol) {
+  const r = await fetch(`${WORKER}/candles?symbol=${symbol}&resolution=weekly&bars=12`);
+  const json = await r.json();
+  if (!json.ok) throw new Error(`weekly candles fetch failed for ${symbol}: ${json.error || "unknown"}`);
+  return json.candles;
+}
+
+// Simple higher-timeframe bias read: compares the latest weekly close against
+// the close ~8 weeks back. Not meant to be sophisticated — just a top-down
+// sanity check per the framework's "monthly/weekly/daily alignment" rule.
+// A daily C2/C3 confirming against opposing weekly structure is weaker evidence
+// than one confirming with the weekly trend, especially when the daily move
+// was gap-driven mid-week (which weekly candles absorb and smooth out).
+function computeWeeklyBias(weeklyCandles) {
+  if (!weeklyCandles || weeklyCandles.length < 8) return null;
+  const recent = weeklyCandles[weeklyCandles.length - 1];
+  const lookback = weeklyCandles[weeklyCandles.length - 8];
+  const pctChange = (recent.c - lookback.c) / lookback.c;
+  if (pctChange > 0.02) return "bull";
+  if (pctChange < -0.02) return "bear";
+  return "neutral";
 }
 
 async function triggerTier2(symbol, card, price) {
@@ -112,6 +141,17 @@ function meaningfulChange(prev, next) {
 
   if (prev.confidence && next.confidence && prev.confidence !== next.confidence) {
     return { changed: true, reason: `confidence changed ${prev.confidence} → ${next.confidence}` };
+  }
+
+  const prevWeeklyConflict = prev.weeklyConflict === true;
+  const nextWeeklyConflict = next.weeklyConflict === true;
+  if (prevWeeklyConflict !== nextWeeklyConflict) {
+    return {
+      changed: true,
+      reason: nextWeeklyConflict
+        ? "weekly bias now conflicts with daily setup direction"
+        : "weekly bias conflict resolved",
+    };
   }
 
   return { changed: false, reason: "no meaningful change" };
@@ -159,9 +199,32 @@ async function main() {
       // parses the card's free-text invalidation string against live price.
       const invCheck = checkInvalidation(card, lastClose);
 
+      // Higher-timeframe (weekly) bias check — only worth checking once a real
+      // daily setup exists (C1_ONLY or beyond). Weekly candles are KV-cached
+      // 24h on the Worker side, so this is a cache hit most nights.
+      let weeklyBias = null, weeklyConflict = false;
+      let effectiveConfidence = result.confidence || null;
+      if (rank(result.stage) >= 1) {
+        try {
+          const weeklyCandles = await fetchWeeklyCandles(symbol);
+          weeklyBias = computeWeeklyBias(weeklyCandles);
+          // direction is "bull"/"bear"; weeklyBias is "bull"/"bear"/"neutral"
+          if ((direction === "bull" && weeklyBias === "bear") || (direction === "bear" && weeklyBias === "bull")) {
+            weeklyConflict = true;
+            effectiveConfidence = downgradeConfidence(effectiveConfidence);
+          }
+        } catch (e) {
+          // Weekly bias is a confluence check, not a hard dependency — never fail
+          // the whole symbol check just because the weekly fetch had an issue.
+          console.error(`  ${symbol}: weekly bias check skipped — ${e.message}`);
+        }
+      }
+
       const next = {
         stage: result.stage,
-        confidence: result.confidence || null,
+        confidence: effectiveConfidence,
+        weeklyBias,
+        weeklyConflict,
         invalidated: invCheck.breached,
         invalidatedThreshold: invCheck.breached ? invCheck.threshold : null,
         price: lastClose,

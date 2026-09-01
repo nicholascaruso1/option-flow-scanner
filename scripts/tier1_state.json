@@ -7,7 +7,7 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 39.6,
-    "checkedAt": "2026-08-31T22:46:55.895Z"
+    "checkedAt": "2026-09-01T01:24:06.561Z"
   },
   "GLD": {
     "stage": "C3_FORMING",
@@ -17,17 +17,17 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 408.89,
-    "checkedAt": "2026-08-31T22:47:09.770Z"
+    "checkedAt": "2026-09-01T01:24:20.640Z"
   },
   "USO": {
     "stage": "C1_ONLY",
     "confidence": null,
-    "weeklyBias": "neutral",
+    "weeklyBias": null,
     "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 129.7,
-    "checkedAt": "2026-08-31T22:47:23.556Z"
+    "checkedAt": "2026-09-01T01:24:34.259Z"
   },
   "PALL": {
     "stage": "C1_ONLY",
@@ -40,37 +40,37 @@
     "checkedAt": "2026-08-31T22:47:37.383Z"
   },
   "ETH": {
-    "stage": "C2_FORMING",
+    "stage": "C2_CONFIRMED",
     "confidence": null,
     "weeklyBias": "bear",
     "weeklyConflict": true,
     "invalidated": false,
     "invalidatedThreshold": null,
-    "price": 2416.86,
-    "checkedAt": "2026-08-31T22:47:51.057Z"
+    "price": 2467.12,
+    "checkedAt": "2026-09-01T01:25:01.526Z"
   },
   "QQQ": {
     "stage": "C1_ONLY",
     "confidence": null,
-    "weeklyBias": "neutral",
+    "weeklyBias": "bull",
     "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 716.43,
-    "checkedAt": "2026-08-31T22:49:03.778Z"
+    "checkedAt": "2026-09-01T01:26:04.519Z"
   },
   "SPY": {
     "stage": "C2_CONFIRMED",
     "confidence": null,
-    "weeklyBias": "neutral",
-    "weeklyConflict": false,
+    "weeklyBias": "bull",
+    "weeklyConflict": true,
     "invalidated": true,
     "invalidatedThreshold": {
       "direction": "above",
       "price": 742.56
     },
     "price": 769.35,
-    "checkedAt": "2026-08-31T22:49:17.459Z"
+    "checkedAt": "2026-09-01T01:26:18.758Z"
   },
   "DIA": {
     "stage": "C3_FORMING",
@@ -80,25 +80,27 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 535.06,
-    "checkedAt": "2026-08-31T22:49:31.309Z"
+    "checkedAt": "2026-09-01T01:27:16.764Z"
   },
   "IWM": {
     "stage": "C2_FORMING",
     "confidence": null,
-    "weeklyBias": null,
+    "weeklyBias": "neutral",
     "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 295.75,
-    "checkedAt": "2026-08-31T22:49:45.075Z"
+    "checkedAt": "2026-09-01T01:27:30.885Z"
   },
   "CPER": {
     "stage": "C3_FORMING",
     "confidence": null,
+    "weeklyBias": "bull",
+    "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 39.67,
-    "checkedAt": "2026-08-29T10:04:08.690Z"
+    "checkedAt": "2026-09-01T01:27:44.629Z"
   },
   "UNG": {
     "stage": "C2_CONFIRMED",
@@ -118,7 +120,7 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 16.49,
-    "checkedAt": "2026-08-31T22:50:25.608Z"
+    "checkedAt": "2026-09-01T01:28:11.870Z"
   },
   "SLV": {
     "stage": "C2_FORMING",
@@ -128,7 +130,7 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 60.02,
-    "checkedAt": "2026-08-31T22:50:39.263Z"
+    "checkedAt": "2026-09-01T01:28:25.832Z"
   },
   "BTC": {
     "stage": "C1_ONLY",
@@ -137,8 +139,8 @@
     "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
-    "price": 77684,
-    "checkedAt": "2026-08-31T22:50:53.016Z"
+    "price": 78566.1,
+    "checkedAt": "2026-09-01T01:28:39.795Z"
   },
   "SOL": {
     "stage": "C2_FORMING",
@@ -147,21 +149,18 @@
     "weeklyConflict": true,
     "invalidated": false,
     "invalidatedThreshold": null,
-    "price": 101.75,
-    "checkedAt": "2026-08-31T22:51:06.652Z"
+    "price": 103.04,
+    "checkedAt": "2026-09-01T01:28:53.834Z"
   },
   "LTC": {
     "stage": "C3_FORMING",
     "confidence": null,
     "weeklyBias": "bear",
     "weeklyConflict": true,
-    "invalidated": true,
-    "invalidatedThreshold": {
-      "direction": "below",
-      "price": 47.967
-    },
-    "price": 47.948,
-    "checkedAt": "2026-08-31T22:52:12.071Z"
+    "invalidated": false,
+    "invalidatedThreshold": null,
+    "price": 48.544,
+    "checkedAt": "2026-09-01T01:29:07.953Z"
   },
   "ACHR": {
     "stage": "C3_FORMING",
@@ -171,7 +170,7 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 5.75,
-    "checkedAt": "2026-08-31T22:52:25.811Z"
+    "checkedAt": "2026-09-01T01:29:21.910Z"
   },
   "KO": {
     "stage": "C2_FORMING",
@@ -181,16 +180,16 @@
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 89.66,
-    "checkedAt": "2026-08-31T22:52:39.473Z"
+    "checkedAt": "2026-09-01T01:29:35.747Z"
   },
   "ABCL": {
     "stage": "C1_ONLY",
     "confidence": null,
-    "weeklyBias": "bear",
-    "weeklyConflict": true,
+    "weeklyBias": null,
+    "weeklyConflict": false,
     "invalidated": false,
     "invalidatedThreshold": null,
     "price": 11.35,
-    "checkedAt": "2026-08-31T22:52:53.061Z"
+    "checkedAt": "2026-09-01T01:29:49.492Z"
   }
 }

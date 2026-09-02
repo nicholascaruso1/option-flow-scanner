@@ -206,6 +206,7 @@ async function main() {
       let effectiveConfidence = result.confidence || null;
       if (rank(result.stage) >= 1) {
         try {
+          await sleep(CANDLE_FETCH_DELAY_MS);
           const weeklyCandles = await fetchWeeklyCandles(symbol);
           weeklyBias = computeWeeklyBias(weeklyCandles);
           // direction is "bull"/"bear"; weeklyBias is "bull"/"bear"/"neutral"

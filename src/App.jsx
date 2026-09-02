@@ -1825,6 +1825,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
            <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
           </div>
           <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+          {h.weekly_conflict&&<div title={`Weekly bias (${h.weekly_bias}) conflicts with daily setup direction`} style={{background:T.amber+"22",color:T.amber,fontSize:8,fontWeight:700,padding:"2px 6px",borderRadius:3,border:"1px solid "+T.amber+"44",letterSpacing:"0.06em"}}>⚠ WKLY {h.weekly_bias}</div>}
           {isTracked&&urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
           <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
            {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(

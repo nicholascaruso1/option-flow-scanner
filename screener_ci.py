@@ -136,12 +136,29 @@ def analyze(df):
     # Suggested direction: bias drives it, but expansion direction is tie-breaker
     direction = bias if bias in ("BULL", "BEAR") else exp_dir or "MIXED"
 
+    # Weekly (higher-timeframe) bias — resampled from the same daily data already
+    # downloaded, no extra API call. Guards against daily setups (especially
+    # gap-driven ones) that look valid on the daily chart but are running
+    # against the actual weekly trend. 8-week lookback, ±2% threshold.
+    weekly_close = close.resample("W").last().dropna()
+    weekly_bias  = None
+    weekly_conflict = False
+    if len(weekly_close) >= 8:
+        w_recent   = float(weekly_close.iloc[-1])
+        w_lookback = float(weekly_close.iloc[-8])
+        w_pct      = (w_recent - w_lookback) / w_lookback
+        weekly_bias = "BULL" if w_pct > 0.02 else "BEAR" if w_pct < -0.02 else "NEUTRAL"
+        if direction in ("BULL", "BEAR") and weekly_bias in ("BULL", "BEAR") and weekly_bias != direction:
+            weekly_conflict = True
+
     return {
         "ticker":     None,          # filled in below
         "price":      round(price, 2),
         "bias":       bias,
         "direction":  direction,     # BULL → call candidate, BEAR → put candidate
         "met":        met,
+        "weekly_bias":     weekly_bias,
+        "weekly_conflict": weekly_conflict,
         "conditions": {
             "topdown_bias": c1_bias,
             "expansion":    c2_expansion,

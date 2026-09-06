@@ -881,7 +881,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
  <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:"auto",padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
+ {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"],["journal","Journal"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -2033,6 +2033,42 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  </div>
 )}
 
+ {view==="journal"&&(()=>{
+ const allSyms=Array.from(new Set([...Object.keys(c123),...Object.keys(journalNotes)])).sort();
+ const parseTs=(ts)=>{
+  if(!ts)return 0;
+  const d=new Date(`${ts} ${new Date().getFullYear()}`);
+  return isNaN(d.getTime())?0:d.getTime();
+ };
+ const entries=[];
+ allSyms.forEach(sym=>{
+  const cd=c123[sym]||{};
+  ["c1","c2","c3"].forEach(k=>{
+   if(cd[k]&&cd[k].confirmed){
+    entries.push({sym,ts:cd[k].ts,sortTs:parseTs(cd[k].ts),type:"candle",label:k.toUpperCase()+" confirmed"});
+   }
+  });
+  (journalNotes[sym]||[]).forEach(n=>{
+   entries.push({sym,ts:n.ts,sortTs:parseTs(n.ts),type:"note",label:n.note});
+  });
+ });
+ entries.sort((a,b)=>b.sortTs-a.sortTs);
+ return(
+ <div style={{padding:16}}>
+  <div style={{fontSize:9,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10,fontFamily:FM}}>Journal — All Symbols · Read-Only</div>
+  {entries.length===0&&(
+   <div style={{textAlign:"center",padding:32,color:T.textDim,fontSize:11,fontFamily:FM}}>No journal notes or confirmed candles yet. Add entries from a symbol's Journal tab.</div>
+  )}
+  {entries.map((e,i)=>(
+   <div key={i} style={{display:"grid",gridTemplateColumns:"90px 70px 1fr",gap:10,padding:"8px 10px",marginBottom:4,borderRadius:4,background:T.surface,border:"1px solid "+T.border,alignItems:"start"}}>
+    <span style={{fontSize:9,color:T.textDim,fontFamily:FM}}>{e.ts||"—"}</span>
+    <span style={{fontSize:10,fontWeight:700,color:T.blue}}>{e.sym}</span>
+    <span style={{fontSize:10,color:e.type==="candle"?T.sage:T.textSec}}>{e.type==="candle"?"● ":""}{e.label}</span>
+   </div>
+  ))}
+ </div>
+ );
+ })()}
  {(view==="all"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>

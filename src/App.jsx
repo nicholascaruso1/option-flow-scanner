@@ -395,6 +395,7 @@ export default function OptionsScanner() {
  const [evPhase, setEvPhase] = useState("all");
  const [liveData, setLiveData] = useState({});
  const [liveError, setLiveError] = useState(null);
+ const [liveErrorDetail, setLiveErrorDetail] = useState(null);
  const [liveTs, setLiveTs] = useState(null);
  const [aiUpdates, setAiUpdates] = useState({});
  const [refreshStatus, setRefreshStatus] = useState("");
@@ -534,9 +535,11 @@ setInitDone(true);
   const lts = new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
   setLiveTs(lts);
   if (allErrors.length > 0) {
-    setLiveError(`⚠ ${allErrors.length} symbol(s) failed: ${allErrors.slice(0,3).join("; ")}${allErrors.length>3?"...":""}`);
+    setLiveError(`⚠ ${allErrors.length} symbol${allErrors.length!==1?"s":""} stale (rate limit)`);
+    setLiveErrorDetail(`${allErrors.length} symbol(s) failed: ${allErrors.slice(0,5).join("; ")}${allErrors.length>5?"...":""}`);
   } else {
     setLiveError(null);
+    setLiveErrorDetail(null);
   }
 
   setRefreshStatus("Updating memory...");
@@ -763,7 +766,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
  <div>
- <div style={{fontFamily:"Georgia,serif",fontStyle:"italic",fontSize:24,fontWeight:700,color:T.gold,lineHeight:1}}>Option Flow</div>
+ <div style={{fontFamily:FM,fontStyle:"normal",fontSize:22,fontWeight:700,color:T.gold,lineHeight:1,letterSpacing:"-0.02em"}}>Option Flow</div>
  <div style={{fontSize:9,color:T.textDim,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:3}}>Proprietary Options Intelligence</div>
  </div>
  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>
@@ -780,7 +783,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  {(liveTs||liveError)&&(
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
  {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
- {liveError&&<span style={{fontSize:9,color:T.textDim}}>{liveError}</span>}
+ {liveError&&<span title={liveErrorDetail||""} style={{fontSize:9,color:T.amber,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.amber}}>{liveError}</span>}
  {(()=>{
  const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const near=Object.entries(liveData).map(([sym,d])=>{

@@ -1339,28 +1339,10 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{s.divergence}</div>
  </div>
  {(()=>{
- const allSetupsL=allSetups.map(x=>({...x,chg:liveData[x.symbol]?.chg??x.chg})).sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
- const maxAbsChg=Math.max(...allSetupsL.map(x=>Math.abs(x.chg||0)),1);
  const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
  const corrMembers=corrGroup?corrGroup.map(m=>({sym:m,chg:liveData[m]?.chg})).filter(m=>typeof m.chg==="number"):[];
  const corrDiv=computeLiveDivergence(s.symbol);
  return(<div>
- {allSetupsL.length>0&&(
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>📊 Momentum Leaderboard — Active Setups</div>
- {allSetupsL.map((x,i)=>(
- <div key={x.symbol} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:x.symbol===s.symbol?T.sage+"10":"transparent",border:x.symbol===s.symbol?"1px solid "+T.sage+"30":"1px solid transparent"}}>
- <span style={{fontSize:9,fontWeight:700,color:x.symbol===s.symbol?T.sage:T.textSec,fontFamily:FD,minWidth:44}}>{x.symbol}</span>
- <span style={{fontSize:7,padding:"1px 4px",background:x.direction==="call"?T.blue+"20":T.rose+"20",border:"1px solid "+(x.direction==="call"?T.blue:T.rose)+"40",borderRadius:0,color:x.direction==="call"?T.blue:T.rose,minWidth:22,textAlign:"center"}}>{x.direction==="call"?"C":"P"}</span>
- <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
- <div style={{height:"100%",background:x.symbol===s.symbol?T.sage:(x.direction==="call"?T.blue:T.rose),width:Math.min(100,(Math.abs(x.chg||0)/maxAbsChg)*100)+"%",borderRadius:0}}/>
- </div>
- <span style={{fontSize:9,color:(x.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(x.chg||0)>0?"+":""}{typeof x.chg==="number"?x.chg.toFixed(1):"—"}%</span>
- {i===0&&<span style={{fontSize:7,padding:"1px 4px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>top</span>}
- </div>
- ))}
- </div>
- )}
  {corrGroup&&corrMembers.length>=2&&(
  <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>

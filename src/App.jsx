@@ -1112,7 +1112,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  };
  const NUMS=["①","②","③"];
  return(
- <div style={{marginBottom:12,background:"linear-gradient(135deg,#090F1E,#0B1A30)",border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
+ <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
  <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>

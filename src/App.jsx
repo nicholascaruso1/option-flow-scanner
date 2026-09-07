@@ -755,9 +755,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
+ const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:0,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
- const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
+ const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:0,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
@@ -768,7 +768,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>
  <div style={{display:"flex",gap:6,alignItems:"center"}}>
- <button onClick={doRefresh} disabled={refreshing} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",background:hint?T.sage+"18":"transparent",border:"1px solid "+(hint?T.sage:T.border2),borderRadius:4,cursor:refreshing?"not-allowed":"pointer",color:hint?T.sage:T.textSec,fontSize:11,fontFamily:FM,transition:"all 0.2s"}}>
+ <button onClick={doRefresh} disabled={refreshing} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",background:hint?T.sage+"18":"transparent",border:"1px solid "+(hint?T.sage:T.border2),borderRadius:0,cursor:refreshing?"not-allowed":"pointer",color:hint?T.sage:T.textSec,fontSize:11,fontFamily:FM,transition:"all 0.2s"}}>
  <span style={{display:"inline-block",animation:refreshing?"spin 0.8s linear infinite":"none",fontSize:13}}>↻</span>
  {refreshing?(refreshStatus||"Fetching…"):hint?"✓ Live Updated":"Refresh Data"}
  </button>
@@ -800,15 +800,15 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const rest=near.length-shown.length;
  return <>
  {shown.map(({sym,price})=>(
- <span key={sym} style={{fontSize:9,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"50",borderRadius:3,color:T.gold}}>
+ <span key={sym} style={{fontSize:9,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"50",borderRadius:0,color:T.gold}}>
  ⚠ {sym} ${price} near key level
  </span>
  ))}
- {rest>0&&<span style={{fontSize:9,padding:"1px 6px",background:T.border+"40",border:"1px solid "+T.border2,borderRadius:3,color:T.textDim}}>+{rest} more</span>}
+ {rest>0&&<span style={{fontSize:9,padding:"1px 6px",background:T.border+"40",border:"1px solid "+T.border2,borderRadius:0,color:T.textDim}}>+{rest} more</span>}
  </>;
  })()}
  {Object.entries(liveData).filter(([,d])=>d.marketState==="PRE"&&d.preMarket&&Math.abs(d.preMarketChg||0)>2).map(([sym,d])=>(
- <span key={sym} style={{fontSize:9,padding:"1px 6px",background:(d.preMarketChg>0?T.blue:T.rose)+"20",border:"1px solid "+(d.preMarketChg>0?T.blue:T.rose)+"50",borderRadius:3,color:d.preMarketChg>0?T.blue:T.rose}}>
+ <span key={sym} style={{fontSize:9,padding:"1px 6px",background:(d.preMarketChg>0?T.blue:T.rose)+"20",border:"1px solid "+(d.preMarketChg>0?T.blue:T.rose)+"50",borderRadius:0,color:d.preMarketChg>0?T.blue:T.rose}}>
  {sym} PM ${d.preMarket} ({d.preMarketChg>0?"+":""}{d.preMarketChg}%)
  </span>
  ))}
@@ -829,7 +829,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  );
  return (
  <div style={{position:"sticky",top:0,zIndex:50,background:T.bg,borderBottom:"1px solid "+T.border,padding:"6px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
- <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:3,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
+ <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:0,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
  {chip("SPY",spy)}
  {chip("QQQ",qqq)}
  {chip("IWM",iwm)}
@@ -944,7 +944,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const ac=ph.color;
  const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
  return(
- <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+ <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
@@ -962,7 +962,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  return(<>
  <span style={{fontFamily:FD,fontSize:15,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
  <span style={{fontFamily:FD,fontSize:11,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
- {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:2,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
+ {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
  </>);
  })()}
  </div>
@@ -974,7 +974,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
- <div style={{marginTop:6,padding:"7px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:4,fontSize:10,color:T.rose}}>
+ <div style={{marginTop:6,padding:"7px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:10,color:T.rose}}>
  {invAlert}
  </div>
  )}
@@ -1006,40 +1006,40 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  {tab==="narrative"&&(
  <div>
  {memNarrative&&(
- <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
  <div style={{fontSize:10,color:T.textSec}}>{memNarrative}</div>
  </div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
  </div>
  )}
  {tab==="phase"&&(
  <div>
- <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:8}}>
+ <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
  <div style={{fontSize:8,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
  <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:11,marginBottom:3}}>{weeklyProfile.name}</div>
  <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
  </div>
- <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:8}}>
+ <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
  <div style={{fontSize:8,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
- {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:3,color:T.sage}}>✓ Entry Window</span>}
+ {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
  </div>
  <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:4}}>{sessionProfile.profile}</div>
  </div>
- <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
+ <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
  </div>
  )}
  {tab==="entry"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px"}}>
+ <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
  <div style={{fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
  <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.textDim}}>Same framework as Options tab:C2 failure swing + C3 CISD body close. No options params (no delta/DTE/IV) — directional bias only, applies to spot/ETF/futures positioning.</div>
  </div>
@@ -1049,7 +1049,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Levels</div>
  {(s.keyLevels||s.levels||[]).map((l,i)=>(
- <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
+ <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
  <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:70,flexShrink:0,fontFamily:FD}}>{l.p}</span>
  <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
  </div>
@@ -1112,7 +1112,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  };
  const NUMS=["①","②","③"];
  return(
- <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:6,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
+ <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
  <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
@@ -1146,7 +1146,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
  <span style={{fontFamily:FD,fontSize:15,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:12,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
- <span style={{fontSize:8,padding:"2px 6px",borderRadius:2,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
+ <span style={{fontSize:8,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
  <span style={{fontSize:8,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
  </div>
  {reasons.slice(0,3).map((w,wi)=>(
@@ -1226,7 +1226,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
    <button onClick={e=>{e.stopPropagation();toggleFav(s.symbol);}} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:13,color:isFav?T.gold:T.border2,lineHeight:1,flexShrink:0}}>★</button>
    <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{s.symbol}</span>
    <PhasePipeline phase={effectivePhase}/>
-   <span style={{fontSize:9,padding:"2px 7px",borderRadius:3,background:dc+"22",color:dc,border:"1px solid "+dc+"44",fontFamily:FM,flexShrink:0}}>{s.direction==="call"?"↑ CALL":s.direction==="put"?"↓ PUT":"WATCH"}</span>
+   <span style={{fontSize:9,padding:"2px 7px",borderRadius:0,background:dc+"22",color:dc,border:"1px solid "+dc+"44",fontFamily:FM,flexShrink:0}}>{s.direction==="call"?"↑ CALL":s.direction==="put"?"↓ PUT":"WATCH"}</span>
    <span style={{fontFamily:FD,fontSize:12,color:T.textPri,marginLeft:"auto",flexShrink:0}}>${(liveData[s.symbol]?.price||s.price).toFixed(2)}</span>
    <span style={{fontFamily:FD,fontSize:10,color:dispChg>0?T.blue:dispChg<0?T.rose:T.textSec,flexShrink:0}}>{dispChg>0?"+":""}{typeof dispChg==="number"?dispChg.toFixed(1):s.chg.toFixed(1)}%</span>
    {earnD!=null&&earnD<=21&&<span style={{fontSize:8,color:earnC,flexShrink:0}}>⚡{earnD}d</span>}
@@ -1235,7 +1235,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   </div>
  );
  return(
- <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+ <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
@@ -1253,7 +1253,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  return(<>
  <span style={{fontFamily:FD,fontSize:15,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
  <span style={{fontFamily:FD,fontSize:11,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
- {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:2,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
+ {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
  </>);
  })()}
  </div>
@@ -1273,7 +1273,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  </div>
  )}
  {invAlert&&(
- <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:4,fontSize:10,color:T.rose}}>
+ <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:10,color:T.rose}}>
  {invAlert}
  </div>
  )}
@@ -1314,7 +1314,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  return(
  <div>
  {memNarrative&&(
- <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
  <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em"}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
  </div>
@@ -1322,16 +1322,16 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  </div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
  <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div>
  </div>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div>
  <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div>
  </div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
  <div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{s.divergence}</div>
  </div>
@@ -1343,29 +1343,29 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const corrDiv=computeLiveDivergence(s.symbol);
  return(<div>
  {allSetupsL.length>0&&(
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>📊 Momentum Leaderboard — Active Setups</div>
  {allSetupsL.map((x,i)=>(
- <div key={x.symbol} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:3,background:x.symbol===s.symbol?T.sage+"10":"transparent",border:x.symbol===s.symbol?"1px solid "+T.sage+"30":"1px solid transparent"}}>
+ <div key={x.symbol} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:x.symbol===s.symbol?T.sage+"10":"transparent",border:x.symbol===s.symbol?"1px solid "+T.sage+"30":"1px solid transparent"}}>
  <span style={{fontSize:9,fontWeight:700,color:x.symbol===s.symbol?T.sage:T.textSec,fontFamily:FD,minWidth:44}}>{x.symbol}</span>
- <span style={{fontSize:7,padding:"1px 4px",background:x.direction==="call"?T.blue+"20":T.rose+"20",border:"1px solid "+(x.direction==="call"?T.blue:T.rose)+"40",borderRadius:2,color:x.direction==="call"?T.blue:T.rose,minWidth:22,textAlign:"center"}}>{x.direction==="call"?"C":"P"}</span>
- <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",background:x.symbol===s.symbol?T.sage:(x.direction==="call"?T.blue:T.rose),width:Math.min(100,(Math.abs(x.chg||0)/maxAbsChg)*100)+"%",borderRadius:2}}/>
+ <span style={{fontSize:7,padding:"1px 4px",background:x.direction==="call"?T.blue+"20":T.rose+"20",border:"1px solid "+(x.direction==="call"?T.blue:T.rose)+"40",borderRadius:0,color:x.direction==="call"?T.blue:T.rose,minWidth:22,textAlign:"center"}}>{x.direction==="call"?"C":"P"}</span>
+ <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+ <div style={{height:"100%",background:x.symbol===s.symbol?T.sage:(x.direction==="call"?T.blue:T.rose),width:Math.min(100,(Math.abs(x.chg||0)/maxAbsChg)*100)+"%",borderRadius:0}}/>
  </div>
  <span style={{fontSize:9,color:(x.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(x.chg||0)>0?"+":""}{typeof x.chg==="number"?x.chg.toFixed(1):"—"}%</span>
- {i===0&&<span style={{fontSize:7,padding:"1px 4px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>top</span>}
+ {i===0&&<span style={{fontSize:7,padding:"1px 4px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>top</span>}
  </div>
  ))}
  </div>
  )}
  {corrGroup&&corrMembers.length>=2&&(
- <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
  {[...corrMembers].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map(m=>(
- <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:3,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
+ <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
  <span style={{fontSize:9,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
- <div style={{flex:1,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:2}}/>
+ <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+ <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:0}}/>
  </div>
  <span style={{fontSize:9,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
  </div>
@@ -1378,13 +1378,13 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
  {ai.logEntry&&(
- <div style={{padding:"9px 11px",background:T.teal+"08",borderRadius:4,borderLeft:"2px solid "+T.teal,marginBottom:5}}>
- <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:2}}>🤖 AI</span></div>
+ <div style={{padding:"9px 11px",background:T.teal+"08",borderRadius:0,borderLeft:"2px solid "+T.teal,marginBottom:5}}>
+ <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0}}>🤖 AI</span></div>
  <div style={{color:T.textSec,fontSize:10}}>{ai.logEntry}</div>
  </div>
  )}
  {s.logEntry&&(
- <div style={{padding:"9px 11px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.border2}}>
+ <div style={{padding:"9px 11px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2}}>
  <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:4}}>{s.logEntry.ts} <span style={{color:T.sage,marginLeft:6}}>● base</span></div>
  <div style={{color:T.textSec,fontSize:10}}>{s.logEntry.note}</div>
  </div>
@@ -1399,10 +1399,10 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol&&x.phase!=="EXPANSION");
  return(
  <div>
- <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
  <div style={{fontSize:8,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
- {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:3,color:T.sage}}>✓ Entry Window</span>}
+ {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
  </div>
  <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:3}}>{sessionProfile.profile}</div>
  <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+sessionProfile.color+"20",fontSize:9,color:T.textDim}}>
@@ -1412,19 +1412,19 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  : "If 9:30 opens below "+(s.keyLevels[s.keyLevels.length-2]?.p||"key level")+", continuation confirmed. If 9:30 spikes up then closes back below, manipulation reversal in play — hold entry."}
  </div>
  </div>
- <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
  <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:11,marginBottom:3}}>{weeklyProfile.name}</div>
  <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
  </div>
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+ <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>AMD Phase (Power of 3)</div>
  <div style={{display:"flex",gap:4}}>
  {[["Accumulation","Asia · consolidation · smart money builds","#4A90D9",!sessionProfile.actionable&&sessionProfile.session==="Asia"],
  ["Manipulation","London/Pre-mkt · fake move · retail trapped","#C9A84C",!sessionProfile.actionable&&sessionProfile.session!=="Asia"&&sessionProfile.session!=="New York"],
  ["Distribution","NY · true directional move begins · your entry","#3D8B6E",sessionProfile.actionable]
  ].map(([label,desc,color,active])=>(
- <div key={label} style={{flex:1,padding:"6px 7px",borderRadius:3,background:active?color+"18":T.bg,border:"1px solid "+(active?color+"40":T.border),transition:"all 0.2s"}}>
+ <div key={label} style={{flex:1,padding:"6px 7px",borderRadius:0,background:active?color+"18":T.bg,border:"1px solid "+(active?color+"40":T.border),transition:"all 0.2s"}}>
  <div style={{fontSize:8,fontWeight:active?700:400,color:active?color:T.textDim,marginBottom:2}}>{label}</div>
  <div style={{fontSize:7,color:T.textDim,lineHeight:1.4}}>{desc}</div>
  </div>
@@ -1451,14 +1451,14 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  );
  })}
  </div>
- <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:4,padding:"9px 11px",marginBottom:8}}>
+ <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
  <div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em"}}>{ph.label}{ai.phase&&ai.phase!==s.phase?" (updated)":""}</div>
- {ai.phaseNote&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:2,color:T.teal}}>🤖 AI</span>}
+ {ai.phaseNote&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0,color:T.teal}}>🤖 AI</span>}
  </div>
  <div style={{color:T.textSec}}>{ai.phaseNote||s.phaseNote}</div>
  </div>
- {s.nestedFib&&<div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Nested Fib · OB Mean Threshold</div><div style={{color:T.gold}}>{s.nestedFib}</div></div>}
+ {s.nestedFib&&<div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Nested Fib · OB Mean Threshold</div><div style={{color:T.gold}}>{s.nestedFib}</div></div>}
  </div>
  );
  })()}
@@ -1468,13 +1468,13 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
- <div style={{width:130,height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
- <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+ <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+ <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
  </div>
  </div>
  <div style={{display:"flex",gap:8,alignItems:"center"}}>
  <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
- {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:3,color:T.rose,cursor:"pointer"}}>Clear</button>}
+ {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
  </div>
  </div>
  {(()=>{
@@ -1484,7 +1484,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
   const dr=cd?.daily, ir=cd?.intraday;
   return(
-   <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+   <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
     {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
     {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
@@ -1493,13 +1493,13 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
        <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
        <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
-       {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:2,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
+       {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
       </div>
       {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
       {dr.detected&&dr.ob&&(
        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
         {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
-         <div key={k} style={{background:T.surface,borderRadius:3,padding:"4px 6px"}}>
+         <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
           <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
           <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
          </div>
@@ -1511,8 +1511,8 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
         <div style={{display:"flex",alignItems:"center",gap:6}}>
          <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
          <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
-         {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:2,color:T.sage}}>✓ CONFIRMED</span>}
-        {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>manual</span>}
+         {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
+        {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
         </div>
         {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
        </div>
@@ -1526,22 +1526,22 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  {CHECKLIST.map(item=>{
  const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
  return(
- <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
- <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+ <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+ <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
  {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
  </div>
  <div style={{flex:1}}>
  <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
  <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
- {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
- {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:2,color:T.teal}}>manual</span>}
+ {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
+ {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
  </div>
  <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
  </div>
  </div>
  );
  })}
- {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:4,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
+ {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
  </div>
  );
  })()}
@@ -1549,14 +1549,14 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>"Entry — 3-Candle Swing · 4pm Close"</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
- <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:4,overflow:"hidden"}}>
+ <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:0,overflow:"hidden"}}>
   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
    <div style={{display:"flex",alignItems:"center",gap:10}}>
    <span style={{fontSize:12,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
    <span style={{fontSize:9,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
-   {pfVerdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:2,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
-   {pfVerdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:2,color:T.gold}}>Review open gates</span>}
-   {pfVerdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:2,color:T.rose}}>Do not enter</span>}
+   {pfVerdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
+   {pfVerdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>Review open gates</span>}
+   {pfVerdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose}}>Do not enter</span>}
    </div>
    <div style={{display:"flex",alignItems:"center",gap:5}}>
    <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
@@ -1574,7 +1574,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
     {id:"g_ote_auto",label:"Price in OTE zone (0–50% Fib)",ok:pfOteOk,note:pfOteOk?"$"+pfLivePrice.toFixed(2)+" inside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2):"$"+pfLivePrice.toFixed(2)+" outside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2)},
     {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfSwing||0).toFixed(2):"⚠ Price "+(s.direction==="call"?"below":"above")+" protected swing $"+(pfSwing||0).toFixed(2)},
    ].map(g=>(
-   <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
+   <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
     <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
     <div style={{flex:1}}>
      <div style={{fontSize:9,color:g.ok?T.sage:T.textSec,fontWeight:g.ok?600:400}}>{g.label}</div>
@@ -1589,8 +1589,8 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
    ].map(g=>{
     const ck2=pfChecks2.includes(g.id);
     return(
-    <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:3,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
-     <div style={{width:12,height:12,borderRadius:2,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+     <div style={{width:12,height:12,borderRadius:0,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
       {ck2&&<span style={{color:T.bg,fontSize:7,fontWeight:900}}>✓</span>}
      </div>
      <div style={{flex:1}}>
@@ -1603,7 +1603,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   </div>
   )}
  </div>
- <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:4,padding:"10px 12px"}}>
+ <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
  {[["Delta","0.35–0.45"],["DTE","Farthest affordable"],["IV Rank","< 30"],["Stop","-40% on premium"]].map(([k,v])=>(
@@ -1618,14 +1618,14 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Price Levels</div>
  {s.keyLevels.map((l,i)=>(
- <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>
+ <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
  <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:50,flexShrink:0,fontFamily:FD}}>{l.p}</span>
  <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
  </div>
  ))}
- <div style={{padding:"5px 9px",background:T.rose+"0a",border:"1px solid "+T.rose+"20",borderRadius:3,marginBottom:12,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
+ <div style={{padding:"5px 9px",background:T.rose+"0a",border:"1px solid "+T.rose+"20",borderRadius:0,marginBottom:12,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
  <div style={{borderTop:"1px solid "+T.border,paddingTop:12}}>
- {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:4}}><div style={{fontSize:8,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:9,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
+ {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:0}}><div style={{fontSize:8,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:9,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
  {s.catalysts.map((c,i)=>(
  <div key={i} style={{display:"flex",gap:7,marginBottom:4}}>
@@ -1645,18 +1645,18 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const dc2=(v)=>v==="bull"?T.sage:v==="bear"?T.rose:v==="neut"?T.amber:T.textDim;
  return(
  <div>
- <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:4,border:"1px solid "+alC+"30"}}>
+ <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
  <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
  <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
  </div>
  {rows.map(([tf,bias,note],i)=>(
- <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:3,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
+ <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
  <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
  <span style={{fontSize:9,color:T.textDim}}>{note}</span>
  </div>
  ))}
- <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:3,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
+ <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
  </div>
  );
  })()}
@@ -1688,20 +1688,20 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{marginBottom:12}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
  {seqDone&&(
- <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:4,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
+ <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
  {candles.map(({key,label,color,desc})=>{
   const cd=c1data[key]||{};
   return(
-  <div key={key} style={{background:cd.confirmed?color+"10":T.bg,border:"1px solid "+(cd.confirmed?color+"50":T.border),borderRadius:4,padding:"9px 10px"}}>
+  <div key={key} style={{background:cd.confirmed?color+"10":T.bg,border:"1px solid "+(cd.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
   <span style={{fontSize:13,fontWeight:700,color:cd.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
   <div style={{width:8,height:8,borderRadius:"50%",background:cd.confirmed?color:T.border2}}/>
   </div>
   <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
   {cd.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd.ts}</div>}
-  <button onClick={()=>setCandle(key,!cd.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd.confirmed?T.rose+"50":color+"50"),color:cd.confirmed?T.rose:color,borderRadius:3,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd.confirmed?"RESET":"CONFIRM"}</button>
+  <button onClick={()=>setCandle(key,!cd.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd.confirmed?T.rose+"50":color+"50"),color:cd.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd.confirmed?"RESET":"CONFIRM"}</button>
   </div>
   );
  })}
@@ -1710,17 +1710,17 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
  <div style={{display:"flex",gap:6,marginBottom:8}}>
- <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:3,fontFamily:FM,outline:"none"}}/>
- <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:3,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
+ <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+ <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
  </div>
  {notes.length===0&&s.logEntry&&(
- <div style={{padding:"8px 10px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
+ <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
  <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
  <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
  </div>
  )}
  {notes.map((n,i)=>(
- <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:4,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
+ <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
  <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
  <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
  </div>
@@ -1747,7 +1747,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
    <div style={{textAlign:"center",padding:32}}>
     <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
-    <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Retry</button>
+    <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Retry</button>
    </div>
   )}
   {!screenerLoading&&screenerHits.length>0&&(
@@ -1757,12 +1757,12 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
       <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
       <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4{screenerMeta.generated_at&&" · ran "+new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})+" ET"}</div>
      </div>
-     <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:4,cursor:"pointer",fontFamily:FM}}>Refresh</button>
+     <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
-    <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:5}}>
+    <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
-      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:3,fontFamily:FM,cursor:"pointer"}}>
+      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
        <option value="score">Score ↓</option>
        <option value="retr">Retracement %</option>
        <option value="ticker">Ticker A–Z</option>
@@ -1770,7 +1770,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      </div>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
-      <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:3,fontFamily:FM,cursor:"pointer"}}>
+      <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
        <option value="all">All</option>
        <option value="BULL">Calls ▲</option>
        <option value="BEAR">Puts ▼</option>
@@ -1825,12 +1825,12 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
            <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
            <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
           </div>
-          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
-          {h.weekly_conflict&&<div title={`Weekly bias (${h.weekly_bias}) conflicts with daily setup direction`} style={{background:T.amber+"22",color:T.amber,fontSize:8,fontWeight:700,padding:"2px 6px",borderRadius:3,border:"1px solid "+T.amber+"44",letterSpacing:"0.06em"}}>⚠ WKLY {h.weekly_bias}</div>}
+          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:0,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+          {h.weekly_conflict&&<div title={`Weekly bias (${h.weekly_bias}) conflicts with daily setup direction`} style={{background:T.amber+"22",color:T.amber,fontSize:8,fontWeight:700,padding:"2px 6px",borderRadius:0,border:"1px solid "+T.amber+"44",letterSpacing:"0.06em"}}>⚠ WKLY {h.weekly_bias}</div>}
           {isTracked&&urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
           <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
            {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
-            <div key={k} title={k} style={{width:8,height:8,borderRadius:2,background:h.conditions?.[k]?T.sage:T.border2}}/>
+            <div key={k} title={k} style={{width:8,height:8,borderRadius:0,background:h.conditions?.[k]?T.sage:T.border2}}/>
            ))}
            <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
           </div>
@@ -1855,18 +1855,18 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
           {isTracked?(
-           match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>
+           match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>
           ):(
            <>
-            {!aiCards[h.ticker]&&<button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:3,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"⏳ Analyzing…":"★ Analyze + Save"}</button>}
+            {!aiCards[h.ticker]&&<button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:0,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"⏳ Analyzing…":"★ Analyze + Save"}</button>}
             {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:8,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>★ SAVED</span>}
-            <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:3,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
+            <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
            </>
           )}
          </div>
         </div>
         {!isTracked&&h.am_projection&&(
-         <div style={{margin:"0 14px 10px",padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center"}}>
+         <div style={{margin:"0 14px 10px",padding:"8px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center"}}>
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>
            <span>📍</span>{" "}
            <span style={{color:h.am_projection.reaction_swing?.type==="low"?T.sage:T.rose,fontWeight:700}}>
@@ -1881,7 +1881,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
            )}
           </div>
           <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>📅 {h.am_projection.profile?.label}</div>
-          <div style={{fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",padding:"2px 7px",borderRadius:3,fontFamily:FM,marginLeft:"auto",background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",color:h.am_projection.both_gates?T.sage:T.gold,border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"}}>
+          <div style={{fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",padding:"2px 7px",borderRadius:0,fontFamily:FM,marginLeft:"auto",background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",color:h.am_projection.both_gates?T.sage:T.gold,border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"}}>
            {h.am_projection.both_gates?"✅ Both Gates":"⚠ Hold"}
           </div>
          </div>
@@ -1902,7 +1902,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
               {match?.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
              </div>
              {(match?.thesis||match?.structure)&&(
-              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border}}>
+              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border}}>
                {(match.thesis||match.structure).slice(0,260)}{(match.thesis||match.structure).length>260?"…":""}
               </div>
              )}
@@ -1919,7 +1919,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
               </div>
              )}
              {match?.invalidation&&(
-              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:4,fontSize:9,color:T.rose,fontFamily:FD}}>
+              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:0,fontSize:9,color:T.rose,fontFamily:FD}}>
                <span style={{fontWeight:700}}>Invalidation: </span>{match.invalidation}
               </div>
              )}
@@ -1933,7 +1933,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
                <span style={{fontSize:9,color:h.conditions?.[k]?T.textSec:T.textDim,fontFamily:FD}}>{label}</span>
               </div>
              ))}
-             <div style={{marginTop:10,padding:"7px 10px",background:T.surface,borderRadius:4,border:"1px solid "+T.border,fontSize:9,color:T.textDim,fontFamily:FD,fontStyle:"italic"}}>
+             <div style={{marginTop:10,padding:"7px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border,fontSize:9,color:T.textDim,fontFamily:FD,fontStyle:"italic"}}>
               Algorithm-only hit — no manual narrative written. Add to scanner to track with full analysis.
              </div>
             </div>
@@ -1944,21 +1944,21 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
               <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
              </div>
-             <div style={{width:"100%",height:3,background:T.border,borderRadius:2,overflow:"hidden",marginBottom:10}}>
-              <div style={{height:"100%",borderRadius:2,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+             <div style={{width:"100%",height:3,background:T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
+              <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
              </div>
-             <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4,padding:"9px 11px",marginBottom:10}}>
+             <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
               <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
               {sd?(
                <div>
                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
                  <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
-                 {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:2,color:cc[sd.confidence]}}>{sd.confidence}</span>}
+                 {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:0,color:cc[sd.confidence]}}>{sd.confidence}</span>}
                 </div>
                 {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
-                  <div key={k} style={{background:T.bg,borderRadius:3,padding:"4px 6px"}}>
+                  <div key={k} style={{background:T.bg,borderRadius:0,padding:"4px 6px"}}>
                    <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
                    <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
                   </div>
@@ -1970,14 +1970,14 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
              </div>
              {CHECKLIST.map(item=>{
               const isAuto=allCk.includes(item.id);
-              return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:4,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
-               <div style={{width:13,height:13,borderRadius:3,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+              return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
+               <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
                 {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
                </div>
                <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
                  <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
-                 {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:2,color:T.sage}}>auto</span>}
+                 {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
                 </div>
                 <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
                </div>
@@ -1993,7 +1993,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
              </div>
              <iframe
               src={"https://s.tradingview.com/widgetembed/?symbol="+h.ticker+"&interval=D&theme=dark&style=1&toolbar_bg=%23050a14&hide_top_toolbar=0&hide_legend=0&save_image=0&locale=en&hide_volume=0&allow_symbol_change=0&range=1M"}
-              style={{width:"100%",height:290,border:"none",borderRadius:4,display:"block"}}
+              style={{width:"100%",height:290,border:"none",borderRadius:0,display:"block"}}
               allowTransparency={true}
              />
             </div>
@@ -2007,7 +2007,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
           return(
       <>
        {newHits.length>0&&(
-        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
          <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
           <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
@@ -2017,7 +2017,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
         </div>
        )}
        {tracked.length>0&&(
-        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+        <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
          <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
           <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
@@ -2028,7 +2028,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
        )}
       </>
      );
-    }catch(e){return(<div style={{color:"#ef4444",padding:"14px 16px",margin:"8px 0",background:"#1a0000",borderRadius:4,border:"1px solid #ef444440",fontFamily:"SF Mono,monospace",fontSize:11}}>⚠ Screener render error: {e.message}</div>);}
+    }catch(e){return(<div style={{color:"#ef4444",padding:"14px 16px",margin:"8px 0",background:"#1a0000",borderRadius:0,border:"1px solid #ef444440",fontFamily:"SF Mono,monospace",fontSize:11}}>⚠ Screener render error: {e.message}</div>);}
     })()}
    </>
   )}
@@ -2036,7 +2036,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
 )}
 
  {(view==="all"||view==="everything")&&(
- <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+ <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
  <span style={{fontSize:9,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology{!fwOpen?" — Private":""}</span>
  <span style={{fontSize:9,color:T.textDim}}>{fwOpen?"▲":"🔒"}</span>

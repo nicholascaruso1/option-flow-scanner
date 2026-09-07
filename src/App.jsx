@@ -1050,6 +1050,36 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[]),...candleAutoChecks])];
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
+ const pfSym=s.symbol;
+ const pfDir=s.direction||s.dir;
+ const pfC1data=c123[pfSym]||{};
+ const pfChecks2=pfChecks[pfSym]||[];
+ const pfMtfRows=s.mtf||[];
+ const pfDirBias=pfDir==="call"?"bull":"bear";
+ const pfMtfCount=pfMtfRows.filter(r=>r[1]===pfDirBias).length;
+ const pfMtfOk=pfMtfRows.length>=4&&pfMtfCount>=4;
+ const pfSessOk=sessionProfile.actionable;
+ const pfEstDay=new Date().getDay(); // weeklyProfile already DST-aware; use local day as proxy
+ const pfDayOk=pfEstDay!==1;
+ const pfDayNote=pfEstDay===3?"Wed — Primary entry day":pfEstDay===4?"Thu — Second opportunity":pfEstDay===1?"Mon — Monday Rule: avoid":pfEstDay===5?"Fri — TGIF setups only":"Valid entry day";
+ const pfCd=candleData[pfSym]?.daily||null;
+ const pfOte_low=(pfCd?.ote_low??aiCards[pfSym]?.ote_low)??null;
+ const pfOte_high=(pfCd?.ote_high??aiCards[pfSym]?.ote_high)??null;
+ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
+ const STAGE_RANK_PF={INSUFFICIENT_DATA:-1,NO_C1:-1,C1_ONLY:1,C2_FORMING:2,C2_CONFIRMED:3,C3_FORMING:4,C3_CISD_CONFIRMED:5};
+ const pfStageRank=pfCd?(STAGE_RANK_PF[pfCd.stage]??-1):-1;
+ const pfC123ok=pfStageRank>=2;
+ const pfLivePrice=liveData[pfSym]?.price||s.price||0;
+ const pfOteOk=!!(pfOte_low!=null&&pfOte_high!=null&&pfLivePrice>=pfOte_low&&pfLivePrice<=pfOte_high);
+ const pfSwingOk=pfSwing!=null?(pfDir==="call"?pfLivePrice>pfSwing:pfLivePrice<pfSwing):false;
+ const pfAutoPass=[pfMtfOk,pfSessOk,pfDayOk,pfC123ok,pfOteOk,pfSwingOk].filter(Boolean).length;
+ const pfManPass=["g_oi","g_cal"].filter(id=>pfChecks2.includes(id)).length;
+ const pfTotal=8;
+ const pfPassing=pfAutoPass+pfManPass;
+ const pfVerdict=pfPassing===pfTotal?"GO":pfPassing>=6?"CAUTION":"NO-GO";
+ const pfVColor=pfVerdict==="GO"?T.sage:pfVerdict==="CAUTION"?T.gold:T.rose;
+ const pfIsPfOpen=pfOpen[pfSym]!==false;
+ const dteD=s.expiryDate?daysUntil(s.expiryDate):null;
  return(
  <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>
@@ -1228,9 +1258,63 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
+ <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:0,overflow:"hidden"}}>
+  <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
+   <div style={{display:"flex",alignItems:"center",gap:10}}>
+   <span style={{fontSize:12,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
+   <span style={{fontSize:9,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
+   {pfVerdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
+   {pfVerdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>Review open gates</span>}
+   {pfVerdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose}}>Do not enter</span>}
+   </div>
+   <div style={{display:"flex",alignItems:"center",gap:5}}>
+   <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
+   <span style={{fontSize:8,color:T.textDim}}>{pfIsPfOpen?"▲":"▼"}</span>
+   </div>
+  </div>
+  {pfIsPfOpen&&(
+  <div style={{padding:"10px 12px"}}>
+   <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Auto-Detected</div>
+   {[
+    {id:"g_mtf",label:"MTF Aligned (4+ timeframes)",ok:pfMtfOk,note:pfMtfRows.length===0?"No MTF data — populate Multi-TF tab":pfMtfCount+"/"+pfMtfRows.length+" timeframes aligned "+pfDirBias},
+    {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:pfSessOk,note:sessionProfile.profile},
+    {id:"g_day",label:"Valid Profile Day",ok:pfDayOk,note:pfDayNote},
+    {id:"g_c123",label:"C1/C2/C3 structure ≥ C2 confirmed",ok:pfC123ok,note:pfC123ok?"Stage: "+(pfCd?.stage||"").replace(/_/g," "):"Stage: "+(pfCd?.stage||"LOADING").replace(/_/g," ")+" — need C2_CONFIRMED or better"},
+    {id:"g_ote_auto",label:"Price in OTE zone (0–50% Fib)",ok:pfOteOk,note:pfOteOk?"$"+pfLivePrice.toFixed(2)+" inside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2):"$"+pfLivePrice.toFixed(2)+" outside OTE $"+(pfOte_low||0).toFixed(2)+"–$"+(pfOte_high||0).toFixed(2)},
+    {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfSwing||0).toFixed(2):"⚠ Price "+(pfDir==="call"?"below":"above")+" protected swing $"+(pfSwing||0).toFixed(2)},
+   ].map(g=>(
+   <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
+    <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
+    <div style={{flex:1}}>
+     <div style={{fontSize:9,color:g.ok?T.sage:T.textSec,fontWeight:g.ok?600:400}}>{g.label}</div>
+     <div style={{fontSize:8,color:T.textDim,lineHeight:1.5}}>{g.note}</div>
+    </div>
+   </div>
+   ))}
+   <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6,marginTop:10}}>Manual Confirmation</div>
+   {[
+    {id:"g_oi",label:"OI > 500 on target strike",desc:"Check options chain before entry. Low OI = wide spreads."},
+    {id:"g_cal",label:"Economic calendar clear",desc:"No red folder events in next 2 hrs (FOMC, NFP, CPI, PPI, JOLTS)"},
+   ].map(g=>{
+    const ck2=pfChecks2.includes(g.id);
+    return(
+    <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+     <div style={{width:12,height:12,borderRadius:0,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+      {ck2&&<span style={{color:T.bg,fontSize:7,fontWeight:900}}>✓</span>}
+     </div>
+     <div style={{flex:1}}>
+      <div style={{fontSize:9,color:ck2?T.teal:T.textSec,fontWeight:ck2?600:400}}>{g.label}</div>
+      <div style={{fontSize:8,color:T.textDim,lineHeight:1.5}}>{g.desc}</div>
+     </div>
+    </div>
+    );
+   })}
+  </div>
+  )}
+ </div>
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
  <div style={{fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
- <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.textDim}}>Same framework as Options tab:C2 failure swing + C3 CISD body close. No options params (no delta/DTE/IV) — directional bias only, applies to spot/ETF/futures positioning.</div>
+ <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.textDim}}>Same framework as Options tab: C2 failure swing + C3 CISD body close. No options params (no delta/DTE/IV) shown here — directional bias only, applies to spot/ETF/futures positioning. Pre-flight gates above use the same auto-detection as tracked Options setups.</div>
  </div>
  </div>
  )}

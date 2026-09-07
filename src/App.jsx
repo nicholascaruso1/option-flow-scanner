@@ -881,7 +881,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
- <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:"auto",padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
+ <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:16,padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
  {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}

@@ -889,7 +889,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  ))}
  </div>
  {isEverything&&(
- <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.surface}}>
+ <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
  {[
  ["Phase",evPhase,setEvPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"],["MANAGING","Managing"]]],
  ["Asset Class",evAsset,setEvAsset,[["all","All"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]]],
@@ -907,7 +907,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  )}
  {view==="all"&&(
- <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.surface}}>
+ <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
  {[["Direction",dir,setDir,[["both","All"],["calls","Calls ↑"],["puts","Puts ↓"],["watch","Watch"]]],
  ["Cap Size",cap,setCap,[["all","All"],["mega","Mega"],["large","Large"],["small","Small"],["micro","Micro"]]],
  ["Phase",phase,setPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"]]]
@@ -1835,19 +1835,20 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
            <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
           </div>
          </div>
-         <div style={{marginBottom:6}}>
-          <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
-           <span style={{fontSize:8,color:T.textDim,fontFamily:FD}}>Retracement</span>
-           <span style={{fontSize:8,color:retrColor,fontFamily:FD,fontWeight:retrPct<=50?700:400}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓":""}</span>
+         <div style={{marginBottom:6,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:44,height:44,position:"relative",flexShrink:0}}>
+           <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke={T.border2} strokeWidth="2"/>
+            <line x1="22" y1="4" x2="22" y2="7" stroke={T.gold} strokeWidth="1" transform="rotate(180 22 22)"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke={retrColor} strokeWidth="2"
+             strokeDasharray={(Math.min(retrPct,100)/100*113.1).toFixed(1)+" 113.1"} transform="rotate(-90 22 22)"/>
+           </svg>
+           <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(0)}%</div>
           </div>
-          <div style={{height:4,borderRadius:2,background:T.border2,overflow:"hidden"}}>
-           <div style={{height:"100%",width:Math.min(retrPct,100)+"%",background:retrColor,borderRadius:2}}/>
+          <div>
+           <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:2}}>RETRACEMENT — 0–50% OTE ZONE</div>
+           <div style={{fontSize:9,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓ inside zone":" — outside zone"}</div>
           </div>
-          {!isTracked&&<div style={{display:"flex",justifyContent:"space-between",marginTop:1}}>
-           <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>0%</span>
-           <span style={{fontSize:7,color:T.sage,fontFamily:FD}}>50%</span>
-           <span style={{fontSize:7,color:T.textDim,fontFamily:FD}}>100%</span>
-          </div>}
          </div>
          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
           <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>

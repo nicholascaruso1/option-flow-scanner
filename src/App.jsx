@@ -877,7 +877,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
   </div>
  );
  })()}
- <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.surface,overflowX:"auto"}}>
+ <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
  <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>

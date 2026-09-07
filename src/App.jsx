@@ -757,7 +757,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
  const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:4,fontFamily:FM,outline:"none",cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
- const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
+ const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
@@ -944,8 +944,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const ac=ph.color;
  const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
  return(
- <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
- <div style={{padding:"12px 16px 0"}}>
+ <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+ <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
@@ -967,7 +967,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  })()}
  </div>
  </div>
- <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:8}}>
+ <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.dir==="call"?"Long ↑":s.dir==="put"?"Short ↓":"Watch"}</span>
  {s.cap&&<span style={pill(CAP_COLORS[s.cap]||T.slate)}>{s.cap}</span>}
@@ -1235,8 +1235,8 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   </div>
  );
  return(
- <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,borderTop:"2px solid "+ac,overflow:"hidden"}}>
- <div style={{padding:"12px 16px 0"}}>
+ <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:6,overflow:"hidden"}}>
+ <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
@@ -1258,7 +1258,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  })()}
  </div>
  </div>
- <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:8}}>
+ <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
  <span style={pill(dc)}>{s.direction==="call"?"Call ↑":s.direction==="put"?"Put ↓":"Watch"}</span>
@@ -1266,7 +1266,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  {vIdx===0&&!invAlert&&<span style={pill(T.teal)}>⚡ Top Aligned</span>}
  </div>
  {(earnD!=null||dteD!=null||allCk.length>0)&&(
- <div style={{display:"flex",flexWrap:"wrap",gap:10,marginTop:5,alignItems:"center"}}>
+ <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:4,alignItems:"center"}}>
  {allCk.length>0&&<span style={{fontSize:9,color:T.sage,fontFamily:FD}}>✓ {allCk.length}/{CHECKLIST.length} checks</span>}
  {earnD!=null&&<span style={{fontSize:9,color:earnC,fontFamily:FD}}>Earnings {s.earningsLabel} · {earnD}d</span>}
  {dteD!=null&&<span style={{fontSize:9,color:dteD<=7?T.rose:T.textDim,fontFamily:FD}}>Exp {dteD}d</span>}
@@ -1277,7 +1277,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  {invAlert}
  </div>
  )}
- <div style={{display:"flex",gap:8,marginTop:8,paddingBottom:10,flexWrap:"wrap",alignItems:"center"}}>
+ <div style={{display:"flex",gap:6,marginTop:6,paddingBottom:8,flexWrap:"wrap",alignItems:"center"}}>
  <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
  <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
  </div>

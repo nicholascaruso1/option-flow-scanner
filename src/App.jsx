@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { detectC123 } from "./lib/detectC123";
 import { parseInvalidation, checkInvalidation } from "./lib/invalidation";
 const T = {
- bg:"#070B09", surface:"#0D1611", border:"#17251C", border2:"#223428",
- textPri:"#ECEEEA", textSec:"#6E8A7A", textDim:"#33473C",
+ bg:"#0A0C0A", surface:"#131513", border:"#232923", border2:"#2E362E",
+ textPri:"#E6E8E4", textSec:"#8B928B", textDim:"#454A45",
  gold:"#C9A84C", goldDim:"#6B5520", blue:"#4A90D9", rose:"#C0445A",
  sage:"#3D8B6E", green:"#3DBF7A", amber:"#B87333", slate:"#5A7A9A", teal:"#2A8B7A", purple:"#8B5CF6",
 };

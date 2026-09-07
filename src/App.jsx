@@ -760,7 +760,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,padding:"2px 8px",borderRadius:12,background:color+"18",border:"1px solid "+color+"40",color:color,fontFamily:FM,whiteSpace:"nowrap"});
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
- <div style={{background:"linear-gradient(160deg,#0A1423,#0D1B31)",borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
+ <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
  <div>
  <div style={{fontFamily:"Georgia,serif",fontStyle:"italic",fontSize:24,fontWeight:700,color:T.gold,lineHeight:1}}>Option Flow</div>
@@ -778,7 +778,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  </div>
  {(liveTs||liveError)&&(
- <div style={{background:"#060b16",borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+ <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
  {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
  {liveError&&<span style={{fontSize:9,color:T.textDim}}>{liveError}</span>}
  {(()=>{
@@ -828,7 +828,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </span>
  );
  return (
- <div style={{position:"sticky",top:0,zIndex:50,background:"#050a14",borderBottom:"1px solid "+T.border,padding:"6px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+ <div style={{position:"sticky",top:0,zIndex:50,background:T.bg,borderBottom:"1px solid "+T.border,padding:"6px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
  <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:3,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
  {chip("SPY",spy)}
  {chip("QQQ",qqq)}
@@ -866,7 +866,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
   </div>
  );
  return(
-  <div style={{background:"#050a13",borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
+  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
    {_cell("Regime",_reg.l,_reg.c,`SPY ${_spy>=0?"+":""}${_spy.toFixed(1)}%`)}
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
    {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}

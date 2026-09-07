@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { detectC123 } from "./lib/detectC123";
 import { parseInvalidation, checkInvalidation } from "./lib/invalidation";
 const T = {
- bg:"#080E1C", surface:"#0F1B2E", border:"#1A2C45", border2:"#243850",
- textPri:"#E8EEF8", textSec:"#7A92B0", textDim:"#3A5270",
+ bg:"#070B09", surface:"#0D1611", border:"#17251C", border2:"#223428",
+ textPri:"#ECEEEA", textSec:"#6E8A7A", textDim:"#33473C",
  gold:"#C9A84C", goldDim:"#6B5520", blue:"#4A90D9", rose:"#C0445A",
  sage:"#3D8B6E", green:"#3DBF7A", amber:"#B87333", slate:"#5A7A9A", teal:"#2A8B7A", purple:"#8B5CF6",
 };
-const FM = "-apple-system,Segoe UI,sans-serif";
-const FD = "SF Mono,Fira Code,monospace";
+const FM = "'IBM Plex Mono',SF Mono,Fira Code,monospace";
+const FD = "'IBM Plex Mono',SF Mono,Fira Code,monospace";
+const FP = "Georgia,'Times New Roman',serif";
 async function ls(key,fb){try{const r=localStorage.getItem(key);return r?JSON.parse(r):fb;}catch{return fb;}}
 async function ss(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
 function daysUntil(d){return Math.max(0,Math.ceil((new Date(d+"T16:00:00")-new Date())/86400000));}
@@ -1011,10 +1012,10 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div>{s.narrative}</div></div>
- <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div>{s.structure}</div></div>
+ <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
+ <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
  </div>
  )}
  {tab==="phase"&&(
@@ -1323,16 +1324,16 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
  <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
- <div style={{fontSize:10,color:T.textSec}}>{s.narrative}</div>
+ <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div>
  </div>
  <div style={{background:T.bg,borderRadius:4,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div>
- <div style={{fontSize:10,color:T.textSec}}>{s.structure}</div>
+ <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div>
  </div>
  </div>
  <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:4,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
- <div style={{color:T.purple,fontSize:10}}>{s.divergence}</div>
+ <div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{s.divergence}</div>
  </div>
  {(()=>{
  const allSetupsL=allSetups.map(x=>({...x,chg:liveData[x.symbol]?.chg??x.chg})).sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));

@@ -946,6 +946,15 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const tab=getTab(s.symbol);
  const ac=ph.color;
  const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
+ const ck=checks[s.symbol]||[];
+ const cd=candleData[s.symbol];
+ const candleAutoChecks=[];
+ if (cd?.daily?.detected){candleAutoChecks.push("c123_daily");candleAutoChecks.push("cisd_daily");}
+ if (cd?.daily?.atOBMean) candleAutoChecks.push("ob_mean");
+ if (cd?.intraday?.detected) candleAutoChecks.push("ic_cisd");
+ const effectiveAutoChecks=[...new Set([...(ai.autoChecks||s.autoChecks||[]),...candleAutoChecks])];
+ const allCk=[...new Set([...ck,...effectiveAutoChecks])];
+ const pct=Math.round((allCk.length/CHECKLIST.length)*100);
  return(
  <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>
@@ -1000,8 +1009,8 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  {isOpen&&(
  <div style={{borderTop:"1px solid "+T.border}}>
  <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid "+T.border,background:T.bg}}>
- {[["narrative","Narrative"],["phase","Phase"],["entry","Entry"],["levels","Levels & Catalysts"]].map(([t,l])=>(
- <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction);}} style={tbtn(tab===t,ac)}>{l}</button>
+ {[["narrative","Narrative"],["phase","Phase"],["checklist","Checklist"],["entry","Entry"],["levels","Levels & Catalysts"],["mtf","Multi-TF"],["journal","Journal"]].map(([t,l])=>(
+ <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction||s.dir);}} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
@@ -1038,6 +1047,88 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
  </div>
  )}
+ {tab==="checklist"&&(()=>{
+  return(
+  <div>
+   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+    <div>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+     <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+      <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+     </div>
+    </div>
+    <div style={{display:"flex",gap:8,alignItems:"center"}}>
+     <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
+     {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
+    </div>
+   </div>
+   {(()=>{
+    if (!cd&&!open[s.symbol]) return null;
+    const stageColor={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber,NO_C1:T.textDim,INSUFFICIENT_DATA:T.textDim,FETCH_ERROR:T.rose};
+    const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+    const dr=cd?.daily, ir=cd?.intraday;
+    return(
+     <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
+      <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
+      {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
+      {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
+      {dr&&!cd?.loading&&(
+       <div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
+         <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
+         {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
+        </div>
+        {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
+        {dr.detected&&dr.ob&&(
+         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+          {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
+           <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
+            <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+            <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+           </div>
+          ))}
+         </div>
+        )}
+        {ir&&(
+         <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+           <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
+           <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
+           {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
+          {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
+          </div>
+          {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
+         </div>
+        )}
+       </div>
+      )}
+      {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
+     </div>
+    );
+   })()}
+   {CHECKLIST.map(item=>{
+    const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
+    return(
+    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+     <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+     {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+     </div>
+     <div style={{flex:1}}>
+     <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
+     <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
+     {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
+     {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
+     </div>
+     <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+     </div>
+    </div>
+    );
+   })}
+   {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
+  </div>
+  );
+ })()}
  {tab==="entry"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
@@ -1065,6 +1156,103 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  </div>
  )}
+ {tab==="mtf"&&(()=>{
+  const rows=s.mtf||[];
+  const bulls=rows.filter(r=>r[1]==="bull").length;
+  const bears=rows.filter(r=>r[1]==="bear").length;
+  const al=bulls>=4?"Strongly Bullish":bears>=4?"Strongly Bearish":bulls>bears?"Leaning Bullish":bears>bulls?"Leaning Bearish":"Mixed";
+  const alC=bulls>=4?T.sage:bears>=4?T.rose:bulls>bears?T.blue:bears>bulls?T.rose:T.amber;
+  const dc2=(v)=>v==="bull"?T.sage:v==="bear"?T.rose:v==="neut"?T.amber:T.textDim;
+  return(
+   <div>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
+     <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
+     <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
+    </div>
+    {rows.length===0&&<div style={{fontSize:9,color:T.textDim,padding:"10px 0",textAlign:"center"}}>No Multi-TF data tracked for {s.symbol} yet.</div>}
+    {rows.map(([tf,bias,note],i)=>(
+     <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
+      <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
+      <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
+      <span style={{fontSize:9,color:T.textDim}}>{note}</span>
+     </div>
+    ))}
+    <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
+   </div>
+  );
+ })()}
+ {tab==="journal"&&(()=>{
+  const sym=s.symbol;
+  const c1data=c123[sym]||{};
+  const notes=journalNotes[sym]||[];
+  const setCandle=(candle,confirmed)=>{
+   const ts2=confirmed?new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):null;
+   const next={...c123,[sym]:{...c1data,[candle]:confirmed?{confirmed:true,ts:ts2}:null}};
+   setC123(next);ss("of_c123",next);
+  };
+  const addNote=()=>{
+   const inp=journalInput[sym]||"";
+   if(!inp.trim())return;
+   const newnote={ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),note:inp.trim()};
+   const next={...journalNotes,[sym]:[newnote,...(journalNotes[sym]||[])]};
+   setJournalNotes(next);ss("of_journal",next);
+   setJournalInput({...journalInput,[sym]:""});
+  };
+  const candles=[
+   {key:"c1",label:"C1",color:T.blue,desc:"Direction candle — prior move confirming the trend. Sets up the swing."},
+   {key:"c2",label:"C2",color:T.gold,desc:"Failure swing — middle candle making the extreme. BODY close through level required. Wick-only = invalid."},
+   {key:"c3",label:"C3",color:T.sage,desc:"CISD body close — Change in State of Delivery. Drop to lower TF and confirm body close. Missing CISD = skip."},
+  ];
+  const seqDone=candles.every(c=>c1data[c.key]&&c1data[c.key].confirmed);
+  return(
+   <div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
+     {seqDone&&(
+      <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
+     )}
+     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+      {candles.map(({key,label,color,desc})=>{
+       const cd2=c1data[key]||{};
+       return(
+       <div key={key} style={{background:cd2.confirmed?color+"10":T.bg,border:"1px solid "+(cd2.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
+       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+       <span style={{fontSize:13,fontWeight:700,color:cd2.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
+       <div style={{width:8,height:8,borderRadius:"50%",background:cd2.confirmed?color:T.border2}}/>
+       </div>
+       <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
+       {cd2.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd2.ts}</div>}
+       <button onClick={()=>setCandle(key,!cd2.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd2.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd2.confirmed?T.rose+"50":color+"50"),color:cd2.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd2.confirmed?"RESET":"CONFIRM"}</button>
+       </div>
+       );
+      })}
+     </div>
+    </div>
+    <div>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
+     <div style={{display:"flex",gap:6,marginBottom:8}}>
+      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+      <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
+     </div>
+     {notes.length===0&&s.logEntry&&(
+      <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
+       <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
+       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
+      </div>
+     )}
+     {notes.map((n,i)=>(
+      <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
+       <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
+       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
+      </div>
+     ))}
+     {notes.length===0&&!s.logEntry&&(
+      <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
+     )}
+    </div>
+   </div>
+  );
+ })()}
  </div>
  </div>
  )}

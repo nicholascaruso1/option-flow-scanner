@@ -376,7 +376,7 @@ const AS_OF = new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"
 const PHASE_ORDER = ["READY","RETRACEMENT","CONSOLIDATION","EXPANSION","MANAGING","WATCH_REVERSAL"];
 const TL_STEPS = ["EXPANSION","CONSOLIDATION","RETRACEMENT","READY","MANAGING"];
 export default function OptionsScanner() {
- const [view, setView] = useState("all");
+ const [view, setView] = useState("everything");
  const [dir, setDir] = useState("both");
  const [cap, setCap] = useState("all");
  const [phase, setPhase] = useState("all");
@@ -885,7 +885,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
  </button>
  <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:16,padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
- {[["everything","All"],["all","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"],["screener","Screener"]].map(([v,l])=>(
+ {[["everything","All"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -893,9 +893,16 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  </div>
  {isEverything&&(
  <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
+ <div>
+ <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
+ <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+ {[["all","All"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
+ <button key={v} onClick={()=>setEvAsset(v)} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:evAsset===v?T.teal+"20":T.bg,border:"1px solid "+(evAsset===v?T.teal:T.border),borderRadius:0,color:evAsset===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
+ ))}
+ </div>
+ </div>
  {[
  ["Phase",evPhase,setEvPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"],["MANAGING","Managing"]]],
- ["Asset Class",evAsset,setEvAsset,[["all","All"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]]],
  ["Direction",evDir,setEvDir,[["all","All"],["bull","Bullish / Call"],["bear","Bearish / Put"]]],
  ["Sort By",evSort,setEvSort,[["align","⚡ Alignment"],["phase","Phase"],["chg","% Move"],["symbol","Symbol A–Z"],["asset","Asset Class"]]],
  ].map(([label,val,setter,opts])=>(
@@ -928,6 +935,94 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
 
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
  {view==="invalidated"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.sage,marginBottom:10}}>✓</div><div style={{fontSize:13,color:T.textSec}}>No invalidated setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>All tracked setups are currently intact</div></div>)}
+ {isEverything&&(evAsset==="all"||evAsset==="options")&&allSetups.length>0&&(()=>{
+ const focusData=[...allSetups].map(s=>{
+ const hist=memoryData[s.symbol]||[];
+ const last=hist[hist.length-1];
+ if(last&&last.invalidated)return{s,pScore:-999,al:0,earnD:null,reasons:[]};
+ if(!s.phase)return{s,pScore:-100,al:0,earnD:null,reasons:[]};
+ let pScore=0;
+ const reasons=[];
+ if(s.phase==="READY"){pScore+=50;reasons.push("READY");}
+ else if(s.phase==="RETRACEMENT"){pScore+=35;reasons.push("Retracing into zone");}
+ else if(s.phase==="EXPANSION"){pScore+=25;reasons.push("Expansion — await pullback");}
+ else if(s.phase==="CONSOLIDATION")pScore+=5;
+ else if(s.phase==="WATCH_REVERSAL")pScore-=10;
+ else if(s.phase==="MANAGING")pScore-=30;
+ const hit=screenerHits.find(h=>h.ticker===s.symbol);
+ if(hit&&hit.met===5){pScore+=25;reasons.push("5/5 screener conditions");}
+ else if(hit&&hit.met>=4){pScore+=15;reasons.push(hit.met+"/5 screener conditions");}
+ const al=alignmentScore(s);
+ if(al>=70){pScore+=15;reasons.push("HTF alignment confirmed");}
+ else if(al>=40)pScore+=8;
+ const earnD=s.earningsDate?daysUntil(s.earningsDate):null;
+ if(earnD!=null&&earnD>7){pScore+=10;reasons.push("Earnings "+earnD+"d away");}
+ if(earnD!=null&&earnD<=7)pScore-=20;
+ return{s,pScore,al,earnD,reasons};
+ }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
+ const readyCount=allSetups.filter(s=>s.phase==="READY").length;
+ const watchCount=allSetups.filter(s=>s.phase!=="READY").length;
+ const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
+ const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
+ const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
+ const avg=(spy+qqq+iwm)/3;
+ const regime=avg>0.5?{l:"Bullish Bias",c:T.sage}:avg<-0.5?{l:"Bearish Bias",c:T.rose}:{l:"Neutral",c:T.gold};
+ const sensitivityLabel=ph=>{
+ if(ph==="READY")return{l:"Valid Today",c:T.sage};
+ if(ph==="RETRACEMENT"||ph==="EXPANSION")return{l:"Waiting",c:T.gold};
+ if(ph==="MANAGING")return{l:"No Action",c:T.teal};
+ return{l:"Monitor",c:T.textDim};
+ };
+ const NUMS=["①","②","③"];
+ return(
+ <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
+ <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+ <div style={{display:"flex",flexDirection:"column",gap:1}}>
+ <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
+ <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
+ </div>
+ <div style={{width:"1px",height:28,background:T.border,flexShrink:0}}/>
+ <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
+ <span style={{fontSize:8,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
+ <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
+ <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
+ </div>
+ </div>
+ {focusData.length===0?(
+ <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
+ ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
+ const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
+ const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
+ const starCount=Math.round((Math.min(pScore,100)/100)*5);
+ const filledS="★".repeat(Math.max(0,Math.min(5,starCount)));
+ const emptyS="☆".repeat(5-Math.max(0,Math.min(5,starCount)));
+ const dcolor=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
+ const sens=sensitivityLabel(s.phase);
+ return(
+ <div key={s.symbol}
+ onClick={()=>{setOpen(p=>({...p,[s.symbol]:true}));setTimeout(()=>{document.getElementById("ofc-"+s.symbol)?.scrollIntoView({behavior:"smooth",block:"start"});},60);}}
+ style={{padding:"11px 16px",borderBottom:qi<focusData.length-1?"1px solid "+T.border:"none",display:"flex",gap:12,alignItems:"flex-start",cursor:"pointer",transition:"background 0.15s"}}
+ onMouseEnter={e=>e.currentTarget.style.background=T.border+"30"}
+ onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+ <span style={{fontSize:14,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
+ <div style={{flex:1,minWidth:0}}>
+ <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
+ <span style={{fontFamily:FD,fontSize:15,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:12,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
+ <span style={{fontSize:8,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
+ <span style={{fontSize:8,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
+ </div>
+ {reasons.slice(0,3).map((w,wi)=>(
+ <div key={wi} style={{fontSize:8,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
+ ))}
+ </div>
+ <span style={{fontSize:10,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
+ </div>
+ );
+ })}
+ </div>
+ );
+ })()}
  {(isAltView||isEverything)&&(
  <div style={{padding:"10px 20px"}}>
  {visible.map((s)=>{
@@ -956,7 +1051,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
  return(
- <div key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
+ <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>

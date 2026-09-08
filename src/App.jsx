@@ -892,16 +892,20 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </button>
  ))}
  </div>
- {isEverything&&(
+ {(isEverything||view==="favorites")&&(
  <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
  <div>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
- {[["favorites","★ Favorites"],["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
- <button key={v} onClick={()=>v==="favorites"?setView("favorites"):setEvAsset(v)} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:v==="favorites"?(favs.length>0?T.gold+"15":T.bg):(evAsset===v?T.teal+"20":T.bg),border:"1px solid "+(v==="favorites"?(favs.length>0?T.gold+"50":T.border):(evAsset===v?T.teal:T.border)),borderRadius:0,color:v==="favorites"?(favs.length>0?T.gold:T.textDim):(evAsset===v?T.teal:T.textDim),cursor:"pointer",whiteSpace:"nowrap"}}>{l}{v==="favorites"&&favs.length>0&&<span style={{marginLeft:4}}>{favs.length}</span>}</button>
- ))}
+ {[["favorites","★ Favorites"],["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>{
+ const active=v==="favorites"?view==="favorites":(isEverything&&evAsset===v);
+ return(
+ <button key={v} onClick={()=>{if(v==="favorites"){setView("favorites");}else{setEvAsset(v);setView("everything");}}} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:active?(v==="favorites"?T.gold+"20":T.teal+"20"):T.bg,border:"1px solid "+(active?(v==="favorites"?T.gold:T.teal):T.border),borderRadius:0,color:active?(v==="favorites"?T.gold:T.teal):(v==="favorites"&&favs.length>0?T.goldDim:T.textDim),cursor:"pointer",whiteSpace:"nowrap"}}>{l}{v==="favorites"&&favs.length>0&&<span style={{marginLeft:4}}>{favs.length}</span>}</button>
+ );
+ })}
  </div>
  </div>
+ {isEverything&&(<>
  {[
  ["Phase",evPhase,setEvPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"],["MANAGING","Managing"]]],
  ["Direction",evDir,setEvDir,[["all","All"],["bull","Bullish / Call"],["bear","Bearish / Put"]]],
@@ -915,6 +919,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  ))}
  <div style={{marginLeft:"auto",fontSize:9,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
+ </>)}
  </div>
  )}
  {view==="all"&&(

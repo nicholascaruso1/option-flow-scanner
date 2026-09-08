@@ -704,6 +704,7 @@ const optionsOnly=allSetups.filter(x=>!_macroSyms.has(x.symbol));
 const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
  const _aiSyms=new Set(allSetups.map(s=>s.symbol));
  const everythingData=evAsset==="all"?[...allSetups,...CRYPTO.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...COMMODITIES.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...INDICES.map(ovl).filter(x=>!_aiSyms.has(x.symbol))]:ASSET_MAP[evAsset]||[];
+ const aqAll=[...allSetups,...CRYPTO.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...COMMODITIES.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...INDICES.map(ovl).filter(x=>!_aiSyms.has(x.symbol))];
 
  // ── Alignment scores: computed once per render, memoized on deps ──
  const alignmentScores = useMemo(() => {
@@ -938,8 +939,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
 
  {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
  {view==="invalidated"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.sage,marginBottom:10}}>✓</div><div style={{fontSize:13,color:T.textSec}}>No invalidated setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>All tracked setups are currently intact</div></div>)}
- {isEverything&&(evAsset==="all"||evAsset==="options")&&allSetups.length>0&&(()=>{
- const focusData=[...allSetups].map(s=>{
+ {isEverything&&aqAll.length>0&&(()=>{
+ const focusData=[...aqAll].map(s=>{
  const hist=memoryData[s.symbol]||[];
  const last=hist[hist.length-1];
  if(last&&last.invalidated)return{s,pScore:-999,al:0,earnD:null,reasons:[]};
@@ -963,8 +964,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  if(earnD!=null&&earnD<=7)pScore-=20;
  return{s,pScore,al,earnD,reasons};
  }).filter(x=>x.pScore>0).sort((a,b)=>b.pScore-a.pScore).slice(0,3);
- const readyCount=allSetups.filter(s=>s.phase==="READY").length;
- const watchCount=allSetups.filter(s=>s.phase!=="READY").length;
+ const readyCount=aqAll.filter(s=>s.phase==="READY").length;
+ const watchCount=aqAll.filter(s=>s.phase!=="READY").length;
  const spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
  const qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
  const iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;

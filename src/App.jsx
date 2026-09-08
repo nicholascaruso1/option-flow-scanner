@@ -157,6 +157,49 @@ function getInvalidationAlert(history) {
  return `Invalidation level breached at $${last.invalidatedAt}. Current price $${last.price}.`;
 }
 
+// Structured session-to-session diff for the News tab. Returns an array of
+// {type, text, severity} events, or [] if nothing changed between the last
+// two daily memory snapshots.
+function getMemoryEvents(history) {
+ if (!history || history.length<2) return [];
+ const last = history[history.length-1];
+ const prev = history[history.length-2];
+ const events = [];
+ if (last.phase!==prev.phase) {
+  events.push({type:"phase",text:`Phase shifted ${prev.phase} → ${last.phase}`,severity:"info"});
+ }
+ if (last.invalidated && !prev.invalidated) {
+  events.push({type:"invalidated",text:`Invalidation triggered at $${last.invalidatedAt}`,severity:"critical"});
+ } else if (!last.invalidated && prev.invalidated) {
+  events.push({type:"resolved",text:`Invalidation cleared — structure re-confirmed`,severity:"info"});
+ }
+ if (last.keyLevelStatus!=="unknown" && last.keyLevelStatus!==prev.keyLevelStatus) {
+  events.push({type:"level",text:`Now testing: ${last.keyLevelStatus.replace("at_level:","")}`,severity:"warning"});
+ }
+ if (last.state!==prev.state) {
+  events.push({type:"state",text:`State changed ${prev.state} → ${last.state}`,severity:"info"});
+ }
+ return events;
+}
+
+// Shared near-key-level scan, used by both the live sticky-bar chips (capped)
+// and the News tab (full list).
+function getNearKeyLevels(all, liveData) {
+ return Object.entries(liveData).map(([sym,d])=>{
+  const s=all.find(x=>x.symbol===sym);
+  if(!s||!d.price)return null;
+  const levels=(s.keyLevels||s.levels||[]);
+  let closestPct=null,closestLabel=null;
+  for(const l of levels){
+   const lp=parseFloat((l.p||"").replace(/[$,]/g,""));
+   if(!lp)continue;
+   const pct=Math.abs((d.price-lp)/lp);
+   if(pct<0.008&&(closestPct===null||pct<closestPct)){closestPct=pct;closestLabel=l.l;}
+  }
+  return closestPct===null?null:{sym,price:d.price,closestPct,label:closestLabel};
+ }).filter(Boolean).sort((a,b)=>a.closestPct-b.closestPct);
+}
+
 function ordinalSuffix(n) {
  if (n%10===1&&n%100!==11) return "st";
  if (n%10===2&&n%100!==12) return "nd";
@@ -791,19 +834,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {liveError&&<span title={liveErrorDetail||""} style={{fontSize:9,color:T.amber,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.amber}}>{liveError}</span>}
  {(()=>{
  const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
- const near=Object.entries(liveData).map(([sym,d])=>{
- const s=all.find(x=>x.symbol===sym);
- if(!s||!d.price)return null;
- const levels=(s.keyLevels||s.levels||[]);
- let closestPct=null;
- for(const l of levels){
- const lp=parseFloat((l.p||"").replace(/[$,]/g,""));
- if(!lp)continue;
- const pct=Math.abs((d.price-lp)/lp);
- if(pct<0.008&&(closestPct===null||pct<closestPct))closestPct=pct;
- }
- return closestPct===null?null:{sym,price:d.price,closestPct};
- }).filter(Boolean).sort((a,b)=>a.closestPct-b.closestPct);
+ const near=getNearKeyLevels(all,liveData);
  const shown=near.slice(0,3);
  const rest=near.length-shown.length;
  return <>
@@ -876,7 +907,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  );
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
- {[["everything","All"],["screener","Screener"]].map(([v,l])=>(
+ {[["everything","All"],["screener","Screener"],["news","News"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
  </button>
@@ -2376,6 +2407,86 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   )}
  </div>
 )}
+
+ {view==="news"&&(()=>{
+  const _all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
+  const _seen=new Set();
+  const _allDeduped=_all.filter(s=>_seen.has(s.symbol)?false:(_seen.add(s.symbol),true));
+  const sinceLastSession=_allDeduped.map(s=>{
+   const hist=memoryData[s.symbol]||[];
+   const events=getMemoryEvents(hist);
+   if(events.length===0)return null;
+   const last=hist[hist.length-1];
+   return{symbol:s.symbol,name:s.name||s.company||"",events,date:last.date};
+  }).filter(Boolean);
+  const activeAlerts=Object.entries(aiUpdates).filter(([,ai])=>ai&&ai.alert).map(([symbol,ai])=>({symbol,alert:ai.alert,alertLevel:ai.alertLevel}));
+  const nearNow=getNearKeyLevels(_allDeduped,liveData);
+  const sevColor=sev=>sev==="critical"?T.rose:sev==="warning"?T.gold:T.teal;
+  const sevIcon=sev=>sev==="critical"?"⚠":sev==="warning"?"⚡":"→";
+  return(
+  <div style={{padding:"10px 20px"}}>
+   <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em",marginBottom:2}}>🗞 NEWS</div>
+   <div style={{fontSize:9,color:T.textDim,marginBottom:14}}>Aggregated from nightly Tier 1/Tier 2 checks and live price data — not a real-time feed. "Since Last Session" reflects the most recent overnight snapshot per symbol.</div>
+
+   <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:12}}>
+    <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
+     <div style={{width:6,height:6,borderRadius:"50%",background:T.teal,flexShrink:0}}/>
+     <span style={{fontSize:9,fontWeight:700,color:T.teal,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Since Last Session</span>
+     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{sinceLastSession.length} symbol{sinceLastSession.length!==1?"s":""} changed</span>
+    </div>
+    {sinceLastSession.length===0&&(
+     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
+    )}
+    {sinceLastSession.map(({symbol,name,events,date})=>(
+     <div key={symbol} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{symbol}</span>
+       <span style={{fontSize:9,color:T.textDim}}>{name}</span>
+       <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{date}</span>
+      </div>
+      {events.map((ev,i)=>(
+       <div key={i} style={{fontSize:9,color:sevColor(ev.severity),marginTop:2}}>{sevIcon(ev.severity)} {ev.text}</div>
+      ))}
+     </div>
+    ))}
+   </div>
+
+   <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:12}}>
+    <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
+     <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
+     <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Active Alerts</span>
+     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{activeAlerts.length} active</span>
+    </div>
+    {activeAlerts.length===0&&(
+     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
+    )}
+    {activeAlerts.map(({symbol,alert,alertLevel})=>(
+     <div key={symbol} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start"}}>
+      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
+      <span style={{fontSize:9,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
+     </div>
+    ))}
+   </div>
+
+   <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
+    <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
+     <div style={{width:6,height:6,borderRadius:"50%",background:T.blue,flexShrink:0}}/>
+     <span style={{fontSize:9,fontWeight:700,color:T.blue,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Near Key Level Now</span>
+     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{nearNow.length} symbol{nearNow.length!==1?"s":""} · live</span>
+    </div>
+    {nearNow.length===0&&(
+     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>Nothing currently within 0.8% of a tracked key level.</div>
+    )}
+    {nearNow.map(({sym,price,label})=>(
+     <div key={sym} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center"}}>
+      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
+      <span style={{fontSize:9,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
+     </div>
+    ))}
+   </div>
+  </div>
+  );
+ })()}
 
  {(view==="all"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>

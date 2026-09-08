@@ -850,17 +850,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
 
  })()}
  {(()=>{
- const _spy=liveData["SPY"]?.chg??INDICES.find(x=>x.symbol==="SPY")?.chg??0;
- const _qqq=liveData["QQQ"]?.chg??INDICES.find(x=>x.symbol==="QQQ")?.chg??0;
- const _iwm=liveData["IWM"]?.chg??INDICES.find(x=>x.symbol==="IWM")?.chg??0;
- const _avg=(_spy+_qqq+_iwm)/3;
- const _reg=_avg>0.5?{l:"RISK-ON",c:T.sage}:_avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
- // Note: spy/qqq/iwm also computed in sticky bar above — future refactor: extract to useMemo
  const _readyT=allSetups.filter(s=>s.phase==="READY"||s.phase==="RETRACEMENT");
  const _readyS=screenerHits.filter(h=>h.met>=4);
- const _topAll=[...allSetups].sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const _top=_topAll[0];
- const _earn=allSetups.filter(s=>s.earningsDate).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
+ const _earn=allSetups.filter(s=>s.earningsDate&&daysUntil(s.earningsDate)>=0).sort((a,b)=>daysUntil(a.earningsDate)-daysUntil(b.earningsDate));
  const _ne=_earn[0];
  const _nd=_ne?daysUntil(_ne.earningsDate):null;
  const _inv=allSetups.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
@@ -873,9 +865,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  );
  return(
   <div style={{background:T.bg,borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
-   {_cell("Regime",_reg.l,_reg.c,`SPY ${_spy>=0?"+":""}${_spy.toFixed(1)}%`)}
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
-   {_cell("Top Aligned",_top?_top.symbol:"—",T.gold,_top?PHASES[_top.phase]?.label||_top.phase:"")}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
    <div onClick={()=>_inv>0&&setView("invalidated")} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}

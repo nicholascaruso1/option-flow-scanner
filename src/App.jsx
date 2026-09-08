@@ -885,10 +885,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  );
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
- <button onClick={()=>setView("favorites")} title="Saved" style={{flexShrink:0,padding:"9px 14px",fontSize:15,background:"transparent",border:"none",borderBottom:view==="favorites"?"2px solid "+T.gold:"2px solid transparent",color:view==="favorites"?T.gold:favs.length?T.goldDim:T.border2,cursor:"pointer"}}>
- ★{favs.length>0&&<span style={{fontSize:9,marginLeft:2,color:T.gold}}>{favs.length}</span>}
- </button>
- <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,marginLeft:16,padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
+ <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
  {[["everything","All"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
@@ -900,8 +897,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
- {[["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
- <button key={v} onClick={()=>setEvAsset(v)} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:evAsset===v?T.teal+"20":T.bg,border:"1px solid "+(evAsset===v?T.teal:T.border),borderRadius:0,color:evAsset===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
+ {[["favorites","★ Favorites"],["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
+ <button key={v} onClick={()=>v==="favorites"?setView("favorites"):setEvAsset(v)} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:v==="favorites"?(favs.length>0?T.gold+"15":T.bg):(evAsset===v?T.teal+"20":T.bg),border:"1px solid "+(v==="favorites"?(favs.length>0?T.gold+"50":T.border):(evAsset===v?T.teal:T.border)),borderRadius:0,color:v==="favorites"?(favs.length>0?T.gold:T.textDim):(evAsset===v?T.teal:T.textDim),cursor:"pointer",whiteSpace:"nowrap"}}>{l}{v==="favorites"&&favs.length>0&&<span style={{marginLeft:4}}>{favs.length}</span>}</button>
  ))}
  </div>
  </div>

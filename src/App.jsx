@@ -418,6 +418,8 @@ export default function OptionsScanner() {
  const [scrTab, setScrTab] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
+ const [scrSearch, setScrSearch] = useState("");
+ const [scrShowAll, setScrShowAll] = useState(false);
  const [aqOpen, setAqOpen] = useState(true);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
 const [initDone, setInitDone] = useState(false);
@@ -2094,6 +2096,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
+     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." style={{fontSize:9,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
       <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
@@ -2104,17 +2107,17 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      </div>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
-      <select value={scrBias} onChange={e=>setScrBias(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
-       <option value="all">All</option>
-       <option value="BULL">Calls ▲</option>
-       <option value="BEAR">Puts ▼</option>
-      </select>
+      <div style={{display:"flex",gap:3}}>
+       {[["all","All"],["BULL","▲ Calls"],["BEAR","▼ Puts"]].map(([v,l])=>(
+        <button key={v} onClick={()=>setScrBias(v)} style={{padding:"3px 8px",fontSize:9,fontFamily:FM,background:scrBias===v?T.teal+"20":T.bg,border:"1px solid "+(scrBias===v?T.teal:T.border),borderRadius:0,color:scrBias===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
+       ))}
+      </div>
      </div>
-     <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).length} shown</span>
+     <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).filter(h=>!scrSearch.trim()||h.ticker.toLowerCase().includes(scrSearch.trim().toLowerCase())).length} shown</span>
     </div>
     {(()=>{ try{
      const allSyms=new Set([...allSetups,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
-     const filtered=scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias);
+     const filtered=(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).filter(h=>!scrSearch.trim()||h.ticker.toLowerCase().includes(scrSearch.trim().toLowerCase()));
      const sorted=[...filtered].sort((a,b)=>{
       if(scrSort==="score") return b.met-a.met;
       if(scrSort==="retr") return parseFloat(b.details?.retr_pct||0)-parseFloat(a.details?.retr_pct||0);
@@ -2347,7 +2350,12 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
           <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
           <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
          </div>
-         {newHits.map(h=>renderScreenerCard(h,false))}
+         {(scrShowAll?newHits:newHits.slice(0,15)).map(h=>renderScreenerCard(h,false))}
+         {newHits.length>15&&(
+          <button onClick={()=>setScrShowAll(p=>!p)} style={{width:"100%",padding:"8px 0",fontSize:9,fontFamily:FM,background:T.bg,border:"none",borderTop:"1px solid "+T.border,color:T.textDim,cursor:"pointer",letterSpacing:"0.05em"}}>
+           {scrShowAll?"▲ Show fewer":`▼ Show all ${newHits.length} (${newHits.length-15} more)`}
+          </button>
+         )}
         </div>
        )}
        {tracked.length>0&&(

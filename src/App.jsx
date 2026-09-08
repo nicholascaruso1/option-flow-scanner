@@ -419,6 +419,7 @@ export default function OptionsScanner() {
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
  const [compact, setCompact] = useState(() => typeof window!=="undefined" && window.innerWidth < 768);
+ const [aqOpen, setAqOpen] = useState(true);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
 const [initDone, setInitDone] = useState(false);
  useEffect(() => {
@@ -698,7 +699,9 @@ const altMap={"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indic
  const altData=altMap[view]||[];
  const aiSetupList = Object.values(aiCards);
 const allSetups = aiSetupList;
-const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
+const _macroSyms=new Set([...CRYPTO,...COMMODITIES,...INDICES].map(x=>x.symbol));
+const optionsOnly=allSetups.filter(x=>!_macroSyms.has(x.symbol));
+const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":COMMODITIES.map(ovl),"indices":INDICES.map(ovl)};
  const _aiSyms=new Set(allSetups.map(s=>s.symbol));
  const everythingData=evAsset==="all"?[...allSetups,...CRYPTO.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...COMMODITIES.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...INDICES.map(ovl).filter(x=>!_aiSyms.has(x.symbol))]:ASSET_MAP[evAsset]||[];
 
@@ -896,7 +899,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <div>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
- {[["all","All"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
+ {[["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>(
  <button key={v} onClick={()=>setEvAsset(v)} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:evAsset===v?T.teal+"20":T.bg,border:"1px solid "+(evAsset===v?T.teal:T.border),borderRadius:0,color:evAsset===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
  ))}
  </div>
@@ -976,7 +979,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  const NUMS=["①","②","③"];
  return(
  <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
- <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+ <div onClick={()=>setAqOpen(p=>!p)} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
  <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
  <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
@@ -987,8 +990,9 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
  <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
  </div>
+ <span style={{marginLeft:"auto",fontSize:9,color:T.textDim,flexShrink:0}}>{aqOpen?"▲":"▼"}</span>
  </div>
- {focusData.length===0?(
+ {aqOpen&&(focusData.length===0?(
  <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
  ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
  const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
@@ -1019,7 +1023,7 @@ const ASSET_MAP={"options":allSetups,"crypto":CRYPTO.map(ovl),"commodities":COMM
  <span style={{fontSize:10,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
  </div>
  );
- })}
+ }))}
  </div>
  );
  })()}

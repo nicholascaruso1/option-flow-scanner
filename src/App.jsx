@@ -1558,7 +1558,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  );
  })()}
- {view!=="screener"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
+ {view!=="screener"&&view!=="news"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
  // Body-close rule: while the NY session is live the daily candle is still forming,

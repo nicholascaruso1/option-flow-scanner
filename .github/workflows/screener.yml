@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -54,6 +55,7 @@ jobs:
           git add public/data/stocks.json
           # Only commit if stocks.json actually changed
           git diff --staged --quiet || git commit -m "chore: nightly screener update [skip ci]"
+          git pull --rebase origin main
           git push
 
       - name: Tier 1 mechanical check (candle-based, isolated from screener/build)
@@ -67,6 +69,7 @@ jobs:
         run: |
           git add scripts/tier1_state.json
           git diff --staged --quiet || git commit -m "chore: tier1 state update [skip ci]"
+          git pull --rebase origin main
           git push
 
       - name: Build site

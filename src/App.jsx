@@ -418,7 +418,6 @@ export default function OptionsScanner() {
  const [scrTab, setScrTab] = useState({});
  const [scrSort, setScrSort] = useState("score");
  const [scrBias, setScrBias] = useState("all");
- const [compact, setCompact] = useState(() => typeof window!=="undefined" && window.innerWidth < 768);
  const [aqOpen, setAqOpen] = useState(true);
  const [openScreenerRows, setOpenScreenerRows] = useState({});
 const [initDone, setInitDone] = useState(false);
@@ -885,7 +884,6 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  );
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
- <button onClick={()=>setCompact(p=>!p)} title={compact?"Exit compact":"Compact scan"} style={{flexShrink:0,padding:"9px 12px",fontSize:11,background:"transparent",border:"none",borderBottom:compact?"2px solid "+T.textSec:"2px solid transparent",color:compact?T.textSec:T.border2,cursor:"pointer",fontFamily:FM}}>☰</button>
  {[["everything","All"],["screener","Screener"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
  {l}
@@ -1598,19 +1596,6 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  const allCk=[...new Set([...ck,...effectiveAutoChecks])];
  const pct=Math.round((allCk.length/CHECKLIST.length)*100);
  const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
- if(compact&&!isOpen)return(
-  <div key={s.symbol} onClick={()=>tog(s.symbol)} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid "+T.border,background:T.surface,cursor:"pointer",borderLeft:"2px solid "+ac}}>
-   <button onClick={e=>{e.stopPropagation();toggleFav(s.symbol);}} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:13,color:isFav?T.gold:T.border2,lineHeight:1,flexShrink:0}}>★</button>
-   <span style={{fontFamily:FD,fontSize:13,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{s.symbol}</span>
-   <PhasePipeline phase={effectivePhase}/>
-   <span style={{fontSize:9,padding:"2px 7px",borderRadius:0,background:dc+"22",color:dc,border:"1px solid "+dc+"44",fontFamily:FM,flexShrink:0}}>{s.direction==="call"?"↑ CALL":s.direction==="put"?"↓ PUT":"WATCH"}</span>
-   <span style={{fontFamily:FD,fontSize:12,color:T.textPri,marginLeft:"auto",flexShrink:0}}>${(liveData[s.symbol]?.price||s.price).toFixed(2)}</span>
-   <span style={{fontFamily:FD,fontSize:10,color:dispChg>0?T.blue:dispChg<0?T.rose:T.textSec,flexShrink:0}}>{dispChg>0?"+":""}{typeof dispChg==="number"?dispChg.toFixed(1):s.chg.toFixed(1)}%</span>
-   {earnD!=null&&earnD<=21&&<span style={{fontSize:8,color:earnC,flexShrink:0}}>⚡{earnD}d</span>}
-   {invAlert&&<span style={{fontSize:8,color:T.rose,flexShrink:0}}>⚠</span>}
-   <span style={{fontSize:8,color:T.border2}}>›</span>
-  </div>
- );
  return(
  <div id={"ofc-"+s.symbol} key={s.symbol} style={{marginBottom:10,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{padding:"10px 14px 0"}}>

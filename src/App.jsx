@@ -749,6 +749,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const _aiSyms=new Set(allSetups.map(s=>s.symbol));
  const everythingData=evAsset==="all"?[...allSetups,...CRYPTO.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...COMMODITIES.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...INDICES.map(ovl).filter(x=>!_aiSyms.has(x.symbol))]:ASSET_MAP[evAsset]||[];
  const aqAll=[...allSetups,...CRYPTO.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...COMMODITIES.map(ovl).filter(x=>!_aiSyms.has(x.symbol)),...INDICES.map(ovl).filter(x=>!_aiSyms.has(x.symbol))];
+ const newsCount=aqAll.filter(s=>getMemoryEvents(memoryData[s.symbol]||[]).length>0).length+Object.values(aiUpdates).filter(ai=>ai&&ai.alert).length;
 
  // ── Alignment scores: computed once per render, memoized on deps ──
  const alignmentScores = useMemo(() => {
@@ -909,7 +910,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
  {[["everything","All"],["screener","Screener"],["news","News"]].map(([v,l])=>(
  <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
- {l}
+ {l}{v==="news"&&newsCount>0&&<span style={{marginLeft:4,color:T.gold}}>{newsCount}</span>}
  </button>
  ))}
  </div>
@@ -2412,21 +2413,26 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
   const _all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
   const _seen=new Set();
   const _allDeduped=_all.filter(s=>_seen.has(s.symbol)?false:(_seen.add(s.symbol),true));
+  const _phaseOf=new Map(_allDeduped.map(s=>[s.symbol,s.phase]));
+  const _sevRank={critical:3,warning:2,info:1};
   const sinceLastSession=_allDeduped.map(s=>{
    const hist=memoryData[s.symbol]||[];
    const events=getMemoryEvents(hist);
    if(events.length===0)return null;
    const last=hist[hist.length-1];
-   return{symbol:s.symbol,name:s.name||s.company||"",events,date:last.date};
-  }).filter(Boolean);
+   const topSev=Math.max(...events.map(e=>_sevRank[e.severity]||0));
+   return{symbol:s.symbol,name:s.name||s.company||"",events,date:last.date,topSev};
+  }).filter(Boolean).sort((a,b)=>b.topSev-a.topSev);
   const activeAlerts=Object.entries(aiUpdates).filter(([,ai])=>ai&&ai.alert).map(([symbol,ai])=>({symbol,alert:ai.alert,alertLevel:ai.alertLevel}));
-  const nearNow=getNearKeyLevels(_allDeduped,liveData);
+  const ACTIVE_PHASES=new Set(["READY","RETRACEMENT","EXPANSION"]);
+  const nearNow=getNearKeyLevels(_allDeduped,liveData).filter(n=>ACTIVE_PHASES.has(_phaseOf.get(n.sym)));
   const sevColor=sev=>sev==="critical"?T.rose:sev==="warning"?T.gold:T.teal;
   const sevIcon=sev=>sev==="critical"?"⚠":sev==="warning"?"⚡":"→";
+  const goToCard=(symbol)=>{setView("everything");setOpen(p=>({...p,[symbol]:true}));setTimeout(()=>{document.getElementById("ofc-"+symbol)?.scrollIntoView({behavior:"smooth",block:"start"});},120);};
   return(
   <div style={{padding:"10px 20px"}}>
    <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em",marginBottom:2}}>🗞 NEWS</div>
-   <div style={{fontSize:9,color:T.textDim,marginBottom:14}}>Aggregated from nightly Tier 1/Tier 2 checks and live price data — not a real-time feed. "Since Last Session" reflects the most recent overnight snapshot per symbol.</div>
+   <div style={{fontSize:9,color:T.textDim,marginBottom:14}}>Aggregated from nightly Tier 1/Tier 2 checks and live price data — not a real-time feed. "Since Last Session" reflects the most recent overnight snapshot per symbol. Click any row to jump to that card.</div>
 
    <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:12}}>
     <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
@@ -2438,7 +2444,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
     )}
     {sinceLastSession.map(({symbol,name,events,date})=>(
-     <div key={symbol} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border}}>
+     <div key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{symbol}</span>
        <span style={{fontSize:9,color:T.textDim}}>{name}</span>
@@ -2461,7 +2467,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
     )}
     {activeAlerts.map(({symbol,alert,alertLevel})=>(
-     <div key={symbol} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start"}}>
+     <div key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
       <span style={{fontSize:9,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
      </div>
@@ -2472,13 +2478,13 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
     <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
      <div style={{width:6,height:6,borderRadius:"50%",background:T.blue,flexShrink:0}}/>
      <span style={{fontSize:9,fontWeight:700,color:T.blue,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Near Key Level Now</span>
-     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{nearNow.length} symbol{nearNow.length!==1?"s":""} · live</span>
+     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{nearNow.length} symbol{nearNow.length!==1?"s":""} · live · active phases only</span>
     </div>
     {nearNow.length===0&&(
-     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>Nothing currently within 0.8% of a tracked key level.</div>
+     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>Nothing in an active phase is currently within 0.8% of a tracked key level.</div>
     )}
     {nearNow.map(({sym,price,label})=>(
-     <div key={sym} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center"}}>
+     <div key={sym} onClick={()=>goToCard(sym)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
       <span style={{fontSize:9,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
      </div>

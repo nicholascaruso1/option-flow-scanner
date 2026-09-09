@@ -1,11 +1,36 @@
 {
-  "generated_at": "2026-09-09T08:05:12.431544+00:00",
+  "generated_at": "2026-09-09T22:46:05.706279+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
     {
-      "ticker": "IONQ",
-      "price": 40.47,
+      "ticker": "PCG",
+      "price": 14.19,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 16.42,
+        "sma50": 16.98,
+        "sma200": 16.69,
+        "avg_vol_m": 52.81,
+        "retr_pct": 34.5,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "CMCSA",
+      "price": 24.59,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -19,18 +44,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 41.96,
-        "sma50": 41.04,
-        "sma200": 44.18,
-        "avg_vol_m": 18.53,
-        "retr_pct": 20.5,
-        "exp_date": "2026-09-08",
+        "sma20": 26.4,
+        "sma50": 24.91,
+        "sma200": 26.44,
+        "avg_vol_m": 21.95,
+        "retr_pct": 19.4,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "CRM",
-      "price": 249.12,
+      "price": 244.16,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -44,168 +69,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 223.5,
-        "sma50": 193.47,
-        "sma200": 200.16,
-        "avg_vol_m": 16.76,
-        "retr_pct": 21.9,
+        "sma20": 225.83,
+        "sma50": 195.19,
+        "sma200": 200.25,
+        "avg_vol_m": 16.85,
+        "retr_pct": 42.2,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "SLB",
-      "price": 57.1,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 54.81,
-        "sma50": 50.75,
-        "sma200": 48.67,
-        "avg_vol_m": 11.71,
-        "retr_pct": 10.5,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "QCOM",
-      "price": 174.09,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 163.86,
-        "sma50": 168.15,
-        "sma200": 166.18,
-        "avg_vol_m": 9.94,
-        "retr_pct": 17.9,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "GLW",
-      "price": 165.96,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 154.29,
-        "sma50": 163.87,
-        "sma200": 143.75,
-        "avg_vol_m": 9.0,
-        "retr_pct": 34.6,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "MDT",
-      "price": 92.39,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 91.88,
-        "sma50": 86.96,
-        "sma200": 88.64,
-        "avg_vol_m": 8.09,
-        "retr_pct": 34.5,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "ON",
-      "price": 71.08,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 5,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 76.01,
-        "sma50": 83.14,
-        "sma200": 78.48,
-        "avg_vol_m": 7.43,
-        "retr_pct": 5.1,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "EIX",
-      "price": 59.33,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 5,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 67.68,
-        "sma50": 72.14,
-        "sma200": 67.39,
-        "avg_vol_m": 6.47,
-        "retr_pct": 6.6,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "BKNG",
-      "price": 180.3,
+      "ticker": "RKLB",
+      "price": 63.07,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -219,18 +94,143 @@
         "liquid": true
       },
       "details": {
-        "sma20": 205.17,
-        "sma50": 194.23,
-        "sma200": 185.29,
-        "avg_vol_m": 5.13,
-        "retr_pct": 6.2,
+        "sma20": 70.2,
+        "sma50": 73.84,
+        "sma200": 79.69,
+        "avg_vol_m": 16.45,
+        "retr_pct": 1.7,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "SLB",
+      "price": 57.05,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 5,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 55.0,
+        "sma50": 50.97,
+        "sma200": 48.78,
+        "avg_vol_m": 12.05,
+        "retr_pct": 8.9,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "QCOM",
+      "price": 176.4,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 5,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 164.59,
+        "sma50": 167.92,
+        "sma200": 166.25,
+        "avg_vol_m": 10.36,
+        "retr_pct": 38.1,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "GLW",
+      "price": 168.46,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 5,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 154.77,
+        "sma50": 162.13,
+        "sma200": 144.19,
+        "avg_vol_m": 9.12,
+        "retr_pct": 11.7,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "ON",
+      "price": 70.98,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 75.5,
+        "sma50": 82.78,
+        "sma200": 78.6,
+        "avg_vol_m": 7.47,
+        "retr_pct": 2.7,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "EIX",
+      "price": 57.44,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 67.05,
+        "sma50": 71.79,
+        "sma200": 67.4,
+        "avg_vol_m": 6.51,
+        "retr_pct": 32.4,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BULL"
       }
     },
     {
       "ticker": "LITE",
-      "price": 978.53,
+      "price": 988.98,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -244,43 +244,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 892.14,
-        "sma50": 819.62,
-        "sma200": 688.88,
-        "avg_vol_m": 4.68,
-        "retr_pct": 18.7,
+        "sma20": 900.56,
+        "sma50": 822.37,
+        "sma200": 692.48,
+        "avg_vol_m": 4.61,
+        "retr_pct": 9.7,
         "exp_date": "2026-09-08",
         "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "LVS",
-      "price": 43.98,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 5,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 45.43,
-        "sma50": 45.88,
-        "sma200": 53.53,
-        "avg_vol_m": 4.53,
-        "retr_pct": 2.5,
-        "exp_date": "2026-08-27",
-        "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "HWM",
-      "price": 231.53,
+      "price": 232.62,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -294,43 +269,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 268.94,
-        "sma50": 274.53,
-        "sma200": 245.5,
-        "avg_vol_m": 3.24,
-        "retr_pct": 12.9,
+        "sma20": 266.5,
+        "sma50": 273.81,
+        "sma200": 245.65,
+        "avg_vol_m": 3.46,
+        "retr_pct": 19.2,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "BEN",
-      "price": 34.65,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 34.12,
-        "sma50": 33.75,
-        "sma200": 28.2,
-        "avg_vol_m": 3.09,
-        "retr_pct": 26.9,
-        "exp_date": "2026-09-04",
-        "exp_dir": "BULL"
       }
     },
     {
       "ticker": "NXPI",
-      "price": 223.87,
+      "price": 223.32,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -344,18 +294,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 227.21,
-        "sma50": 249.21,
-        "sma200": 242.73,
-        "avg_vol_m": 3.03,
-        "retr_pct": 17.3,
+        "sma20": 226.56,
+        "sma50": 248.11,
+        "sma200": 242.91,
+        "avg_vol_m": 3.07,
+        "retr_pct": 11.1,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "TAP",
-      "price": 38.84,
+      "ticker": "UDR",
+      "price": 35.4,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -369,43 +319,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 41.11,
-        "sma50": 40.6,
-        "sma200": 43.01,
-        "avg_vol_m": 2.57,
-        "retr_pct": 8.3,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "DG",
-      "price": 127.87,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 5,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 124.64,
-        "sma50": 122.92,
-        "sma200": 125.34,
-        "avg_vol_m": 2.55,
-        "retr_pct": 42.1,
-        "exp_date": "2026-08-27",
+        "sma20": 37.17,
+        "sma50": 38.4,
+        "sma200": 36.59,
+        "avg_vol_m": 2.97,
+        "retr_pct": 8.0,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "SYK",
-      "price": 276.43,
+      "price": 275.39,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -419,18 +344,68 @@
         "liquid": true
       },
       "details": {
-        "sma20": 325.88,
-        "sma50": 327.77,
-        "sma200": 336.79,
-        "avg_vol_m": 2.47,
-        "retr_pct": 5.0,
+        "sma20": 322.24,
+        "sma50": 326.68,
+        "sma200": 336.36,
+        "avg_vol_m": 2.66,
+        "retr_pct": 1.1,
         "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "CF",
+      "price": 138.11,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 5,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 127.41,
+        "sma50": 122.02,
+        "sma200": 107.77,
+        "avg_vol_m": 2.62,
+        "retr_pct": 31.7,
+        "exp_date": "2026-09-02",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "COO",
+      "price": 63.48,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 72.68,
+        "sma50": 72.42,
+        "sma200": 73.32,
+        "avg_vol_m": 2.04,
+        "retr_pct": 21.9,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "STZ",
-      "price": 120.98,
+      "price": 121.55,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -444,22 +419,22 @@
         "liquid": true
       },
       "details": {
-        "sma20": 132.32,
-        "sma50": 132.15,
-        "sma200": 143.36,
-        "avg_vol_m": 1.92,
-        "retr_pct": 5.2,
+        "sma20": 131.7,
+        "sma50": 131.81,
+        "sma200": 143.33,
+        "avg_vol_m": 1.97,
+        "retr_pct": 10.6,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "XYL",
-      "price": 108.81,
+      "ticker": "FSLR",
+      "price": 203.1,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
-      "weekly_bias": "BEAR",
+      "weekly_bias": "NEUTRAL",
       "weekly_conflict": false,
       "conditions": {
         "topdown_bias": true,
@@ -469,18 +444,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 113.24,
-        "sma50": 116.99,
-        "sma200": 123.16,
-        "avg_vol_m": 1.81,
-        "retr_pct": 32.2,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BULL"
+        "sma20": 211.63,
+        "sma50": 217.94,
+        "sma200": 230.16,
+        "avg_vol_m": 1.97,
+        "retr_pct": 3.2,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "SNPS",
-      "price": 392.03,
+      "price": 393.22,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -494,18 +469,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 413.23,
-        "sma50": 411.36,
-        "sma200": 447.23,
-        "avg_vol_m": 1.79,
-        "retr_pct": 31.0,
+        "sma20": 412.34,
+        "sma50": 410.28,
+        "sma200": 447.27,
+        "avg_vol_m": 1.81,
+        "retr_pct": 34.1,
         "exp_date": "2026-09-04",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "WYNN",
-      "price": 92.22,
+      "ticker": "ODFL",
+      "price": 181.96,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -519,18 +494,68 @@
         "liquid": true
       },
       "details": {
-        "sma20": 97.44,
-        "sma50": 97.67,
-        "sma200": 106.48,
-        "avg_vol_m": 1.52,
-        "retr_pct": 32.1,
-        "exp_date": "2026-08-31",
+        "sma20": 199.18,
+        "sma50": 212.93,
+        "sma200": 196.56,
+        "avg_vol_m": 1.64,
+        "retr_pct": 23.1,
+        "exp_date": "2026-09-03",
         "exp_dir": "BEAR"
       }
     },
     {
+      "ticker": "TXT",
+      "price": 79.89,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 83.22,
+        "sma50": 87.43,
+        "sma200": 90.02,
+        "avg_vol_m": 1.52,
+        "retr_pct": 47.7,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "MAR",
+      "price": 331.52,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 5,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 348.51,
+        "sma50": 359.54,
+        "sma200": 343.96,
+        "avg_vol_m": 1.42,
+        "retr_pct": 6.4,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BULL"
+      }
+    },
+    {
       "ticker": "MLYS",
-      "price": 31.12,
+      "price": 30.5,
       "bias": "BULL",
       "direction": "BULL",
       "met": 5,
@@ -544,18 +569,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 26.71,
-        "sma50": 27.08,
-        "sma200": 29.55,
-        "avg_vol_m": 1.01,
-        "retr_pct": 13.2,
+        "sma20": 26.86,
+        "sma50": 27.16,
+        "sma200": 29.49,
+        "avg_vol_m": 1.07,
+        "retr_pct": 30.6,
         "exp_date": "2026-09-08",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "GNRC",
-      "price": 190.21,
+      "price": 186.48,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 5,
@@ -569,43 +594,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 201.56,
-        "sma50": 214.77,
-        "sma200": 208.74,
-        "avg_vol_m": 0.97,
-        "retr_pct": 42.9,
+        "sma20": 200.09,
+        "sma50": 212.83,
+        "sma200": 208.94,
+        "avg_vol_m": 0.95,
+        "retr_pct": 18.7,
         "exp_date": "2026-08-28",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "VMC",
-      "price": 258.3,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 5,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 272.3,
-        "sma50": 281.03,
-        "sma200": 287.21,
-        "avg_vol_m": 0.89,
-        "retr_pct": 10.9,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "NVDA",
-      "price": 225.73,
+      "price": 223.67,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -619,43 +619,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 220.49,
-        "sma50": 211.23,
-        "sma200": 196.75,
-        "avg_vol_m": 129.26,
-        "retr_pct": 71.6,
+        "sma20": 220.8,
+        "sma50": 211.8,
+        "sma200": 196.94,
+        "avg_vol_m": 128.17,
+        "retr_pct": 55.1,
         "exp_date": "2026-08-28",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "PCG",
-      "price": 14.82,
-      "bias": "BEAR",
+      "ticker": "F",
+      "price": 13.45,
+      "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
       "weekly_bias": "BEAR",
       "weekly_conflict": false,
       "conditions": {
-        "topdown_bias": true,
+        "topdown_bias": false,
         "expansion": true,
-        "in_zone": false,
+        "in_zone": true,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 16.57,
-        "sma50": 17.04,
-        "sma200": 16.69,
-        "avg_vol_m": 50.84,
-        "retr_pct": -1.7,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BULL"
+        "sma20": 14.05,
+        "sma50": 14.01,
+        "sma200": 13.25,
+        "avg_vol_m": 42.37,
+        "retr_pct": 0.0,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "TSLA",
-      "price": 368.16,
+      "price": 367.81,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -669,18 +669,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 350.3,
-        "sma50": 357.72,
-        "sma200": 399.39,
-        "avg_vol_m": 39.26,
-        "retr_pct": 3.5,
+        "sma20": 352.05,
+        "sma50": 356.84,
+        "sma200": 399.21,
+        "avg_vol_m": 39.71,
+        "retr_pct": 5.1,
         "exp_date": "2026-08-31",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "SMR",
-      "price": 11.18,
+      "price": 10.81,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -694,43 +694,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 9.51,
-        "sma50": 9.13,
-        "sma200": 12.96,
-        "avg_vol_m": 34.19,
-        "retr_pct": 12.9,
+        "sma20": 9.55,
+        "sma50": 9.14,
+        "sma200": 12.91,
+        "avg_vol_m": 34.03,
+        "retr_pct": 38.0,
         "exp_date": "2026-09-08",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "MSTR",
-      "price": 136.52,
-      "bias": "MIXED",
+      "ticker": "BAC",
+      "price": 62.67,
+      "bias": "BULL",
       "direction": "BULL",
       "met": 4,
-      "weekly_bias": "BULL",
+      "weekly_bias": "NEUTRAL",
       "weekly_conflict": false,
       "conditions": {
-        "topdown_bias": false,
+        "topdown_bias": true,
         "expansion": true,
         "in_zone": true,
-        "vol_confirm": true,
+        "vol_confirm": false,
         "liquid": true
       },
       "details": {
-        "sma20": 117.48,
-        "sma50": 104.59,
-        "sma200": 138.73,
-        "avg_vol_m": 28.1,
-        "retr_pct": 48.4,
-        "exp_date": "2026-09-03",
+        "sma20": 62.53,
+        "sma50": 61.51,
+        "sma200": 54.41,
+        "avg_vol_m": 29.93,
+        "retr_pct": 29.5,
+        "exp_date": "2026-09-09",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "HPE",
-      "price": 56.03,
+      "price": 58.9,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -744,18 +744,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 54.49,
-        "sma50": 50.25,
-        "sma200": 33.3,
-        "avg_vol_m": 21.97,
-        "retr_pct": -12.5,
+        "sma20": 54.71,
+        "sma50": 50.54,
+        "sma200": 33.5,
+        "avg_vol_m": 22.93,
+        "retr_pct": -43.8,
         "exp_date": "2026-09-03",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "HOOD",
-      "price": 117.34,
+      "price": 115.28,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -769,23 +769,23 @@
         "liquid": true
       },
       "details": {
-        "sma20": 104.44,
-        "sma50": 102.83,
-        "sma200": 95.11,
-        "avg_vol_m": 21.48,
-        "retr_pct": 63.7,
+        "sma20": 105.48,
+        "sma50": 103.1,
+        "sma200": 95.1,
+        "avg_vol_m": 21.81,
+        "retr_pct": 81.1,
         "exp_date": "2026-09-03",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "NOW",
-      "price": 134.21,
-      "bias": "BULL",
-      "direction": "BULL",
+      "ticker": "IONQ",
+      "price": 38.14,
+      "bias": "BEAR",
+      "direction": "BEAR",
       "met": 4,
       "weekly_bias": "BULL",
-      "weekly_conflict": false,
+      "weekly_conflict": true,
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
@@ -794,18 +794,68 @@
         "liquid": true
       },
       "details": {
-        "sma20": 131.95,
-        "sma50": 117.74,
-        "sma200": 118.44,
-        "avg_vol_m": 17.4,
-        "retr_pct": 56.3,
-        "exp_date": "2026-08-27",
+        "sma20": 41.69,
+        "sma50": 40.72,
+        "sma200": 44.13,
+        "avg_vol_m": 19.02,
+        "retr_pct": -26.3,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "SLV",
+      "price": 60.72,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": true,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 60.18,
+        "sma50": 56.29,
+        "sma200": 65.46,
+        "avg_vol_m": 16.6,
+        "retr_pct": 21.6,
+        "exp_date": "2026-08-28",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "KHC",
+      "price": 24.61,
+      "bias": "MIXED",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": true,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 24.96,
+        "sma50": 25.08,
+        "sma200": 23.23,
+        "avg_vol_m": 15.66,
+        "retr_pct": 25.0,
+        "exp_date": "2026-08-26",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "HPQ",
-      "price": 31.17,
+      "price": 32.39,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -819,18 +869,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 30.3,
-        "sma50": 27.37,
-        "sma200": 22.58,
-        "avg_vol_m": 15.09,
-        "retr_pct": -48.0,
+        "sma20": 30.47,
+        "sma50": 27.57,
+        "sma200": 22.64,
+        "avg_vol_m": 15.36,
+        "retr_pct": -88.7,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "ATAI",
-      "price": 7.28,
+      "price": 7.29,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -845,67 +895,42 @@
       },
       "details": {
         "sma20": 7.33,
-        "sma50": 6.77,
-        "sma200": 4.68,
-        "avg_vol_m": 12.95,
-        "retr_pct": 29.4,
+        "sma50": 6.81,
+        "sma200": 4.7,
+        "avg_vol_m": 13.51,
+        "retr_pct": 35.3,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "KMI",
-      "price": 31.98,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "NEUTRAL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 31.82,
-        "sma50": 31.79,
-        "sma200": 30.63,
-        "avg_vol_m": 10.98,
-        "retr_pct": 19.2,
-        "exp_date": "2026-08-26",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "CRWD",
-      "price": 210.02,
-      "bias": "BULL",
-      "direction": "BULL",
+      "ticker": "TSCO",
+      "price": 34.0,
+      "bias": "MIXED",
+      "direction": "BEAR",
       "met": 4,
       "weekly_bias": "BULL",
-      "weekly_conflict": false,
+      "weekly_conflict": true,
       "conditions": {
-        "topdown_bias": true,
+        "topdown_bias": false,
         "expansion": true,
-        "in_zone": false,
+        "in_zone": true,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 209.8,
-        "sma50": 201.51,
-        "sma200": 142.9,
-        "avg_vol_m": 10.34,
-        "retr_pct": -2.8,
-        "exp_date": "2026-08-28",
+        "sma20": 35.02,
+        "sma50": 32.72,
+        "sma200": 41.11,
+        "avg_vol_m": 9.22,
+        "retr_pct": 38.4,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "CSX",
-      "price": 49.0,
+      "price": 48.37,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -919,18 +944,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 50.26,
-        "sma50": 50.05,
-        "sma200": 43.0,
-        "avg_vol_m": 9.15,
-        "retr_pct": 44.0,
+        "sma20": 50.19,
+        "sma50": 50.06,
+        "sma200": 43.07,
+        "avg_vol_m": 9.18,
+        "retr_pct": 20.3,
         "exp_date": "2026-09-01",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "DELL",
-      "price": 533.88,
+      "price": 535.25,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -944,20 +969,95 @@
         "liquid": true
       },
       "details": {
-        "sma20": 469.91,
-        "sma50": 441.93,
-        "sma200": 254.89,
-        "avg_vol_m": 8.4,
-        "retr_pct": -5.9,
+        "sma20": 474.63,
+        "sma50": 444.36,
+        "sma200": 256.97,
+        "avg_vol_m": 8.53,
+        "retr_pct": -8.5,
         "exp_date": "2026-09-03",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "KR",
-      "price": 57.2,
+      "ticker": "GIS",
+      "price": 37.09,
       "bias": "BEAR",
       "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": true,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 39.49,
+        "sma50": 37.76,
+        "sma200": 38.82,
+        "avg_vol_m": 8.51,
+        "retr_pct": 26.8,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "C",
+      "price": 137.8,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 134.95,
+        "sma50": 134.78,
+        "sma200": 122.59,
+        "avg_vol_m": 8.29,
+        "retr_pct": 15.8,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "MDT",
+      "price": 91.89,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": true,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 91.94,
+        "sma50": 87.18,
+        "sma200": 88.61,
+        "avg_vol_m": 8.06,
+        "retr_pct": 23.6,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "WMB",
+      "price": 75.15,
+      "bias": "BULL",
+      "direction": "BULL",
       "met": 4,
       "weekly_bias": "NEUTRAL",
       "weekly_conflict": false,
@@ -969,18 +1069,68 @@
         "liquid": true
       },
       "details": {
-        "sma20": 57.33,
-        "sma50": 57.43,
-        "sma200": 63.3,
-        "avg_vol_m": 5.72,
-        "retr_pct": 23.3,
-        "exp_date": "2026-09-08",
+        "sma20": 73.75,
+        "sma50": 73.33,
+        "sma200": 69.75,
+        "avg_vol_m": 7.19,
+        "retr_pct": 8.6,
+        "exp_date": "2026-08-26",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "FISV",
+      "price": 48.65,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 52.36,
+        "sma50": 52.19,
+        "sma200": 58.2,
+        "avg_vol_m": 6.62,
+        "retr_pct": 1.4,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "BKR",
+      "price": 63.64,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 63.42,
+        "sma50": 60.14,
+        "sma200": 58.31,
+        "avg_vol_m": 6.31,
+        "retr_pct": 6.5,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "HRL",
-      "price": 21.21,
+      "price": 20.97,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -994,18 +1144,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 23.16,
-        "sma50": 24.28,
+        "sma20": 22.99,
+        "sma50": 24.18,
         "sma200": 23.0,
-        "avg_vol_m": 5.53,
-        "retr_pct": -2.8,
+        "avg_vol_m": 5.59,
+        "retr_pct": -14.2,
         "exp_date": "2026-08-27",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "FIS",
-      "price": 39.42,
+      "ticker": "BKNG",
+      "price": 173.43,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 203.2,
+        "sma50": 194.05,
+        "sma200": 185.23,
+        "avg_vol_m": 5.55,
+        "retr_pct": -48.9,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "O",
+      "price": 60.11,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1019,18 +1194,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 41.4,
-        "sma50": 41.92,
-        "sma200": 48.85,
-        "avg_vol_m": 5.33,
-        "retr_pct": 2.3,
-        "exp_date": "2026-09-08",
+        "sma20": 61.92,
+        "sma50": 62.79,
+        "sma200": 60.6,
+        "avg_vol_m": 5.4,
+        "retr_pct": 4.8,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "SNOW",
-      "price": 335.5,
+      "price": 331.48,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1044,18 +1219,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 328.29,
-        "sma50": 299.05,
-        "sma200": 219.35,
-        "avg_vol_m": 5.26,
-        "retr_pct": -68.6,
+        "sma20": 328.15,
+        "sma50": 300.65,
+        "sma200": 219.74,
+        "avg_vol_m": 5.29,
+        "retr_pct": -82.5,
         "exp_date": "2026-09-03",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "CARR",
-      "price": 59.11,
+      "ticker": "LVS",
+      "price": 43.33,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1064,73 +1239,23 @@
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 60.22,
-        "sma50": 64.37,
-        "sma200": 61.08,
-        "avg_vol_m": 5.05,
-        "retr_pct": 31.6,
-        "exp_date": "2026-08-25",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "CTVA",
-      "price": 85.9,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": true,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 81.76,
-        "sma50": 83.26,
-        "sma200": 77.15,
-        "avg_vol_m": 4.62,
-        "retr_pct": 22.2,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "UNH",
-      "price": 400.84,
-      "bias": "MIXED",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": true,
-      "conditions": {
-        "topdown_bias": false,
-        "expansion": true,
-        "in_zone": true,
+        "in_zone": false,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 396.52,
-        "sma50": 411.2,
-        "sma200": 349.61,
-        "avg_vol_m": 4.29,
-        "retr_pct": 22.7,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BULL"
+        "sma20": 45.31,
+        "sma50": 45.83,
+        "sma200": 53.43,
+        "avg_vol_m": 4.69,
+        "retr_pct": -24.2,
+        "exp_date": "2026-08-27",
+        "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "EBAY",
-      "price": 104.59,
+      "price": 103.51,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -1144,18 +1269,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 104.04,
-        "sma50": 108.98,
-        "sma200": 98.21,
-        "avg_vol_m": 4.24,
-        "retr_pct": 12.2,
+        "sma20": 103.93,
+        "sma50": 108.84,
+        "sma200": 98.32,
+        "avg_vol_m": 4.49,
+        "retr_pct": 32.2,
         "exp_date": "2026-09-08",
         "exp_dir": "BULL"
       }
     },
     {
+      "ticker": "VRT",
+      "price": 262.89,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 269.86,
+        "sma50": 281.55,
+        "sma200": 258.44,
+        "avg_vol_m": 4.39,
+        "retr_pct": 9.6,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
       "ticker": "BBY",
-      "price": 89.33,
+      "price": 88.03,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1169,147 +1319,47 @@
         "liquid": true
       },
       "details": {
-        "sma20": 85.73,
-        "sma50": 84.25,
-        "sma200": 70.4,
-        "avg_vol_m": 4.09,
-        "retr_pct": -53.1,
+        "sma20": 85.97,
+        "sma50": 84.46,
+        "sma200": 70.48,
+        "avg_vol_m": 4.12,
+        "retr_pct": -37.3,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "TPR",
-      "price": 117.58,
+      "ticker": "INTU",
+      "price": 313.94,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 129.4,
-        "sma50": 139.69,
-        "sma200": 137.49,
-        "avg_vol_m": 3.93,
-        "retr_pct": 10.2,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "MS",
-      "price": 216.24,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "NEUTRAL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 215.1,
-        "sma50": 215.12,
-        "sma200": 189.57,
-        "avg_vol_m": 3.77,
-        "retr_pct": 0.3,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "IVZ",
-      "price": 32.34,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
       "weekly_bias": "BULL",
-      "weekly_conflict": false,
+      "weekly_conflict": true,
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 32.33,
-        "sma50": 30.42,
-        "sma200": 26.94,
-        "avg_vol_m": 3.63,
-        "retr_pct": 45.3,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "OKE",
-      "price": 97.51,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 94.67,
-        "sma50": 91.34,
-        "sma200": 83.44,
-        "avg_vol_m": 3.37,
-        "retr_pct": 48.8,
-        "exp_date": "2026-09-01",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "CFG",
-      "price": 69.99,
-      "bias": "MIXED",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "NEUTRAL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": false,
-        "expansion": true,
-        "in_zone": true,
+        "in_zone": false,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 71.13,
-        "sma50": 71.26,
-        "sma200": 63.41,
-        "avg_vol_m": 2.98,
-        "retr_pct": 31.3,
-        "exp_date": "2026-09-02",
+        "sma20": 347.62,
+        "sma50": 317.52,
+        "sma200": 421.41,
+        "avg_vol_m": 4.11,
+        "retr_pct": 129.9,
+        "exp_date": "2026-08-26",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "AKAM",
-      "price": 105.61,
-      "bias": "BEAR",
-      "direction": "BEAR",
+      "ticker": "BRK-B",
+      "price": 506.72,
+      "bias": "BULL",
+      "direction": "BULL",
       "met": 4,
-      "weekly_bias": "BEAR",
+      "weekly_bias": "BULL",
       "weekly_conflict": false,
       "conditions": {
         "topdown_bias": true,
@@ -1319,18 +1369,68 @@
         "liquid": true
       },
       "details": {
-        "sma20": 111.85,
-        "sma50": 115.82,
-        "sma200": 109.67,
-        "avg_vol_m": 2.84,
-        "retr_pct": 34.1,
-        "exp_date": "2026-09-08",
+        "sma20": 503.75,
+        "sma50": 503.5,
+        "sma200": 492.45,
+        "avg_vol_m": 4.07,
+        "retr_pct": 33.5,
+        "exp_date": "2026-09-09",
         "exp_dir": "BULL"
       }
     },
     {
+      "ticker": "MS",
+      "price": 215.35,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "NEUTRAL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 215.11,
+        "sma50": 215.22,
+        "sma200": 189.85,
+        "avg_vol_m": 3.78,
+        "retr_pct": 12.4,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "OKE",
+      "price": 95.82,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 94.89,
+        "sma50": 91.5,
+        "sma200": 83.59,
+        "avg_vol_m": 3.4,
+        "retr_pct": 15.3,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
       "ticker": "CLX",
-      "price": 91.6,
+      "price": 89.62,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1344,23 +1444,23 @@
         "liquid": true
       },
       "details": {
-        "sma20": 102.27,
-        "sma50": 99.03,
-        "sma200": 101.09,
-        "avg_vol_m": 2.84,
-        "retr_pct": -95.7,
+        "sma20": 101.41,
+        "sma50": 98.91,
+        "sma200": 101.07,
+        "avg_vol_m": 2.85,
+        "retr_pct": -132.4,
         "exp_date": "2026-08-31",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "DECK",
-      "price": 82.6,
+      "ticker": "CHTR",
+      "price": 133.89,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
+      "weekly_bias": "BULL",
+      "weekly_conflict": true,
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
@@ -1369,22 +1469,22 @@
         "liquid": true
       },
       "details": {
-        "sma20": 88.79,
-        "sma50": 96.75,
-        "sma200": 102.55,
-        "avg_vol_m": 2.73,
-        "retr_pct": 8.1,
-        "exp_date": "2026-09-08",
+        "sma20": 150.29,
+        "sma50": 143.27,
+        "sma200": 181.59,
+        "avg_vol_m": 2.82,
+        "retr_pct": 4.5,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "CF",
-      "price": 134.33,
-      "bias": "BULL",
-      "direction": "BULL",
+      "ticker": "TAP",
+      "price": 38.48,
+      "bias": "BEAR",
+      "direction": "BEAR",
       "met": 4,
-      "weekly_bias": "BULL",
+      "weekly_bias": "BEAR",
       "weekly_conflict": false,
       "conditions": {
         "topdown_bias": true,
@@ -1394,18 +1494,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 126.36,
-        "sma50": 121.36,
-        "sma200": 107.47,
-        "avg_vol_m": 2.62,
-        "retr_pct": 69.5,
-        "exp_date": "2026-09-02",
-        "exp_dir": "BULL"
+        "sma20": 40.96,
+        "sma50": 40.58,
+        "sma200": 42.98,
+        "avg_vol_m": 2.6,
+        "retr_pct": -5.3,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "NDAQ",
-      "price": 95.04,
+      "ticker": "DG",
+      "price": 124.57,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -1419,18 +1519,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 97.45,
-        "sma50": 93.1,
-        "sma200": 90.08,
+        "sma20": 124.86,
+        "sma50": 123.08,
+        "sma200": 125.48,
         "avg_vol_m": 2.58,
-        "retr_pct": 14.6,
-        "exp_date": "2026-09-02",
+        "retr_pct": 0.9,
+        "exp_date": "2026-08-27",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "TTWO",
-      "price": 213.29,
+      "price": 211.14,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1444,43 +1544,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 232.3,
-        "sma50": 239.16,
-        "sma200": 227.76,
-        "avg_vol_m": 2.56,
-        "retr_pct": -19.5,
+        "sma20": 230.34,
+        "sma50": 238.44,
+        "sma200": 227.61,
+        "avg_vol_m": 2.55,
+        "retr_pct": -31.6,
         "exp_date": "2026-08-31",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "CEG",
-      "price": 299.05,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 279.99,
-        "sma50": 266.84,
-        "sma200": 295.28,
-        "avg_vol_m": 2.55,
-        "retr_pct": 4.3,
-        "exp_date": "2026-09-04",
-        "exp_dir": "BULL"
-      }
-    },
-    {
       "ticker": "AMGN",
-      "price": 393.17,
+      "price": 391.27,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -1494,97 +1569,22 @@
         "liquid": true
       },
       "details": {
-        "sma20": 429.26,
-        "sma50": 396.05,
-        "sma200": 354.51,
-        "avg_vol_m": 2.48,
-        "retr_pct": 10.6,
+        "sma20": 428.23,
+        "sma50": 396.71,
+        "sma200": 354.8,
+        "avg_vol_m": 2.52,
+        "retr_pct": 0.5,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "CIEN",
-      "price": 341.29,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 387.43,
-        "sma50": 401.98,
-        "sma200": 377.94,
-        "avg_vol_m": 2.44,
-        "retr_pct": 63.0,
-        "exp_date": "2026-09-03",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "MPC",
-      "price": 397.77,
-      "bias": "BULL",
+      "ticker": "NTAP",
+      "price": 184.74,
+      "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
       "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 366.22,
-        "sma50": 324.25,
-        "sma200": 241.31,
-        "avg_vol_m": 2.44,
-        "retr_pct": 4.8,
-        "exp_date": "2026-09-03",
-        "exp_dir": "BULL"
-      }
-    },
-    {
-      "ticker": "CDNS",
-      "price": 284.11,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 319.87,
-        "sma50": 339.78,
-        "sma200": 327.03,
-        "avg_vol_m": 2.37,
-        "retr_pct": -18.6,
-        "exp_date": "2026-09-04",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "OMC",
-      "price": 81.13,
-      "bias": "MIXED",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "NEUTRAL",
       "weekly_conflict": false,
       "conditions": {
         "topdown_bias": false,
@@ -1594,18 +1594,118 @@
         "liquid": true
       },
       "details": {
-        "sma20": 86.31,
-        "sma50": 82.86,
-        "sma200": 77.15,
-        "avg_vol_m": 2.26,
-        "retr_pct": 8.5,
-        "exp_date": "2026-09-02",
+        "sma20": 192.12,
+        "sma50": 179.96,
+        "sma200": 130.83,
+        "avg_vol_m": 2.51,
+        "retr_pct": 10.2,
+        "exp_date": "2026-09-03",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "NRG",
+      "price": 115.37,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 115.86,
+        "sma50": 125.99,
+        "sma200": 145.34,
+        "avg_vol_m": 2.5,
+        "retr_pct": 48.7,
+        "exp_date": "2026-09-04",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "CIEN",
+      "price": 338.0,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 384.95,
+        "sma50": 399.16,
+        "sma200": 378.68,
+        "avg_vol_m": 2.45,
+        "retr_pct": 56.0,
+        "exp_date": "2026-09-03",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "CDNS",
+      "price": 284.6,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 317.73,
+        "sma50": 338.02,
+        "sma200": 326.92,
+        "avg_vol_m": 2.39,
+        "retr_pct": -16.2,
+        "exp_date": "2026-09-04",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "YUM",
+      "price": 145.16,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 150.89,
+        "sma50": 152.83,
+        "sma200": 154.1,
+        "avg_vol_m": 2.31,
+        "retr_pct": 45.5,
+        "exp_date": "2026-09-09",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "AWK",
-      "price": 140.38,
+      "price": 140.33,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1619,18 +1719,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 137.63,
-        "sma50": 134.73,
-        "sma200": 130.02,
-        "avg_vol_m": 2.14,
-        "retr_pct": 31.2,
+        "sma20": 137.85,
+        "sma50": 134.9,
+        "sma200": 130.1,
+        "avg_vol_m": 2.16,
+        "retr_pct": 32.1,
         "exp_date": "2026-09-02",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "FTV",
-      "price": 56.51,
+      "price": 55.81,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1644,18 +1744,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 59.34,
-        "sma50": 60.48,
-        "sma200": 57.95,
-        "avg_vol_m": 2.13,
-        "retr_pct": -4.8,
+        "sma20": 59.05,
+        "sma50": 60.39,
+        "sma200": 57.98,
+        "avg_vol_m": 2.16,
+        "retr_pct": -35.0,
         "exp_date": "2026-09-01",
         "exp_dir": "BEAR"
       }
     },
     {
+      "ticker": "XYL",
+      "price": 107.64,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 112.49,
+        "sma50": 116.82,
+        "sma200": 123.01,
+        "avg_vol_m": 2.08,
+        "retr_pct": 60.7,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BULL"
+      }
+    },
+    {
       "ticker": "AMT",
-      "price": 175.73,
+      "price": 175.43,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1669,18 +1794,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 174.87,
-        "sma50": 171.12,
+        "sma20": 175.16,
+        "sma50": 171.25,
         "sma200": 175.35,
-        "avg_vol_m": 1.94,
-        "retr_pct": 6.7,
+        "avg_vol_m": 1.96,
+        "retr_pct": 1.4,
         "exp_date": "2026-08-26",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "VEEV",
-      "price": 264.84,
+      "price": 260.8,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1694,45 +1819,20 @@
         "liquid": true
       },
       "details": {
-        "sma20": 258.7,
-        "sma50": 221.87,
-        "sma200": 198.58,
-        "avg_vol_m": 1.93,
-        "retr_pct": 146.5,
+        "sma20": 259.91,
+        "sma50": 223.57,
+        "sma200": 198.52,
+        "avg_vol_m": 1.9,
+        "retr_pct": 165.4,
         "exp_date": "2026-08-27",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "CME",
-      "price": 278.23,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 275.31,
-        "sma50": 259.59,
-        "sma200": 275.21,
-        "avg_vol_m": 1.91,
-        "retr_pct": 24.7,
-        "exp_date": "2026-09-02",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "SPGI",
-      "price": 429.31,
-      "bias": "BULL",
-      "direction": "BULL",
+      "price": 418.36,
+      "bias": "BEAR",
+      "direction": "BEAR",
       "met": 4,
       "weekly_bias": "NEUTRAL",
       "weekly_conflict": false,
@@ -1744,18 +1844,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 429.14,
-        "sma50": 426.49,
-        "sma200": 427.98,
-        "avg_vol_m": 1.85,
-        "retr_pct": 95.7,
+        "sma20": 429.67,
+        "sma50": 427.14,
+        "sma200": 427.77,
+        "avg_vol_m": 1.87,
+        "retr_pct": 136.6,
         "exp_date": "2026-09-01",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "GDDY",
-      "price": 92.88,
+      "price": 93.6,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1769,43 +1869,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 97.34,
-        "sma50": 93.62,
-        "sma200": 96.01,
+        "sma20": 97.49,
+        "sma50": 93.78,
+        "sma200": 95.86,
         "avg_vol_m": 1.82,
-        "retr_pct": 0.1,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "ZBH",
-      "price": 94.22,
-      "bias": "MIXED",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BULL",
-      "weekly_conflict": true,
-      "conditions": {
-        "topdown_bias": false,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 99.33,
-        "sma50": 94.95,
-        "sma200": 91.07,
-        "avg_vol_m": 1.68,
-        "retr_pct": 43.8,
+        "retr_pct": 9.3,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "WRB",
-      "price": 69.77,
+      "price": 69.91,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -1819,68 +1894,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 69.18,
-        "sma50": 71.05,
-        "sma200": 68.65,
-        "avg_vol_m": 1.67,
-        "retr_pct": 36.7,
+        "sma20": 69.17,
+        "sma50": 71.03,
+        "sma200": 68.62,
+        "avg_vol_m": 1.78,
+        "retr_pct": 31.0,
         "exp_date": "2026-09-08",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "ODFL",
-      "price": 187.01,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 200.54,
-        "sma50": 213.68,
-        "sma200": 196.28,
-        "avg_vol_m": 1.65,
-        "retr_pct": 67.5,
-        "exp_date": "2026-09-03",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
-      "ticker": "PODD",
-      "price": 142.28,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 145.99,
-        "sma50": 154.0,
-        "sma200": 209.25,
-        "avg_vol_m": 1.64,
-        "retr_pct": 37.1,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "EXPE",
-      "price": 274.55,
+      "price": 272.6,
       "bias": "MIXED",
       "direction": "BEAR",
       "met": 4,
@@ -1894,18 +1919,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 318.9,
-        "sma50": 294.61,
-        "sma200": 257.97,
-        "avg_vol_m": 1.52,
-        "retr_pct": 11.6,
+        "sma20": 316.5,
+        "sma50": 294.76,
+        "sma200": 258.14,
+        "avg_vol_m": 1.59,
+        "retr_pct": 3.8,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }
     },
     {
+      "ticker": "WYNN",
+      "price": 90.23,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 96.73,
+        "sma50": 97.49,
+        "sma200": 106.34,
+        "avg_vol_m": 1.57,
+        "retr_pct": -15.2,
+        "exp_date": "2026-08-31",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
       "ticker": "BG",
-      "price": 123.89,
+      "price": 123.5,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -1919,43 +1969,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 115.21,
-        "sma50": 113.4,
-        "sma200": 113.08,
-        "avg_vol_m": 1.41,
-        "retr_pct": 165.1,
+        "sma20": 115.84,
+        "sma50": 113.71,
+        "sma200": 113.24,
+        "avg_vol_m": 1.47,
+        "retr_pct": 160.6,
         "exp_date": "2026-08-31",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "PPG",
-      "price": 109.72,
-      "bias": "BEAR",
-      "direction": "BEAR",
+      "ticker": "HCA",
+      "price": 421.83,
+      "bias": "MIXED",
+      "direction": "BULL",
       "met": 4,
-      "weekly_bias": "BEAR",
+      "weekly_bias": "BULL",
       "weekly_conflict": false,
       "conditions": {
-        "topdown_bias": true,
+        "topdown_bias": false,
         "expansion": true,
         "in_zone": true,
-        "vol_confirm": false,
+        "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 113.05,
-        "sma50": 115.1,
-        "sma200": 110.23,
-        "avg_vol_m": 1.27,
-        "retr_pct": 11.1,
-        "exp_date": "2026-09-03",
-        "exp_dir": "BEAR"
+        "sma20": 414.03,
+        "sma50": 403.68,
+        "sma200": 450.31,
+        "avg_vol_m": 1.3,
+        "retr_pct": 16.2,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BULL"
       }
     },
     {
       "ticker": "PTC",
-      "price": 133.26,
+      "price": 128.89,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1969,18 +2019,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 150.52,
-        "sma50": 136.86,
-        "sma200": 148.52,
-        "avg_vol_m": 1.18,
-        "retr_pct": -87.2,
+        "sma20": 149.44,
+        "sma50": 137.16,
+        "sma200": 148.3,
+        "avg_vol_m": 1.25,
+        "retr_pct": -143.7,
         "exp_date": "2026-09-04",
         "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "VRSK",
-      "price": 175.49,
+      "ticker": "SPG",
+      "price": 204.53,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 216.16,
+        "sma50": 221.81,
+        "sma200": 199.72,
+        "avg_vol_m": 1.17,
+        "retr_pct": 5.9,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "AON",
+      "price": 304.69,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -1989,23 +2064,48 @@
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
+        "in_zone": false,
+        "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 186.1,
-        "sma50": 190.44,
-        "sma200": 193.71,
+        "sma20": 341.66,
+        "sma50": 352.05,
+        "sma200": 335.73,
+        "avg_vol_m": 1.16,
+        "retr_pct": 152.8,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "EFX",
+      "price": 168.09,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 185.2,
+        "sma50": 178.19,
+        "sma200": 186.29,
         "avg_vol_m": 1.13,
-        "retr_pct": 1.8,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
+        "retr_pct": 98.6,
+        "exp_date": "2026-09-04",
+        "exp_dir": "BULL"
       }
     },
     {
       "ticker": "PFG",
-      "price": 115.04,
+      "price": 114.02,
       "bias": "BULL",
       "direction": "BULL",
       "met": 4,
@@ -2019,18 +2119,18 @@
         "liquid": true
       },
       "details": {
-        "sma20": 112.04,
-        "sma50": 111.57,
-        "sma200": 97.5,
-        "avg_vol_m": 1.12,
-        "retr_pct": 126.6,
+        "sma20": 112.13,
+        "sma50": 111.7,
+        "sma200": 97.67,
+        "avg_vol_m": 1.13,
+        "retr_pct": 147.6,
         "exp_date": "2026-09-03",
         "exp_dir": "BULL"
       }
     },
     {
       "ticker": "RJF",
-      "price": 176.55,
+      "price": 175.47,
       "bias": "MIXED",
       "direction": "BULL",
       "met": 4,
@@ -2044,43 +2144,118 @@
         "liquid": true
       },
       "details": {
-        "sma20": 177.72,
-        "sma50": 172.83,
-        "sma200": 159.68,
+        "sma20": 177.49,
+        "sma50": 173.37,
+        "sma200": 159.78,
         "avg_vol_m": 1.12,
-        "retr_pct": 10.1,
+        "retr_pct": 22.9,
         "exp_date": "2026-08-26",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "EFX",
-      "price": 171.62,
+      "ticker": "VRSK",
+      "price": 177.99,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
-      "weekly_bias": "NEUTRAL",
+      "weekly_bias": "BEAR",
       "weekly_conflict": false,
       "conditions": {
         "topdown_bias": true,
         "expansion": true,
-        "in_zone": false,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 185.95,
+        "sma50": 190.41,
+        "sma200": 193.49,
+        "avg_vol_m": 1.12,
+        "retr_pct": 29.0,
+        "exp_date": "2026-09-08",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "TKO",
+      "price": 191.08,
+      "bias": "MIXED",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 185.87,
-        "sma50": 177.99,
-        "sma200": 186.47,
-        "avg_vol_m": 1.08,
-        "retr_pct": 67.5,
-        "exp_date": "2026-09-04",
+        "sma20": 191.69,
+        "sma50": 188.84,
+        "sma200": 196.46,
+        "avg_vol_m": 1.03,
+        "retr_pct": 31.4,
+        "exp_date": "2026-09-08",
         "exp_dir": "BULL"
       }
     },
     {
-      "ticker": "AON",
-      "price": 315.79,
+      "ticker": "HUM",
+      "price": 400.02,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 390.13,
+        "sma50": 388.95,
+        "sma200": 280.42,
+        "avg_vol_m": 0.97,
+        "retr_pct": 39.6,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "EXR",
+      "price": 135.63,
+      "bias": "BEAR",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "BEAR",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": false,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 143.85,
+        "sma50": 146.0,
+        "sma200": 139.65,
+        "avg_vol_m": 0.9,
+        "retr_pct": 1.7,
+        "exp_date": "2026-09-09",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "VMC",
+      "price": 249.89,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -2094,43 +2269,43 @@
         "liquid": true
       },
       "details": {
-        "sma20": 344.25,
-        "sma50": 352.49,
-        "sma200": 335.92,
-        "avg_vol_m": 1.07,
-        "retr_pct": 81.6,
+        "sma20": 270.43,
+        "sma50": 279.96,
+        "sma200": 287.05,
+        "avg_vol_m": 0.9,
+        "retr_pct": -69.9,
         "exp_date": "2026-09-01",
-        "exp_dir": "BULL"
+        "exp_dir": "BEAR"
       }
     },
     {
-      "ticker": "TKO",
-      "price": 195.32,
-      "bias": "MIXED",
-      "direction": "BULL",
+      "ticker": "AXON",
+      "price": 490.0,
+      "bias": "BEAR",
+      "direction": "BEAR",
       "met": 4,
-      "weekly_bias": "BULL",
+      "weekly_bias": "BEAR",
       "weekly_conflict": false,
       "conditions": {
-        "topdown_bias": false,
+        "topdown_bias": true,
         "expansion": true,
-        "in_zone": true,
+        "in_zone": false,
         "vol_confirm": true,
         "liquid": true
       },
       "details": {
-        "sma20": 191.87,
-        "sma50": 189.25,
-        "sma200": 196.44,
-        "avg_vol_m": 1.03,
-        "retr_pct": 4.7,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BULL"
+        "sma20": 580.57,
+        "sma50": 567.23,
+        "sma200": 505.21,
+        "avg_vol_m": 0.76,
+        "retr_pct": -44.0,
+        "exp_date": "2026-09-01",
+        "exp_dir": "BEAR"
       }
     },
     {
       "ticker": "MSCI",
-      "price": 551.39,
+      "price": 554.54,
       "bias": "BEAR",
       "direction": "BEAR",
       "met": 4,
@@ -2144,11 +2319,11 @@
         "liquid": true
       },
       "details": {
-        "sma20": 565.34,
-        "sma50": 577.09,
-        "sma200": 569.32,
-        "avg_vol_m": 0.52,
-        "retr_pct": 6.5,
+        "sma20": 565.09,
+        "sma50": 577.07,
+        "sma200": 569.33,
+        "avg_vol_m": 0.51,
+        "retr_pct": 22.9,
         "exp_date": "2026-09-08",
         "exp_dir": "BEAR"
       }

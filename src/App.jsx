@@ -2421,7 +2421,9 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
    if(events.length===0)return null;
    const last=hist[hist.length-1];
    const topSev=Math.max(...events.map(e=>_sevRank[e.severity]||0));
-   return{symbol:s.symbol,name:s.name||s.company||"",events,date:last.date,topSev};
+   const analysisAge=s.dataAsOf?Math.round((Date.now()-Date.parse(s.dataAsOf))/864e5):null;
+   const isStale=analysisAge!=null&&analysisAge>7;
+   return{symbol:s.symbol,name:s.name||s.company||"",events,date:last.date,topSev,dataAsOf:s.dataAsOf,isStale,analysisAge};
   }).filter(Boolean).sort((a,b)=>b.topSev-a.topSev);
   const activeAlerts=Object.entries(aiUpdates).filter(([,ai])=>ai&&ai.alert).map(([symbol,ai])=>({symbol,alert:ai.alert,alertLevel:ai.alertLevel}));
   const ACTIVE_PHASES=new Set(["READY","RETRACEMENT","EXPANSION"]);
@@ -2443,16 +2445,19 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
     {sinceLastSession.length===0&&(
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
     )}
-    {sinceLastSession.map(({symbol,name,events,date})=>(
+    {sinceLastSession.map(({symbol,name,events,date,dataAsOf,isStale,analysisAge})=>(
      <div key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{symbol}</span>
        <span style={{fontSize:9,color:T.textDim}}>{name}</span>
-       <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{date}</span>
+       <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>checked {date}</span>
       </div>
       {events.map((ev,i)=>(
        <div key={i} style={{fontSize:9,color:sevColor(ev.severity),marginTop:2}}>{sevIcon(ev.severity)} {ev.text}</div>
       ))}
+      {isStale&&(
+       <div style={{fontSize:8,color:T.amber,marginTop:4,fontStyle:"italic"}}>⚠ Underlying analysis is {analysisAge}d old (as of {dataAsOf}) — this is today's live price checked against that stale thesis, not a fresh review. Consider Regen.</div>
+      )}
      </div>
     ))}
    </div>

@@ -11,6 +11,18 @@ on:
     - cron: "13 3 * * 2-6"
   workflow_dispatch:  # allows manual run from GitHub Actions tab
 
+# Prevent overlapping runs entirely. Without this, a manual/cron-job.org
+# trigger and a delayed GitHub-native schedule cron can both be mid-run at
+# once, each computing an independent version of scripts/tier1_state.json —
+# when the second run tries to rebase onto the first run's already-pushed
+# changes, git hits a genuine content conflict (not just a push-order
+# problem), which the earlier "pull --rebase before push" fix can't resolve
+# on its own. Queuing new triggers behind an in-progress run eliminates the
+# possibility of two Tier 1 checks racing each other on the same file.
+concurrency:
+  group: nightly-screener
+  cancel-in-progress: false
+
 jobs:
   screen:
     runs-on: ubuntu-latest

@@ -695,7 +695,6 @@ const WORKER = window.location.hostname === "localhost"
     price:h.price, chg:0, vol:"\u2014",
     ...a,
     cap:a.capSize||"Mid", capSize:a.capSize||"Mid",
-    accountFit:a.accountFit||[],
     earningsDate:a.earningsDate&&a.earningsDate!=="null"?a.earningsDate:null,
     earningsLabel:a.earningsLabel&&a.earningsLabel!=="null"?a.earningsLabel:null,
     keyLevels:(a.keyLevels||[]).map(k=>({p:k.p,l:k.l,c:KIND_C[k.kind]||T.gold})),

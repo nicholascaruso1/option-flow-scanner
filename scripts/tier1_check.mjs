@@ -50,6 +50,18 @@ function downgradeConfidence(confidence) {
   return CONFIDENCE_DOWNGRADE[confidence] || confidence;
 }
 
+// Even with zero structural change, a symbol's narrative can go stale —
+// price context, catalysts, and phase notes drift from reality the longer
+// a card sits untouched. This forces a refresh floor independent of the
+// stage/invalidation/confidence triggers below.
+const STALE_ANALYSIS_DAYS = 14;
+function daysSinceAnalysis(dataAsOf) {
+  if (!dataAsOf) return Infinity; // no dataAsOf at all = treat as maximally stale
+  const parsed = Date.parse(dataAsOf);
+  if (Number.isNaN(parsed)) return Infinity;
+  return Math.floor((Date.now() - parsed) / 86400000);
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -233,7 +245,13 @@ async function main() {
       };
 
       const prev = tier1State[symbol];
-      const { changed, reason } = meaningfulChange(prev, next);
+      const structural = meaningfulChange(prev, next);
+      const staleDays = daysSinceAnalysis(card.dataAsOf);
+      const isStale = staleDays >= STALE_ANALYSIS_DAYS;
+      const changed = structural.changed || isStale;
+      const reason = structural.changed
+        ? structural.reason
+        : (isStale ? `stale — analysis is ${staleDays}d old (≥${STALE_ANALYSIS_DAYS}d threshold)` : structural.reason);
 
       console.log(`  ${symbol}: ${prev ? prev.stage : "(new)"} → ${next.stage} — ${changed ? "TRIGGER TIER 2" : "no change"} (${reason})`);
 

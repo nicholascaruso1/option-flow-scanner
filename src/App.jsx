@@ -817,6 +817,52 @@ const WORKER = window.location.hostname === "localhost"
   );
  };
  const CORR_GROUPS = [["BTC","ETH"],["SPY","QQQ","IWM","DIA"],["GLD","SLV"],["PALL","PPLT"]];
+ // Shared Multi-TF tab body — was two nearly-identical JSX blocks; the Options copy
+ // was missing the "no data tracked yet" empty state that alt-view already had, so
+ // that's now included for both.
+ const renderMtfTab = (s) => {
+  const rows=s.mtf||[];
+  const bulls=rows.filter(r=>r[1]==="bull").length;
+  const bears=rows.filter(r=>r[1]==="bear").length;
+  const al=bulls>=4?"Strongly Bullish":bears>=4?"Strongly Bearish":bulls>bears?"Leaning Bullish":bears>bulls?"Leaning Bearish":"Mixed";
+  const alC=bulls>=4?T.sage:bears>=4?T.rose:bulls>bears?T.blue:bears>bulls?T.rose:T.amber;
+  const dc2=(v)=>v==="bull"?T.sage:v==="bear"?T.rose:v==="neut"?T.amber:T.textDim;
+  return(
+   <div>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
+     <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
+     <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
+    </div>
+    {rows.length===0&&<div style={{fontSize:9,color:T.textDim,padding:"10px 0",textAlign:"center"}}>No Multi-TF data tracked for {s.symbol} yet.</div>}
+    {rows.map(([tf,bias,note],i)=>(
+     <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
+      <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
+      <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
+      <span style={{fontSize:9,color:T.textDim}}>{note}</span>
+     </div>
+    ))}
+    <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
+   </div>
+  );
+ };
+ // Shared Key Levels / Catalysts list rendering. The two Levels tabs have genuinely
+ // different content around these lists (Options adds an Invalidation line and an
+ // Earnings block that don't apply to crypto/commodities/indices), so only the list
+ // rendering itself is shared. The Options copy previously mapped s.keyLevels/
+ // s.catalysts with no fallback (would throw if either were ever undefined) - both
+ // now defensively fall back to [] like alt-view already did.
+ const renderKeyLevelsList = (levels, minWidth) => (levels||[]).map((l,i)=>(
+  <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
+   <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth,flexShrink:0,fontFamily:FD}}>{l.p}</span>
+   <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
+  </div>
+ ));
+ const renderCatalystsList = (catalysts) => (catalysts||[]).map((c,i)=>(
+  <div key={i} style={{display:"flex",gap:7,marginBottom:4}}>
+   <span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span>
+   <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
+  </div>
+ ));
  // Pre-Flight gate computation — was duplicated near-verbatim in both card renderers
  // (only difference: alt-view read pfDir=s.direction||s.dir, Options read s.direction
  // directly — both now get the canonical s.direction via the normalized shape).
@@ -1378,45 +1424,14 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {tab==="levels"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Levels</div>
- {(s.keyLevels||s.levels||[]).map((l,i)=>(
- <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
- <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:70,flexShrink:0,fontFamily:FD}}>{l.p}</span>
- <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
- </div>
- ))}
+ {renderKeyLevelsList(s.keyLevels||s.levels, 70)}
  <div style={{borderTop:"1px solid "+T.border,paddingTop:10,marginTop:6}}>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
- {(s.catalysts||s.cats||[]).map((c,i)=>(
- <div key={i} style={{display:"flex",gap:7,marginBottom:4}}><span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span><span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span></div>
- ))}
+ {renderCatalystsList(s.catalysts||s.cats)}
  </div>
  </div>
  )}
- {tab==="mtf"&&(()=>{
-  const rows=s.mtf||[];
-  const bulls=rows.filter(r=>r[1]==="bull").length;
-  const bears=rows.filter(r=>r[1]==="bear").length;
-  const al=bulls>=4?"Strongly Bullish":bears>=4?"Strongly Bearish":bulls>bears?"Leaning Bullish":bears>bulls?"Leaning Bearish":"Mixed";
-  const alC=bulls>=4?T.sage:bears>=4?T.rose:bulls>bears?T.blue:bears>bulls?T.rose:T.amber;
-  const dc2=(v)=>v==="bull"?T.sage:v==="bear"?T.rose:v==="neut"?T.amber:T.textDim;
-  return(
-   <div>
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
-     <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
-     <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
-    </div>
-    {rows.length===0&&<div style={{fontSize:9,color:T.textDim,padding:"10px 0",textAlign:"center"}}>No Multi-TF data tracked for {s.symbol} yet.</div>}
-    {rows.map(([tf,bias,note],i)=>(
-     <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
-      <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
-      <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
-      <span style={{fontSize:9,color:T.textDim}}>{note}</span>
-     </div>
-    ))}
-    <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
-   </div>
-  );
- })()}
+ {tab==="mtf"&&renderMtfTab(s)}
  {tab==="journal"&&(()=>{
   const sym=s.symbol;
   const c1data=c123[sym]||{};
@@ -1852,49 +1867,16 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {tab==="levels"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Price Levels</div>
- {s.keyLevels.map((l,i)=>(
- <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
- <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth:50,flexShrink:0,fontFamily:FD}}>{l.p}</span>
- <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
- </div>
- ))}
+ {renderKeyLevelsList(s.keyLevels, 50)}
  <div style={{padding:"5px 9px",background:T.rose+"0a",border:"1px solid "+T.rose+"20",borderRadius:0,marginBottom:12,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
  <div style={{borderTop:"1px solid "+T.border,paddingTop:12}}>
  {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:0}}><div style={{fontSize:8,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:9,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
- {s.catalysts.map((c,i)=>(
- <div key={i} style={{display:"flex",gap:7,marginBottom:4}}>
- <span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span>
- <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
- </div>
- ))}
+ {renderCatalystsList(s.catalysts)}
  </div>
  </div>
  )}
- {tab==="mtf"&&(()=>{
- const rows=s.mtf||[];
- const bulls=rows.filter(r=>r[1]==="bull").length;
- const bears=rows.filter(r=>r[1]==="bear").length;
- const al=bulls>=4?"Strongly Bullish":bears>=4?"Strongly Bearish":bulls>bears?"Leaning Bullish":bears>bulls?"Leaning Bearish":"Mixed";
- const alC=bulls>=4?T.sage:bears>=4?T.rose:bulls>bears?T.blue:bears>bulls?T.rose:T.amber;
- const dc2=(v)=>v==="bull"?T.sage:v==="bear"?T.rose:v==="neut"?T.amber:T.textDim;
- return(
- <div>
- <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
- <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
- <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
- </div>
- {rows.map(([tf,bias,note],i)=>(
- <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
- <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
- <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
- <span style={{fontSize:9,color:T.textDim}}>{note}</span>
- </div>
- ))}
- <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
- </div>
- );
- })()}
+ {tab==="mtf"&&renderMtfTab(s)}
  {tab==="journal"&&(()=>{
  const sym=s.symbol;
  const c1data=c123[sym]||{};

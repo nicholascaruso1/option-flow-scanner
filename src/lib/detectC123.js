@@ -120,6 +120,7 @@ export function detectC123(candles, direction = "bull") {
       return {
         detected: false,
         stage: last.h > c1.h ? "C2_FORMING" : "C1_ONLY",
+        reason: last.h > c1.h ? `C2 wick above $${c1.h.toFixed(2)} — waiting for body close back below $${c1.c.toFixed(2)}` : `C1 confirmed. Waiting for C2 above $${c1.h.toFixed(2)}.`,
         c1: { idx: c1Idx, o: c1.o, h: c1.h, l: c1.l, c: c1.c },
         protectedSwing: c1.h,
         swingLow: candles[swingLowIdx].l
@@ -142,6 +143,7 @@ export function detectC123(candles, direction = "bull") {
       return {
         detected: false,
         stage: last.h > c2.h ? "C3_FORMING" : "C2_CONFIRMED",
+        reason: last.h > c2.h ? `C3 wick above $${c2.h.toFixed(2)} — waiting for CISD body close below $${bullishLegOriginOpen.toFixed(2)}` : `C2 at $${c2.h.toFixed(2)}. Waiting for C3.`,
         c1: { idx: c1Idx, o: c1.o, h: c1.h, l: c1.l, c: c1.c },
         c2: { idx: c2Idx, o: c2.o, h: c2.h, l: c2.l, c: c2.c },
         ob,

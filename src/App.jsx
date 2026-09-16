@@ -427,6 +427,7 @@ export default function OptionsScanner() {
  const [tabs, setTabs] = useState({});
  const [favs, setFavs] = useState([]);
  const [removedFavs, setRemovedFavs] = useState([]);
+ const [closedTrades, setClosedTrades] = useState([]);
  const [checks, setChecks] = useState({});
  const [ts, setTs] = useState(null);
  const [refreshing, setRefreshing] = useState(false);
@@ -629,6 +630,39 @@ setInitDone(true);
  }, []);
  const kvSyncRef = useRef(null);
 const lastKvPayloadRef = useRef(null);
+const kvRetryRef = useRef(null);
+const [kvSyncError, setKvSyncError] = useState(null);
+// GET-merge-POST instead of a blind POST: fetches the freshest KV document
+// immediately before writing so this sync can't stomp fields the nightly
+// Tier 1 script (or another open tab/device) wrote in between, and only
+// overwrites the keys this browser actually owns. On failure, retries with
+// capped backoff and surfaces kvSyncError instead of silently dropping the
+// write — a save that fails on a network blip previously vanished with no
+// indication and no way to retry it.
+const syncToKv = useCallback(async (payload, serialized, attempt=0) => {
+  try {
+    let base = {};
+    try {
+      const r = await fetch("https://market.electronmailbag.workers.dev/user-data");
+      if (r.ok) base = await r.json();
+    } catch { /* GET failed — fall back to writing just our own keys below */ }
+    const merged = {...base, ...payload};
+    const r2 = await fetch("https://market.electronmailbag.workers.dev/user-data",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(merged)
+    });
+    if(!r2.ok) throw new Error("HTTP "+r2.status);
+    lastKvPayloadRef.current = serialized;
+    setKvSyncError(null);
+    clearTimeout(kvRetryRef.current);
+  } catch {
+    const delay = Math.min(60000, 15000 * Math.pow(2, attempt));
+    setKvSyncError(`⚠ Save failed — retrying in ${Math.round(delay/1000)}s`);
+    clearTimeout(kvRetryRef.current);
+    kvRetryRef.current = setTimeout(()=>syncToKv(payload, serialized, attempt+1), delay);
+  }
+}, []);
 useEffect(()=>{
   if(!initDone) return;
   clearTimeout(kvSyncRef.current);
@@ -642,19 +676,16 @@ useEffect(()=>{
       of_c123:c123,
       of_journal:journalNotes,
       of_preflight:pfChecks,
-      ...(typeof closedTrades!=="undefined"?{of_closed_trades:closedTrades}:{})
+      of_closed_trades:closedTrades
     };
     const serialized=JSON.stringify(payload);
     // Skip the KV write entirely if nothing actually changed since the last
     // successful sync — avoids burning daily KV put() quota on no-op re-renders.
     if(serialized===lastKvPayloadRef.current) return;
-    fetch("https://market.electronmailbag.workers.dev/user-data",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:serialized
-    }).then(r=>{ if(r.ok) lastKvPayloadRef.current=serialized; }).catch(()=>{});
+    clearTimeout(kvRetryRef.current); // a fresh change supersedes any pending retry
+    syncToKv(payload, serialized, 0);
   },10000);
-},[favs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,initDone]);
+},[favs,removedFavs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,closedTrades,initDone,syncToKv]);
 const WORKER = window.location.hostname === "localhost"
    ? "/worker"
    : "https://market.electronmailbag.workers.dev";
@@ -1140,10 +1171,11 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  </div>
  </div>
- {(liveTs||liveError)&&(
+ {(liveTs||liveError||kvSyncError)&&(
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
  {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
  {liveError&&<span title={liveErrorDetail||""} style={{fontSize:9,color:T.amber,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.amber}}>{liveError}</span>}
+ {kvSyncError&&<span title="Your favorites, checklist, and notes are safe locally and will sync once this succeeds." style={{fontSize:9,color:T.rose,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.rose}}>{kvSyncError}</span>}
  {(()=>{
  const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const near=getNearKeyLevels(all,liveData);

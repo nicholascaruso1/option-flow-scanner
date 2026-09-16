@@ -189,6 +189,14 @@ async function main() {
   }
 
   const nextState = { ...tier1State };
+  // Detection state for symbols that triggered Tier 2 is held here, NOT written
+  // into nextState yet — it's only safe to persist once the corresponding card
+  // content has actually landed in KV. Committing it earlier (the previous
+  // behavior) meant a failed KV write could leave tier1_state.json claiming a
+  // stage the live card never actually reflects, and since meaningfulChange()
+  // only fires on a further stage change, that symbol would then be stuck
+  // showing stale content forever with no self-healing retrigger.
+  const pendingNextState = {};
   const tier2Fired = [];
   const errors = [];
 
@@ -276,30 +284,46 @@ async function main() {
           console.log(`  ${symbol}: Tier 2 card saved (dataAsOf: ${updatedCard.dataAsOf})`);
         }
         tier2Fired.push({ symbol, reason });
+        // Held back until the KV write below actually succeeds.
+        pendingNextState[symbol] = next;
+      } else {
+        // No KV dependency for an unchanged symbol — safe to persist immediately.
+        nextState[symbol] = next;
       }
-
-      nextState[symbol] = next;
     } catch (e) {
       console.error(`  ${symbol}: ERROR — ${e.message}`);
       errors.push({ symbol, error: e.message });
     }
   }
 
-  console.log("Tier 1: persisting updated state to file...");
-  writeFileSync(STATE_FILE, JSON.stringify(nextState, null, 2));
-
+  let kvWriteFailed = false;
   if (tier2Fired.length > 0) {
     console.log("Tier 1: saving updated AI cards to KV...");
-    await postUserData({ ...kv, of_ai_cards: aiCards });
-    console.log("Tier 1: KV save complete.");
+    try {
+      // Re-fetch immediately before writing rather than reusing the snapshot
+      // from the top of this run (which can now be several minutes stale after
+      // the sequential candle/weekly/Tier-2 fetches above) — shrinks the window
+      // in which this write can clobber a concurrent browser-side KV sync.
+      const freshKv = await getUserData();
+      await postUserData({ ...freshKv, of_ai_cards: { ...(freshKv.of_ai_cards || {}), ...aiCards } });
+      console.log("Tier 1: KV save complete.");
+      Object.assign(nextState, pendingNextState);
+    } catch (e) {
+      kvWriteFailed = true;
+      console.error(`Tier 1: KV save FAILED — ${e.message}`);
+      console.error(`Tier 1: NOT persisting detection state for ${Object.keys(pendingNextState).join(", ")} — will re-check fresh next run instead of getting stuck on stale content.`);
+    }
   }
+
+  console.log("Tier 1: persisting updated state to file...");
+  writeFileSync(STATE_FILE, JSON.stringify(nextState, null, 2));
 
   console.log(`\nTier 1 summary: ${symbols.length} checked, ${tier2Fired.length} Tier 2 trigger(s), ${errors.length} error(s)`);
   if (tier2Fired.length) console.log("Tier 2 fired for:", tier2Fired.map((t) => `${t.symbol} (${t.reason})`).join("; "));
   if (errors.length) console.log("Errors:", errors.map((e) => `${e.symbol}: ${e.error}`).join("; "));
 
-  if (errors.length === symbols.length && symbols.length > 0) {
-    process.exitCode = 1; // hard fail only if every symbol errored
+  if (kvWriteFailed || (errors.length === symbols.length && symbols.length > 0)) {
+    process.exitCode = 1; // surface a failed KV save, or a run where every symbol errored
   }
 }
 

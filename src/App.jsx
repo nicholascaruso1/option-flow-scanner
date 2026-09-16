@@ -722,7 +722,100 @@ const WORKER = window.location.hostname === "localhost"
  const setTab = (sym,t) => setTabs(p=>({...p,[sym]:t}));
  const getTab = (sym) => tabs[sym]||"narrative";
  const cc = (v) => v>0?T.blue:v<0?T.rose:T.textSec;
- const ovl = (x) => aiCards[x.symbol] ? {...x, ...aiCards[x.symbol]} : x;
+ // Normalizes crypto/commodities/indices literals onto the same field names Options
+ // setups already use (direction/company/capSize), so the card renderer can read one
+ // canonical shape instead of branching on asset class. Legacy dir/name/cap are left
+ // in place untouched — nothing currently reading them elsewhere breaks.
+ const ovl = (x) => {
+  const merged = aiCards[x.symbol] ? {...x, ...aiCards[x.symbol]} : x;
+  return {...merged, direction: merged.direction||merged.dir, company: merged.name||merged.company||"", capSize: merged.capSize||merged.cap};
+ };
+ // Shared Checklist tab body — was two byte-for-byte-identical JSX blocks (one in the
+ // alt-view/Everything renderer, one in the Options renderer). Closes over candleData,
+ // open, clearChecks and toggleCheck from component scope; per-card values are passed in.
+ const renderChecklistTab = (s, allCk, ck, pct, effectiveAutoChecks) => {
+  const cd=candleData[s.symbol];
+  return(
+  <div>
+   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+    <div>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+     <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+      <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
+     </div>
+    </div>
+    <div style={{display:"flex",gap:8,alignItems:"center"}}>
+     <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
+     {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
+    </div>
+   </div>
+   {(()=>{
+    if (!cd&&!open[s.symbol]) return null;
+    const stageColor={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber,NO_C1:T.textDim,INSUFFICIENT_DATA:T.textDim,FETCH_ERROR:T.rose};
+    const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
+    const dr=cd?.daily, ir=cd?.intraday;
+    return(
+     <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
+      <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
+      {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
+      {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
+      {dr&&!cd?.loading&&(
+       <div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
+         <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
+         {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
+        </div>
+        {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
+        {dr.detected&&dr.ob&&(
+         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+          {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
+           <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
+            <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+            <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+           </div>
+          ))}
+         </div>
+        )}
+        {ir&&(
+         <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+           <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
+           <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
+           {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
+          {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
+          </div>
+          {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
+         </div>
+        )}
+       </div>
+      )}
+      {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
+     </div>
+    );
+   })()}
+   {CHECKLIST.map(item=>{
+    const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
+    return(
+    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+     <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
+     {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+     </div>
+     <div style={{flex:1}}>
+     <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
+     <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
+     {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
+     {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
+     </div>
+     <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+     </div>
+    </div>
+    );
+   })}
+   {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
+  </div>
+  );
+ };
  const CORR_GROUPS = [["BTC","ETH"],["SPY","QQQ","IWM","DIA"],["GLD","SLV"],["PALL","PPLT"]];
  const computeLiveDivergence = (sym) => {
   const group = CORR_GROUPS.find(g => g.includes(sym));
@@ -1068,7 +1161,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const isFav=favs.includes(s.symbol);
  const tab=getTab(s.symbol);
  const ac=ph.color;
- const dc=s.dir==="call"?T.blue:s.dir==="put"?T.rose:T.slate;
+ const dc=s.direction==="call"?T.blue:s.direction==="put"?T.rose:T.slate;
  const ck=checks[s.symbol]||[];
  const cd=candleData[s.symbol];
  const candleAutoChecks=[];
@@ -1115,7 +1208,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
  <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
  <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
- <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</span>
+ <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  </div>
  <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0,flexWrap:"wrap"}}>
  {(()=>{
@@ -1134,8 +1227,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
  <span style={pill(ac)}>{ph.icon} {ph.label}</span>
- <span style={pill(dc)}>{s.dir==="call"?"Long ↑":s.dir==="put"?"Short ↓":"Watch"}</span>
- {s.cap&&<span style={pill(CAP_COLORS[s.cap]||T.slate)}>{s.cap}</span>}
+ <span style={pill(dc)}>{s.direction==="call"?"Long ↑":s.direction==="put"?"Short ↓":"Watch"}</span>
+ {s.capSize&&<span style={pill(CAP_COLORS[s.capSize]||T.slate)}>{s.capSize}</span>}
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
@@ -1200,88 +1293,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
  </div>
  )}
- {tab==="checklist"&&(()=>{
-  return(
-  <div>
-   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-    <div>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
-     <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
-      <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
-     </div>
-    </div>
-    <div style={{display:"flex",gap:8,alignItems:"center"}}>
-     <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
-     {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
-    </div>
-   </div>
-   {(()=>{
-    if (!cd&&!open[s.symbol]) return null;
-    const stageColor={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber,NO_C1:T.textDim,INSUFFICIENT_DATA:T.textDim,FETCH_ERROR:T.rose};
-    const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
-    const dr=cd?.daily, ir=cd?.intraday;
-    return(
-     <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
-      <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
-      {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
-      {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
-      {dr&&!cd?.loading&&(
-       <div>
-        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
-         <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
-         {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
-        </div>
-        {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
-        {dr.detected&&dr.ob&&(
-         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
-          {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
-           <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
-            <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-            <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
-           </div>
-          ))}
-         </div>
-        )}
-        {ir&&(
-         <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-           <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
-           <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
-           {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
-          {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
-          </div>
-          {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
-         </div>
-        )}
-       </div>
-      )}
-      {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
-     </div>
-    );
-   })()}
-   {CHECKLIST.map(item=>{
-    const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
-    return(
-    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
-     <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-     {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
-     </div>
-     <div style={{flex:1}}>
-     <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
-     <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
-     {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
-     {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
-     </div>
-     <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
-     </div>
-    </div>
-    );
-   })}
-   {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
-  </div>
-  );
- })()}
+ {tab==="checklist"&&renderChecklistTab(s, allCk, ck, pct, effectiveAutoChecks)}
  {tab==="entry"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
@@ -1829,89 +1841,7 @@ const pfSwing=(pfCd?.protected_swing??aiCards[pfSym]?.protected_swing)??null;
  </div>
  );
  })()}
- {tab==="checklist"&&(()=>{
- return(
- <div>
- <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
- <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
- <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
- <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
- </div>
- </div>
- <div style={{display:"flex",gap:8,alignItems:"center"}}>
- <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
- {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
- </div>
- </div>
- {(()=>{
-  const cd=candleData[s.symbol];
-  if (!cd&&!open[s.symbol]) return null;
-  const stageColor={C3_CISD_CONFIRMED:T.sage,C3_FORMING:T.gold,C2_CONFIRMED:T.gold,C2_FORMING:T.amber,C1_ONLY:T.amber,NO_C1:T.textDim,INSUFFICIENT_DATA:T.textDim,FETCH_ERROR:T.rose};
-  const confColor={HIGH:T.sage,MEDIUM:T.gold,LOW:T.rose};
-  const dr=cd?.daily, ir=cd?.intraday;
-  return(
-   <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
-    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
-    {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
-    {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
-    {dr&&!cd?.loading&&(
-     <div>
-      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
-       <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
-       {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
-      </div>
-      {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
-      {dr.detected&&dr.ob&&(
-       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
-        {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
-         <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
-          <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-          <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
-         </div>
-        ))}
-       </div>
-      )}
-      {ir&&(
-       <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
-        <div style={{display:"flex",alignItems:"center",gap:6}}>
-         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
-         <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
-         {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
-        {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
-        </div>
-        {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
-       </div>
-      )}
-     </div>
-    )}
-    {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
-   </div>
-  );
- })()}
- {CHECKLIST.map(item=>{
- const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
- return(
- <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
- <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
- {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
- </div>
- <div style={{flex:1}}>
- <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
- <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
- {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
- {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
- </div>
- <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
- </div>
- </div>
- );
- })}
- {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
- </div>
- );
- })()}
+ {tab==="checklist"&&renderChecklistTab(s, allCk, ck, pct, effectiveAutoChecks)}
  {tab==="entry"&&(
  <div>
  <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>"Entry — 3-Candle Swing · 4pm Close"</div>

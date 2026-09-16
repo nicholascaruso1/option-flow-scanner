@@ -863,6 +863,82 @@ const WORKER = window.location.hostname === "localhost"
    <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
   </div>
  ));
+ // Shared Journal tab — was two byte-identical JSX blocks (options used local var
+ // name `cd` where alt-view used `cd2` to dodge an outer-scope collision; purely
+ // cosmetic, function-scoped here either way). Closes over c123/setC123,
+ // journalNotes/setJournalNotes, journalInput/setJournalInput from component scope.
+ const renderJournalTab = (s) => {
+  const sym=s.symbol;
+  const c1data=c123[sym]||{};
+  const notes=journalNotes[sym]||[];
+  const setCandle=(candle,confirmed)=>{
+   const ts2=confirmed?new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):null;
+   const next={...c123,[sym]:{...c1data,[candle]:confirmed?{confirmed:true,ts:ts2}:null}};
+   setC123(next);ss("of_c123",next);
+  };
+  const addNote=()=>{
+   const inp=journalInput[sym]||"";
+   if(!inp.trim())return;
+   const newnote={ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),note:inp.trim()};
+   const next={...journalNotes,[sym]:[newnote,...(journalNotes[sym]||[])]};
+   setJournalNotes(next);ss("of_journal",next);
+   setJournalInput({...journalInput,[sym]:""});
+  };
+  const candles=[
+   {key:"c1",label:"C1",color:T.blue,desc:"Direction candle — prior move confirming the trend. Sets up the swing."},
+   {key:"c2",label:"C2",color:T.gold,desc:"Failure swing — middle candle making the extreme. BODY close through level required. Wick-only = invalid."},
+   {key:"c3",label:"C3",color:T.sage,desc:"CISD body close — Change in State of Delivery. Drop to lower TF and confirm body close. Missing CISD = skip."},
+  ];
+  const seqDone=candles.every(c=>c1data[c.key]&&c1data[c.key].confirmed);
+  return(
+   <div>
+    <div style={{marginBottom:12}}>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
+     {seqDone&&(
+      <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
+     )}
+     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+      {candles.map(({key,label,color,desc})=>{
+       const cd2=c1data[key]||{};
+       return(
+       <div key={key} style={{background:cd2.confirmed?color+"10":T.bg,border:"1px solid "+(cd2.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
+       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+       <span style={{fontSize:13,fontWeight:700,color:cd2.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
+       <div style={{width:8,height:8,borderRadius:"50%",background:cd2.confirmed?color:T.border2}}/>
+       </div>
+       <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
+       {cd2.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd2.ts}</div>}
+       <button onClick={()=>setCandle(key,!cd2.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd2.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd2.confirmed?T.rose+"50":color+"50"),color:cd2.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd2.confirmed?"RESET":"CONFIRM"}</button>
+       </div>
+       );
+      })}
+     </div>
+    </div>
+    <div>
+     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
+     <div style={{display:"flex",gap:6,marginBottom:8}}>
+      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+      <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
+     </div>
+     {notes.length===0&&s.logEntry&&(
+      <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
+       <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
+       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
+      </div>
+     )}
+     {notes.map((n,i)=>(
+      <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
+       <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
+       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
+      </div>
+     ))}
+     {notes.length===0&&!s.logEntry&&(
+      <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
+     )}
+    </div>
+   </div>
+  );
+ };
  // Pre-Flight gate computation — was duplicated near-verbatim in both card renderers
  // (only difference: alt-view read pfDir=s.direction||s.dir, Options read s.direction
  // directly — both now get the canonical s.direction via the normalized shape).
@@ -1432,78 +1508,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  )}
  {tab==="mtf"&&renderMtfTab(s)}
- {tab==="journal"&&(()=>{
-  const sym=s.symbol;
-  const c1data=c123[sym]||{};
-  const notes=journalNotes[sym]||[];
-  const setCandle=(candle,confirmed)=>{
-   const ts2=confirmed?new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):null;
-   const next={...c123,[sym]:{...c1data,[candle]:confirmed?{confirmed:true,ts:ts2}:null}};
-   setC123(next);ss("of_c123",next);
-  };
-  const addNote=()=>{
-   const inp=journalInput[sym]||"";
-   if(!inp.trim())return;
-   const newnote={ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),note:inp.trim()};
-   const next={...journalNotes,[sym]:[newnote,...(journalNotes[sym]||[])]};
-   setJournalNotes(next);ss("of_journal",next);
-   setJournalInput({...journalInput,[sym]:""});
-  };
-  const candles=[
-   {key:"c1",label:"C1",color:T.blue,desc:"Direction candle — prior move confirming the trend. Sets up the swing."},
-   {key:"c2",label:"C2",color:T.gold,desc:"Failure swing — middle candle making the extreme. BODY close through level required. Wick-only = invalid."},
-   {key:"c3",label:"C3",color:T.sage,desc:"CISD body close — Change in State of Delivery. Drop to lower TF and confirm body close. Missing CISD = skip."},
-  ];
-  const seqDone=candles.every(c=>c1data[c.key]&&c1data[c.key].confirmed);
-  return(
-   <div>
-    <div style={{marginBottom:12}}>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
-     {seqDone&&(
-      <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
-     )}
-     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
-      {candles.map(({key,label,color,desc})=>{
-       const cd2=c1data[key]||{};
-       return(
-       <div key={key} style={{background:cd2.confirmed?color+"10":T.bg,border:"1px solid "+(cd2.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
-       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-       <span style={{fontSize:13,fontWeight:700,color:cd2.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
-       <div style={{width:8,height:8,borderRadius:"50%",background:cd2.confirmed?color:T.border2}}/>
-       </div>
-       <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
-       {cd2.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd2.ts}</div>}
-       <button onClick={()=>setCandle(key,!cd2.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd2.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd2.confirmed?T.rose+"50":color+"50"),color:cd2.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd2.confirmed?"RESET":"CONFIRM"}</button>
-       </div>
-       );
-      })}
-     </div>
-    </div>
-    <div>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
-     <div style={{display:"flex",gap:6,marginBottom:8}}>
-      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
-      <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
-     </div>
-     {notes.length===0&&s.logEntry&&(
-      <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
-       <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
-       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
-      </div>
-     )}
-     {notes.map((n,i)=>(
-      <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
-       <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
-       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
-      </div>
-     ))}
-     {notes.length===0&&!s.logEntry&&(
-      <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
-     )}
-    </div>
-   </div>
-  );
- })()}
+ {tab==="journal"&&renderJournalTab(s)}
  </div>
  </div>
  )}
@@ -1709,11 +1714,6 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
  <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(()=>{
- const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol);
- const liveChg=(x)=>liveData[x.symbol]?.chg??x.chg;
- const sameDirL=sameDir.map(x=>({...x,chg:liveChg(x)}));
- const sL={...s,chg:liveChg(s)};
- const rsLeader=sameDirL.length>0?[...sameDirL].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0))[0]:null;
  return(
  <div>
  {memNarrative&&(
@@ -1780,8 +1780,6 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  })()}
  {tab==="phase"&&(()=>{
  const ci=TL_STEPS.indexOf(s.phase);
- 
- const sameDir=allSetups.filter(x=>x.direction===s.direction&&x.symbol!==s.symbol&&x.phase!=="EXPANSION");
  return(
  <div>
  <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
@@ -1877,78 +1875,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  )}
  {tab==="mtf"&&renderMtfTab(s)}
- {tab==="journal"&&(()=>{
- const sym=s.symbol;
- const c1data=c123[sym]||{};
- const notes=journalNotes[sym]||[];
- const setCandle=(candle,confirmed)=>{
-  const ts2=confirmed?new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):null;
-  const next={...c123,[sym]:{...c1data,[candle]:confirmed?{confirmed:true,ts:ts2}:null}};
-  setC123(next);ss("of_c123",next);
- };
- const addNote=()=>{
-  const inp=journalInput[sym]||"";
-  if(!inp.trim())return;
-  const newnote={ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),note:inp.trim()};
-  const next={...journalNotes,[sym]:[newnote,...(journalNotes[sym]||[])]};
-  setJournalNotes(next);ss("of_journal",next);
-  setJournalInput({...journalInput,[sym]:""});
- };
- const candles=[
-  {key:"c1",label:"C1",color:T.blue,desc:"Direction candle — prior move confirming the trend. Sets up the swing."},
-  {key:"c2",label:"C2",color:T.gold,desc:"Failure swing — middle candle making the extreme. BODY close through level required. Wick-only = invalid."},
-  {key:"c3",label:"C3",color:T.sage,desc:"CISD body close — Change in State of Delivery. Drop to lower TF and confirm body close. Missing CISD = skip."},
- ];
- const seqDone=candles.every(c=>c1data[c.key]&&c1data[c.key].confirmed);
- return(
- <div>
- <div style={{marginBottom:12}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
- {seqDone&&(
- <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
- )}
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
- {candles.map(({key,label,color,desc})=>{
-  const cd=c1data[key]||{};
-  return(
-  <div key={key} style={{background:cd.confirmed?color+"10":T.bg,border:"1px solid "+(cd.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
-  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-  <span style={{fontSize:13,fontWeight:700,color:cd.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
-  <div style={{width:8,height:8,borderRadius:"50%",background:cd.confirmed?color:T.border2}}/>
-  </div>
-  <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
-  {cd.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd.ts}</div>}
-  <button onClick={()=>setCandle(key,!cd.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd.confirmed?T.rose+"50":color+"50"),color:cd.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd.confirmed?"RESET":"CONFIRM"}</button>
-  </div>
-  );
- })}
- </div>
- </div>
- <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
- <div style={{display:"flex",gap:6,marginBottom:8}}>
- <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
- <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
- </div>
- {notes.length===0&&s.logEntry&&(
- <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
- </div>
- )}
- {notes.map((n,i)=>(
- <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
- <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
- </div>
- ))}
- {notes.length===0&&!s.logEntry&&(
- <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
- )}
- </div>
- </div>
- );
- })()}
+ {tab==="journal"&&renderJournalTab(s)}
  </div>
  </div>
  )}

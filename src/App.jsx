@@ -3,7 +3,7 @@ import { detectC123 } from "./lib/detectC123";
 import { parseInvalidation, checkInvalidation } from "./lib/invalidation";
 const T = {
  bg:"#000000", surface:"#090B0A", border:"#16211B", border2:"#1F2E24",
- textPri:"#EAEAE6", textSec:"#8B928B", textDim:"#454A45",
+ textPri:"#EAEAE6", textSec:"#8B928B", textDim:"#757D75",
  gold:"#C9A84C", goldDim:"#6B5520", blue:"#4A90D9", rose:"#C0445A",
  sage:"#3D8B6E", green:"#3DBF7A", amber:"#B87333", slate:"#5A7A9A", teal:"#2A8B7A", purple:"#8B5CF6",
 };
@@ -833,7 +833,7 @@ const WORKER = window.location.hostname === "localhost"
    {CHECKLIST.map(item=>{
     const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
     return(
-    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} role={isAuto?undefined:"button"} tabIndex={isAuto?undefined:0} onKeyDown={isAuto?undefined:e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCheck(s.symbol,item.id);}}} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
      <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
      {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
      </div>
@@ -965,7 +965,7 @@ const WORKER = window.location.hostname === "localhost"
     <div>
      <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
      <div style={{display:"flex",gap:6,marginBottom:8}}>
-      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" aria-label="Add journal observation" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
       <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
      </div>
      {notes.length===0&&s.logEntry&&(
@@ -1029,7 +1029,7 @@ const WORKER = window.location.hostname === "localhost"
   const {pfSym,pfDir,pfChecks2,pfMtfRows,pfDirBias,pfMtfCount,pfMtfOk,pfSessOk,pfDayOk,pfDayNote,pfCd,pfOte_low,pfOte_high,pfC123ok,pfLivePrice,pfOteOk,pfSwing,pfSwingOk,pfTotal,pfPassing,pfVerdict,pfVColor,pfIsPfOpen}=pf;
   return (
   <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:0,overflow:"hidden"}}>
-   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
+   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} role="button" tabIndex={0} aria-expanded={pfIsPfOpen} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}));}}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
     <div style={{display:"flex",alignItems:"center",gap:10}}>
     <span style={{fontSize:12,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
     <span style={{fontSize:9,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
@@ -1068,7 +1068,7 @@ const WORKER = window.location.hostname === "localhost"
     ].map(g=>{
      const ck2=pfChecks2.includes(g.id);
      return(
-     <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+     <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
       <div style={{width:12,height:12,borderRadius:0,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
        {ck2&&<span style={{color:T.bg,fontSize:7,fontWeight:900}}>✓</span>}
       </div>
@@ -1261,7 +1261,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
   <div style={{background:T.bg,borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
-   <div onClick={()=>_inv>0&&setView("invalidated")} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
+   <div onClick={()=>_inv>0&&setView("invalidated")} role={_inv>0?"button":undefined} tabIndex={_inv>0?0:undefined} onKeyDown={_inv>0?e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setView("invalidated");}}:undefined} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
   </div>
   </div>
@@ -1295,7 +1295,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  ].map(([label,val,setter,opts])=>(
  <div key={label}>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>{label}</div>
- <select value={val} onChange={e=>setter(e.target.value)} style={sel}>
+ <select value={val} onChange={e=>setter(e.target.value)} aria-label={label} style={sel}>
  {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
  </select>
  </div>
@@ -1312,7 +1312,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  ].map(([label,val,setter,opts])=>(
  <div key={label}>
  <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4}}>{label}</div>
- <select value={val} onChange={e=>setter(e.target.value)} style={sel}>
+ <select value={val} onChange={e=>setter(e.target.value)} aria-label={label} style={sel}>
  {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
  </select>
  </div>
@@ -1364,7 +1364,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const NUMS=["①","②","③"];
  return(
  <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
- <div onClick={()=>setAqOpen(p=>!p)} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
+ <div onClick={()=>setAqOpen(p=>!p)} role="button" tabIndex={0} aria-expanded={aqOpen} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setAqOpen(p=>!p);}}} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
  <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
  <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
@@ -1943,10 +1943,10 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
-     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." style={{fontSize:9,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
+     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." aria-label="Search ticker" style={{fontSize:9,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
-      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
+      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} aria-label="Sort screener results" style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
        <option value="score">Score ↓</option>
        <option value="retr">Retracement %</option>
        <option value="ticker">Ticker A–Z</option>
@@ -2261,7 +2261,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
     )}
     {sinceLastSession.map(({symbol,name,events,date,dataAsOf,isStale,analysisAge})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
+     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(symbol);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
        <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{symbol}</span>
        <span style={{fontSize:9,color:T.textDim}}>{name}</span>
@@ -2287,7 +2287,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
     )}
     {activeAlerts.map(({symbol,alert,alertLevel})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
+     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(symbol);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
       <span style={{fontSize:9,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
      </div>
@@ -2304,7 +2304,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>Nothing in an active phase is currently within 0.8% of a tracked key level.</div>
     )}
     {nearNow.map(({sym,price,label})=>(
-     <div key={sym} onClick={()=>goToCard(sym)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
+     <div key={sym} onClick={()=>goToCard(sym)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(sym);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
       <span style={{fontSize:9,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
      </div>
@@ -2338,7 +2338,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
- <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+ <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A90D9;outline-offset:2px}"}</style>
  </div>
  );
 }

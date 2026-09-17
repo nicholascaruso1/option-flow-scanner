@@ -2338,7 +2338,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
- <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A90D9;outline-offset:2px}"}</style>
+ <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A6D92;outline-offset:2px}"}</style>
  </div>
  );
 }

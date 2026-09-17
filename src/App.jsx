@@ -441,6 +441,17 @@ function Pressable({ onClick, disabled, children, ...rest }) {
   );
 }
 
+// Favorite-toggle star. Renders as a real SVG (inherits color via currentColor)
+// instead of the ★ emoji glyph, which rendered inconsistently across OS/browser
+// and couldn't take on the app's own theme colors directly.
+function StarIcon({ filled, size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" style={{ display: "block" }}>
+      <path d="M12 2.5l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9-6.3 3.9 1.7-7-5.4-4.7 7.1-.6z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 // Named font-size scale. Values match what was already in use everywhere -
 // this pass only names them, it does not change any rendered size.
 // Collapsing this down to fewer tiers is a separate visual-design decision.
@@ -829,7 +840,7 @@ const WORKER = window.location.hostname === "localhost"
         </div>
         {dr.reason&&<div style={{fontSize:FS.sm,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
         {dr.detected&&dr.ob&&(
-         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:4,marginTop:4}}>
           {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
            <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
             <div style={{fontSize:FS.xxs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
@@ -970,7 +981,7 @@ const WORKER = window.location.hostname === "localhost"
      {seqDone&&(
       <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:FS.sm,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
      )}
-     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:6}}>
       {candles.map(({key,label,color,desc})=>{
        const cd2=c1data[key]||{};
        return(
@@ -990,7 +1001,7 @@ const WORKER = window.location.hostname === "localhost"
     <div>
      <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
      <div style={{display:"flex",gap:6,marginBottom:8}}>
-      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" aria-label="Add journal observation" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:FS.sm,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" aria-label="Add journal observation" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:FS.sm,padding:"5px 8px",borderRadius:0,fontFamily:FM}}/>
       <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:FS.sm,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
      </div>
      {notes.length===0&&s.logEntry&&(
@@ -1190,13 +1201,13 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:FS.lg,borderRadius:0,fontFamily:FM,outline:"none",cursor:"pointer"};
+ const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:FS.lg,borderRadius:0,fontFamily:FM,cursor:"pointer"};
  const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:FS.base,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
  const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:FS.sm,fontWeight:700,padding:"2px 8px",borderRadius:0,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
- <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
+ <div className="of-header-row" style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
  <div>
  <div style={{fontFamily:FM,fontStyle:"normal",fontSize:FS.price,fontWeight:700,color:T.gold,lineHeight:1,letterSpacing:"-0.02em"}}>Option Flow</div>
  <div style={{fontSize:FS.sm,color:T.textDim,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:3}}>Proprietary Options Intelligence</div>
@@ -1466,7 +1477,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
- <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:FS.hero,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
+ <button onClick={()=>toggleFav(s.symbol)} aria-label={isFav?"Remove from favorites":"Add to favorites"} aria-pressed={isFav} style={{background:"none",border:"none",cursor:"pointer",padding:0,color:isFav?T.gold:T.border2,lineHeight:1}}><StarIcon filled={isFav}/></button>
  <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:FS.base,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  </div>
@@ -1529,7 +1540,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{fontSize:FS.base,color:T.textSec}}>{memNarrative}</div>
  </div>
  )}
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+ <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:8,marginBottom:10}}>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
  </div>
@@ -1710,7 +1721,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
- <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:FS.hero,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
+ <button onClick={()=>toggleFav(s.symbol)} aria-label={isFav?"Remove from favorites":"Add to favorites"} aria-pressed={isFav} style={{background:"none",border:"none",cursor:"pointer",padding:0,color:isFav?T.gold:T.border2,lineHeight:1}}><StarIcon filled={isFav}/></button>
  <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
  <span style={{fontSize:FS.base,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  </div>
@@ -1787,7 +1798,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{fontSize:FS.base,color:T.textSec}}>{memNarrative}</div>
  </div>
  )}
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+ <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:8,marginBottom:10}}>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}>
  <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
  <div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div>
@@ -1916,7 +1927,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {renderEntryPreFlight(pf)}
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
  <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
- <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+ <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:6}}>
  {[["Delta","0.35–0.45"],["DTE","Farthest affordable"],["IV Rank","< 30"],["Stop","-40% on premium"]].map(([k,v])=>(
  <div key={k}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{k}</div><div style={{fontSize:FS.base,color:T.textPri,fontFamily:FD}}>{v}</div></div>
  ))}
@@ -1967,7 +1978,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{fontSize:FS.sm,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
-     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." aria-label="Search ticker" style={{fontSize:FS.sm,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
+     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." aria-label="Search ticker" style={{fontSize:FS.sm,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,width:120}}/>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
       <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
       <select value={scrSort} onChange={e=>setScrSort(e.target.value)} aria-label="Sort screener results" style={{fontSize:FS.sm,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
@@ -2164,7 +2175,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
                  {sd.confidence&&<span style={{fontSize:FS.xxs,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:0,color:cc[sd.confidence]}}>{sd.confidence}</span>}
                 </div>
                 {sd.reason&&<div style={{fontSize:FS.sm,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
-                {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
+                {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:4,marginTop:4}}>
                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
                   <div key={k} style={{background:T.bg,borderRadius:0,padding:"4px 6px"}}>
                    <div style={{fontSize:FS.xxs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
@@ -2362,7 +2373,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{marginTop:8,textAlign:"center",fontSize:FS.xs,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
- <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A6D92;outline-offset:2px}"}</style>
+ <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A6D92;outline-offset:2px} @media (max-width:640px){.of-header-row{flex-direction:column;align-items:flex-start !important}.of-header-row > div:last-child{align-items:flex-start !important;width:100%}}"}</style>
  </div>
  );
 }

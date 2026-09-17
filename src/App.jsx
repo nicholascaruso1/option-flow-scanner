@@ -423,6 +423,24 @@ const TL_STEPS = ["EXPANSION","CONSOLIDATION","RETRACEMENT","READY","MANAGING"];
 // Use on any element with role="button" that isn't a real <button>.
 const keyActivate = fn => e => { if (e.key==="Enter" || e.key===" ") { e.preventDefault(); fn(); } };
 
+// Shared clickable-<div> wrapper: adds keyboard support (role, tabIndex,
+// Enter/Space activation) around arbitrary children. Pass disabled to render
+// a plain non-interactive <div> instead (e.g. a stat cell with nothing to do
+// yet). Any extra prop (style, title, aria-expanded, className) passes through.
+function Pressable({ onClick, disabled, children, ...rest }) {
+  return (
+    <div
+      onClick={disabled ? undefined : onClick}
+      role={disabled ? undefined : "button"}
+      tabIndex={disabled ? undefined : 0}
+      onKeyDown={disabled ? undefined : keyActivate(onClick)}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
 // Named font-size scale. Values match what was already in use everywhere -
 // this pass only names them, it does not change any rendered size.
 // Collapsing this down to fewer tiers is a separate visual-design decision.
@@ -843,7 +861,7 @@ const WORKER = window.location.hostname === "localhost"
    {CHECKLIST.map(item=>{
     const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
     return(
-    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} role={isAuto?undefined:"button"} tabIndex={isAuto?undefined:0} onKeyDown={isAuto?undefined:keyActivate(()=>toggleCheck(s.symbol,item.id))} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+    <Pressable key={item.id} onClick={()=>toggleCheck(s.symbol,item.id)} disabled={isAuto} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
      <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
      {isCk&&<span style={{color:T.bg,fontSize:FS.xs,fontWeight:900}}>✓</span>}
      </div>
@@ -855,7 +873,7 @@ const WORKER = window.location.hostname === "localhost"
      </div>
      <div style={{color:T.textDim,fontSize:FS.sm}}>{item.desc}</div>
      </div>
-    </div>
+    </Pressable>
     );
    })}
    {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:FS.base,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
@@ -1039,7 +1057,7 @@ const WORKER = window.location.hostname === "localhost"
   const {pfSym,pfDir,pfChecks2,pfMtfRows,pfDirBias,pfMtfCount,pfMtfOk,pfSessOk,pfDayOk,pfDayNote,pfCd,pfOte_low,pfOte_high,pfC123ok,pfLivePrice,pfOteOk,pfSwing,pfSwingOk,pfTotal,pfPassing,pfVerdict,pfVColor,pfIsPfOpen}=pf;
   return (
   <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:0,overflow:"hidden"}}>
-   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} role="button" tabIndex={0} aria-expanded={pfIsPfOpen} onKeyDown={keyActivate(()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen})))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
+   <Pressable onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} aria-expanded={pfIsPfOpen} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
     <div style={{display:"flex",alignItems:"center",gap:10}}>
     <span style={{fontSize:FS.lg,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
     <span style={{fontSize:FS.sm,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
@@ -1051,7 +1069,7 @@ const WORKER = window.location.hostname === "localhost"
     <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
     <span style={{fontSize:FS.xs,color:T.textDim}}>{pfIsPfOpen?"▲":"▼"}</span>
     </div>
-   </div>
+   </Pressable>
    {pfIsPfOpen&&(
    <div style={{padding:"10px 12px"}}>
     <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Auto-Detected</div>
@@ -1078,7 +1096,7 @@ const WORKER = window.location.hostname === "localhost"
     ].map(g=>{
      const ck2=pfChecks2.includes(g.id);
      return(
-     <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} role="button" tabIndex={0} onKeyDown={keyActivate(()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);})} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+     <Pressable key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
       <div style={{width:12,height:12,borderRadius:0,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
        {ck2&&<span style={{color:T.bg,fontSize:FS.xxs,fontWeight:900}}>✓</span>}
       </div>
@@ -1086,7 +1104,7 @@ const WORKER = window.location.hostname === "localhost"
        <div style={{fontSize:FS.sm,color:ck2?T.teal:T.textSec,fontWeight:ck2?600:400}}>{g.label}</div>
        <div style={{fontSize:FS.xs,color:T.textDim,lineHeight:1.5}}>{g.desc}</div>
       </div>
-     </div>
+     </Pressable>
      );
     })}
    </div>
@@ -1271,9 +1289,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
   <div style={{background:T.bg,borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
-   <div onClick={()=>_inv>0&&setView("invalidated")} role={_inv>0?"button":undefined} tabIndex={_inv>0?0:undefined} onKeyDown={_inv>0?keyActivate(()=>setView("invalidated")):undefined} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
+   <Pressable onClick={()=>setView("invalidated")} disabled={_inv===0} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
-  </div>
+  </Pressable>
   </div>
  );
  })()}
@@ -1374,7 +1392,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const NUMS=["①","②","③"];
  return(
  <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
- <div onClick={()=>setAqOpen(p=>!p)} role="button" tabIndex={0} aria-expanded={aqOpen} onKeyDown={keyActivate(()=>setAqOpen(p=>!p))} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
+ <Pressable onClick={()=>setAqOpen(p=>!p)} aria-expanded={aqOpen} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
  <span style={{fontSize:FS.xs,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
  <span style={{fontSize:FS.xs,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
@@ -1386,7 +1404,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <span style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
  </div>
  <span style={{marginLeft:"auto",fontSize:FS.sm,color:T.textDim,flexShrink:0}}>{aqOpen?"▲":"▼"}</span>
- </div>
+ </Pressable>
  {aqOpen&&(focusData.length===0?(
  <div style={{padding:"14px 16px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
  ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
@@ -2271,7 +2289,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
     )}
     {sinceLastSession.map(({symbol,name,events,date,dataAsOf,isStale,analysisAge})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(symbol))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
+     <Pressable key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
        <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri}}>{symbol}</span>
        <span style={{fontSize:FS.sm,color:T.textDim}}>{name}</span>
@@ -2283,7 +2301,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
       {isStale&&(
        <div style={{fontSize:FS.xs,color:T.amber,marginTop:4,fontStyle:"italic"}}>⚠ Underlying analysis is {analysisAge}d old (as of {dataAsOf}) — this is today's live price checked against that stale thesis, not a fresh review. Consider Regen.</div>
       )}
-     </div>
+     </Pressable>
     ))}
    </div>
 
@@ -2297,10 +2315,10 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
     )}
     {activeAlerts.map(({symbol,alert,alertLevel})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(symbol))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
+     <Pressable key={symbol} onClick={()=>goToCard(symbol)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
       <span style={{fontSize:FS.sm,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
-     </div>
+     </Pressable>
     ))}
    </div>
 
@@ -2314,10 +2332,10 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
      <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>Nothing in an active phase is currently within 0.8% of a tracked key level.</div>
     )}
     {nearNow.map(({sym,price,label})=>(
-     <div key={sym} onClick={()=>goToCard(sym)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(sym))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
+     <Pressable key={sym} onClick={()=>goToCard(sym)} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
       <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
       <span style={{fontSize:FS.sm,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
-     </div>
+     </Pressable>
     ))}
    </div>
   </div>

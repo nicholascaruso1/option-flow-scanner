@@ -455,7 +455,6 @@ export default function OptionsScanner() {
  const [tabs, setTabs] = useState({});
  const [favs, setFavs] = useState([]);
  const [removedFavs, setRemovedFavs] = useState([]);
- const [closedTrades, setClosedTrades] = useState([]);
  const [checks, setChecks] = useState({});
  const [ts, setTs] = useState(null);
  const [refreshing, setRefreshing] = useState(false);
@@ -530,7 +529,6 @@ try {
     if(kv.of_c123&&Object.keys(kv.of_c123).length){setC123(kv.of_c123);ss("of_c123",kv.of_c123);}
     if(kv.of_journal&&Object.keys(kv.of_journal).length){setJournalNotes(kv.of_journal);ss("of_journal",kv.of_journal);}
     if(kv.of_preflight&&Object.keys(kv.of_preflight).length){setPfChecks(kv.of_preflight);ss("of_preflight",kv.of_preflight);}
-    if(kv.of_closed_trades?.length){setClosedTrades(kv.of_closed_trades);ss("of_closed_trades",kv.of_closed_trades);}
   }
 }catch(e){/* KV unavailable — localStorage values already applied above */}
 setInitDone(true);
@@ -708,8 +706,7 @@ useEffect(()=>{
       of_ai_cards:aiCards,
       of_c123:c123,
       of_journal:journalNotes,
-      of_preflight:pfChecks,
-      of_closed_trades:closedTrades
+      of_preflight:pfChecks
     };
     const serialized=JSON.stringify(payload);
     // Skip the KV write entirely if nothing actually changed since the last
@@ -718,7 +715,7 @@ useEffect(()=>{
     clearTimeout(kvRetryRef.current); // a fresh change supersedes any pending retry
     syncToKv(payload, serialized, 0);
   },10000);
-},[favs,removedFavs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,closedTrades,initDone,syncToKv]);
+},[favs,removedFavs,checks,aiUpdates,aiCards,c123,journalNotes,pfChecks,initDone,syncToKv]);
 const WORKER = window.location.hostname === "localhost"
    ? "/worker"
    : "https://market.electronmailbag.workers.dev";
@@ -1186,7 +1183,6 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  : allSetups.filter(s => {
  if (view==="favorites") return favs.includes(s.symbol);
  if (view==="invalidated") { const _h=memoryData[s.symbol]||[]; const _l=_h[_h.length-1]; return _l&&_l.invalidated; }
- if (view==="closed") return false;
  if (dir==="calls" && s.direction!=="call") return false;
  if (dir==="puts" && s.direction!=="put") return false;
  if (dir==="watch" && s.direction!=="watch") return false;
@@ -1297,12 +1293,12 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  })()}
  <div style={{display:"flex",borderBottom:"1px solid "+T.border,background:T.bg,overflowX:"auto",padding:"0 20px"}}>
  {[["everything","All"],["screener","Screener"],["news","News"]].map(([v,l])=>(
- <button key={v} onClick={()=>setView(v)} style={tbtn(view===v)}>
+ <button key={v} onClick={()=>setView(v)} style={tbtn(view===v||(v==="everything"&&(view==="favorites"||view==="invalidated")))}>
  {l}{v==="news"&&newsCount>0&&<span style={{marginLeft:4,color:T.gold}}>{newsCount}</span>}
  </button>
  ))}
  </div>
- {(isEverything||view==="favorites")&&(
+ {(isEverything||view==="favorites"||view==="invalidated")&&(
  <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
  <div>
  <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
@@ -2344,9 +2340,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
 
  {(view==="all"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
- <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
- <span style={{fontSize:FS.sm,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology{!fwOpen?" — Private":""}</span>
- <span style={{fontSize:FS.sm,color:T.textDim}}>{fwOpen?"▲":"🔒"}</span>
+ <button onClick={()=>setFwOpen(p=>!p)} aria-expanded={fwOpen} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+ <span style={{fontSize:FS.sm,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology</span>
+ <span style={{fontSize:FS.sm,color:T.textDim}}>{fwOpen?"▲":"▼"}</span>
  </button>
  {fwOpen&&(
  <div style={{padding:"0 16px 12px",fontSize:FS.base,color:T.textSec,lineHeight:2,borderTop:"1px solid "+T.border}}>

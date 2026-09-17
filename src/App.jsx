@@ -962,7 +962,6 @@ const WORKER = window.location.hostname === "localhost"
  const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
  const corrMembers=corrGroup?corrGroup.map(m=>({sym:m,chg:liveData[m]?.chg})).filter(m=>typeof m.chg==="number"):[];
  if(!corrGroup||corrMembers.length<2) return null;
- const corrDiv=computeLiveDivergence(s.symbol);
  return(
  <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
@@ -975,7 +974,6 @@ const WORKER = window.location.hostname === "localhost"
  <span style={{fontSize:FS.sm,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
  </div>
  ))}
- {corrDiv&&<div style={{marginTop:6,fontSize:FS.sm,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
  </div>
  );
  };

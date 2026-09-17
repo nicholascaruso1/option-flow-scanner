@@ -244,7 +244,7 @@ function PhasePipeline({phase}){
      }}/>}
     </span>);
    })}
-   <span style={{fontSize:8,color:inv?T.rose:T.textDim,fontFamily:FM,marginLeft:5,letterSpacing:"0.06em"}}>
+   <span style={{fontSize:FS.xs,color:inv?T.rose:T.textDim,fontFamily:FM,marginLeft:5,letterSpacing:"0.06em"}}>
     {inv?"WATCH":stages[cur]?.key||""}
    </span>
   </div>
@@ -418,6 +418,16 @@ const INDICES=[
 const AS_OF = new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 const PHASE_ORDER = ["READY","RETRACEMENT","CONSOLIDATION","EXPANSION","MANAGING","WATCH_REVERSAL"];
 const TL_STEPS = ["EXPANSION","CONSOLIDATION","RETRACEMENT","READY","MANAGING"];
+
+// Fires fn on Enter or Space and prevents the page from scrolling on Space.
+// Use on any element with role="button" that isn't a real <button>.
+const keyActivate = fn => e => { if (e.key==="Enter" || e.key===" ") { e.preventDefault(); fn(); } };
+
+// Named font-size scale. Values match what was already in use everywhere -
+// this pass only names them, it does not change any rendered size.
+// Collapsing this down to fewer tiers is a separate visual-design decision.
+const FS = { micro:5, tiny:6, xxs:7, xs:8, sm:9, base:10, lg:12, hero:16, price:22, giant:32 };
+
 export default function OptionsScanner() {
  const [view, setView] = useState("everything");
  const [dir, setDir] = useState("both");
@@ -775,14 +785,14 @@ const WORKER = window.location.hostname === "localhost"
   <div>
    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
     <div>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+     <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
      <div style={{width:130,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
       <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
      </div>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center"}}>
-     <span style={{fontSize:8,color:T.textDim}}>🤖 auto · ✋ manual</span>
-     {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:8,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
+     <span style={{fontSize:FS.xs,color:T.textDim}}>🤖 auto · ✋ manual</span>
+     {ck.length>0&&<button onClick={()=>clearChecks(s.symbol)} style={{fontSize:FS.xs,padding:"2px 7px",background:"transparent",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose,cursor:"pointer"}}>Clear</button>}
     </div>
    </div>
    {(()=>{
@@ -792,23 +802,23 @@ const WORKER = window.location.hostname === "localhost"
     const dr=cd?.daily, ir=cd?.intraday;
     return(
      <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
-      <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
-      {cd?.loading&&<div style={{fontSize:9,color:T.textDim}}>Fetching OHLC data...</div>}
-      {cd?.error&&<div style={{fontSize:9,color:T.rose}}>Error: {cd.error}</div>}
+      <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Auto-Detection · 30-Day OHLC</div>
+      {cd?.loading&&<div style={{fontSize:FS.sm,color:T.textDim}}>Fetching OHLC data...</div>}
+      {cd?.error&&<div style={{fontSize:FS.sm,color:T.rose}}>Error: {cd.error}</div>}
       {dr&&!cd?.loading&&(
        <div>
         <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-         <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
-         <span style={{fontSize:9,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
-         {dr.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
+         <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>Daily</span>
+         <span style={{fontSize:FS.sm,fontWeight:600,color:stageColor[dr.stage]||T.textSec}}>{dr.stage?.replace(/_/g," ")}</span>
+         {dr.confidence&&<span style={{fontSize:FS.xxs,padding:"1px 5px",background:(confColor[dr.confidence]||T.textDim)+"20",border:"1px solid "+(confColor[dr.confidence]||T.textDim)+"40",borderRadius:0,color:confColor[dr.confidence]||T.textDim}}>{dr.confidence}</span>}
         </div>
-        {dr.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
+        {dr.reason&&<div style={{fontSize:FS.sm,color:T.textSec,marginBottom:4}}>{dr.reason}</div>}
         {dr.detected&&dr.ob&&(
          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
           {[["OB Mean","$"+dr.ob.mean.toFixed(2)],["Prot. Swing","$"+dr.protectedSwing?.toFixed(2)],["OTE Zone","$"+dr.oteZone?.low.toFixed(2)+"–$"+dr.oteZone?.high.toFixed(2)]].map(([k,v])=>(
            <div key={k} style={{background:T.surface,borderRadius:0,padding:"4px 6px"}}>
-            <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-            <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+            <div style={{fontSize:FS.xxs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+            <div style={{fontSize:FS.sm,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
            </div>
           ))}
          </div>
@@ -816,39 +826,39 @@ const WORKER = window.location.hostname === "localhost"
         {ir&&(
          <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border}}>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-           <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
-           <span style={{fontSize:9,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
-           {ir.detected&&<span style={{fontSize:7,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
-          {ir.stage==="MANUAL"&&<span style={{fontSize:7,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
+           <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>5-Min IC-CISD</span>
+           <span style={{fontSize:FS.sm,fontWeight:600,color:stageColor[ir.stage]||T.textSec}}>{ir.stage?.replace(/_/g," ")}</span>
+           {ir.detected&&<span style={{fontSize:FS.xxs,padding:"1px 5px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ CONFIRMED</span>}
+          {ir.stage==="MANUAL"&&<span style={{fontSize:FS.xxs,padding:"1px 5px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>manual</span>}
           </div>
-          {ir.reason&&!ir.detected&&<div style={{fontSize:9,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
+          {ir.reason&&!ir.detected&&<div style={{fontSize:FS.sm,color:ir.stage==="MANUAL"?T.textDim:T.textSec,marginTop:2}}>{ir.reason}</div>}
          </div>
         )}
        </div>
       )}
-      {!cd&&<div style={{fontSize:9,color:T.textDim}}>Open card to run detection</div>}
+      {!cd&&<div style={{fontSize:FS.sm,color:T.textDim}}>Open card to run detection</div>}
      </div>
     );
    })()}
    {CHECKLIST.map(item=>{
     const isAuto=effectiveAutoChecks.includes(item.id), isMan=ck.includes(item.id), isCk=isAuto||isMan;
     return(
-    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} role={isAuto?undefined:"button"} tabIndex={isAuto?undefined:0} onKeyDown={isAuto?undefined:e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCheck(s.symbol,item.id);}}} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
+    <div key={item.id} onClick={()=>!isAuto&&toggleCheck(s.symbol,item.id)} role={isAuto?undefined:"button"} tabIndex={isAuto?undefined:0} onKeyDown={isAuto?undefined:keyActivate(()=>toggleCheck(s.symbol,item.id))} style={{display:"flex",gap:8,marginBottom:5,cursor:isAuto?"default":"pointer",padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":isMan?T.teal+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":isMan?T.teal+"25":T.border),transition:"all 0.15s"}}>
      <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:isMan?T.teal:"transparent",border:"1.5px solid "+(isAuto?T.sage:isMan?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-     {isCk&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+     {isCk&&<span style={{color:T.bg,fontSize:FS.xs,fontWeight:900}}>✓</span>}
      </div>
      <div style={{flex:1}}>
      <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
-     <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:10}}>{item.label}</span>
-     {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
-     {isMan&&!isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
+     <span style={{color:isAuto?T.sage:isMan?T.teal:T.textSec,fontWeight:isCk?600:400,fontSize:FS.base}}>{item.label}</span>
+     {isAuto&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
+     {isMan&&!isAuto&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:T.teal+"15",border:"1px solid "+T.teal+"30",borderRadius:0,color:T.teal}}>manual</span>}
      </div>
-     <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+     <div style={{color:T.textDim,fontSize:FS.sm}}>{item.desc}</div>
      </div>
     </div>
     );
    })}
-   {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:10,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
+   {pct===100&&<div style={{marginTop:8,padding:"9px 11px",background:T.sage+"10",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage,fontSize:FS.base,textAlign:"center",fontWeight:600}}>All criteria met — ready to execute</div>}
   </div>
   );
  };
@@ -866,18 +876,18 @@ const WORKER = window.location.hostname === "localhost"
   return(
    <div>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"9px 11px",background:T.bg,borderRadius:0,border:"1px solid "+alC+"30"}}>
-     <div><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:12,fontWeight:700,color:alC}}>{al}</div></div>
-     <div style={{fontSize:9,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
+     <div><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Aggregate Bias</div><div style={{fontSize:FS.lg,fontWeight:700,color:alC}}>{al}</div></div>
+     <div style={{fontSize:FS.sm,color:T.textDim}}><span style={{color:T.sage,marginRight:6}}>↑ {bulls}</span><span style={{color:T.rose,marginRight:6}}>↓ {bears}</span></div>
     </div>
-    {rows.length===0&&<div style={{fontSize:9,color:T.textDim,padding:"10px 0",textAlign:"center"}}>No Multi-TF data tracked for {s.symbol} yet.</div>}
+    {rows.length===0&&<div style={{fontSize:FS.sm,color:T.textDim,padding:"10px 0",textAlign:"center"}}>No Multi-TF data tracked for {s.symbol} yet.</div>}
     {rows.map(([tf,bias,note],i)=>(
      <div key={i} style={{display:"grid",gridTemplateColumns:"60px 10px 1fr",gap:8,padding:"6px 9px",marginBottom:3,borderRadius:0,background:T.bg,border:"1px solid "+T.border,alignItems:"center"}}>
-      <span style={{fontSize:9,color:T.textSec,fontWeight:600}}>{tf}</span>
+      <span style={{fontSize:FS.sm,color:T.textSec,fontWeight:600}}>{tf}</span>
       <div style={{width:7,height:7,borderRadius:"50%",background:dc2(bias)}}/>
-      <span style={{fontSize:9,color:T.textDim}}>{note}</span>
+      <span style={{fontSize:FS.sm,color:T.textDim}}>{note}</span>
      </div>
     ))}
-    <div style={{marginTop:8,fontSize:9,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
+    <div style={{marginTop:8,fontSize:FS.sm,color:T.textDim,padding:"7px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>Daily setup valid only when monthly + weekly bias aligns. Counter-trend: shorter DTE, first target only.</div>
    </div>
   );
  };
@@ -889,14 +899,14 @@ const WORKER = window.location.hostname === "localhost"
  // now defensively fall back to [] like alt-view already did.
  const renderKeyLevelsList = (levels, minWidth) => (levels||[]).map((l,i)=>(
   <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
-   <span style={{fontWeight:700,color:l.c,fontSize:11,minWidth,flexShrink:0,fontFamily:FD}}>{l.p}</span>
-   <span style={{color:l.c,fontSize:9,marginTop:1}}>{l.l}</span>
+   <span style={{fontWeight:700,color:l.c,fontSize:FS.lg,minWidth,flexShrink:0,fontFamily:FD}}>{l.p}</span>
+   <span style={{color:l.c,fontSize:FS.sm,marginTop:1}}>{l.l}</span>
   </div>
  ));
  const renderCatalystsList = (catalysts) => (catalysts||[]).map((c,i)=>(
   <div key={i} style={{display:"flex",gap:7,marginBottom:4}}>
-   <span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:10}}>{c.startsWith("⚠")?"⚠":"→"}</span>
-   <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
+   <span style={{color:c.startsWith("⚠")?T.gold:T.blue,fontSize:FS.base}}>{c.startsWith("⚠")?"⚠":"→"}</span>
+   <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:FS.base}}>{c.startsWith("⚠")?c.slice(2):c}</span>
   </div>
  ));
  // Invalidation-alert text — was recomputed identically (_invP/_invCk/invAlert,
@@ -941,9 +951,9 @@ const WORKER = window.location.hostname === "localhost"
   return(
    <div>
     <div style={{marginBottom:12}}>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
+     <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>C1 / C2 / C3 — Three-Candle Entry Sequence</div>
      {seqDone&&(
-      <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:9,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
+      <div style={{padding:"6px 10px",background:T.sage+"18",border:"1px solid "+T.sage+"50",borderRadius:0,marginBottom:8,fontSize:FS.sm,color:T.sage,fontWeight:700,letterSpacing:"0.05em"}}>ALL THREE CONFIRMED — Entry sequence complete. Confirm OTE + DTE before executing.</div>
      )}
      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
       {candles.map(({key,label,color,desc})=>{
@@ -951,37 +961,37 @@ const WORKER = window.location.hostname === "localhost"
        return(
        <div key={key} style={{background:cd2.confirmed?color+"10":T.bg,border:"1px solid "+(cd2.confirmed?color+"50":T.border),borderRadius:0,padding:"9px 10px"}}>
        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-       <span style={{fontSize:13,fontWeight:700,color:cd2.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
+       <span style={{fontSize:FS.lg,fontWeight:700,color:cd2.confirmed?color:T.textDim,fontFamily:FD}}>{label}</span>
        <div style={{width:8,height:8,borderRadius:"50%",background:cd2.confirmed?color:T.border2}}/>
        </div>
-       <div style={{fontSize:8,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
-       {cd2.ts&&<div style={{fontSize:8,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd2.ts}</div>}
-       <button onClick={()=>setCandle(key,!cd2.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:8,background:cd2.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd2.confirmed?T.rose+"50":color+"50"),color:cd2.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd2.confirmed?"RESET":"CONFIRM"}</button>
+       <div style={{fontSize:FS.xs,color:T.textDim,lineHeight:1.6,marginBottom:6}}>{desc}</div>
+       {cd2.ts&&<div style={{fontSize:FS.xs,color:color,fontFamily:FD,marginBottom:5,opacity:0.9}}>{cd2.ts}</div>}
+       <button onClick={()=>setCandle(key,!cd2.confirmed)} style={{width:"100%",padding:"3px 0",fontSize:FS.xs,background:cd2.confirmed?T.rose+"20":color+"20",border:"1px solid "+(cd2.confirmed?T.rose+"50":color+"50"),color:cd2.confirmed?T.rose:color,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700,letterSpacing:"0.05em"}}>{cd2.confirmed?"RESET":"CONFIRM"}</button>
        </div>
        );
       })}
      </div>
     </div>
     <div>
-     <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
+     <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Session Notes</div>
      <div style={{display:"flex",gap:6,marginBottom:8}}>
-      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" aria-label="Add journal observation" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:9,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
-      <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:9,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
+      <input value={journalInput[sym]||""} onChange={e=>setJournalInput({...journalInput,[sym]:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")addNote();}} placeholder="Add observation... (Enter to save)" aria-label="Add journal observation" style={{flex:1,background:T.bg,border:"1px solid "+T.border,color:T.textSec,fontSize:FS.sm,padding:"5px 8px",borderRadius:0,fontFamily:FM,outline:"none"}}/>
+      <button onClick={addNote} style={{padding:"5px 10px",background:T.teal+"20",border:"1px solid "+T.teal+"40",color:T.teal,fontSize:FS.sm,borderRadius:0,cursor:"pointer",fontFamily:FM,fontWeight:700}}>ADD</button>
      </div>
      {notes.length===0&&s.logEntry&&(
       <div style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2,marginBottom:5}}>
-       <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
-       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
+       <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:3}}>{s.logEntry.ts} <span style={{color:T.textDim}}>base note</span></div>
+       <div style={{fontSize:FS.sm,color:T.textSec,lineHeight:1.6}}>{s.logEntry.note}</div>
       </div>
      )}
      {notes.map((n,i)=>(
       <div key={i} style={{padding:"8px 10px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.teal+"60",marginBottom:5}}>
-       <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
-       <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
+       <div style={{fontSize:FS.xs,color:T.teal,fontFamily:FD,marginBottom:3}}>{n.ts}</div>
+       <div style={{fontSize:FS.sm,color:T.textSec,lineHeight:1.6}}>{n.note}</div>
       </div>
      ))}
      {notes.length===0&&!s.logEntry&&(
-      <div style={{fontSize:9,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
+      <div style={{fontSize:FS.sm,color:T.textDim,textAlign:"center",padding:"16px 0"}}>No notes yet for {sym}. Add your first observation above.</div>
      )}
     </div>
    </div>
@@ -1029,22 +1039,22 @@ const WORKER = window.location.hostname === "localhost"
   const {pfSym,pfDir,pfChecks2,pfMtfRows,pfDirBias,pfMtfCount,pfMtfOk,pfSessOk,pfDayOk,pfDayNote,pfCd,pfOte_low,pfOte_high,pfC123ok,pfLivePrice,pfOteOk,pfSwing,pfSwingOk,pfTotal,pfPassing,pfVerdict,pfVColor,pfIsPfOpen}=pf;
   return (
   <div style={{marginBottom:12,border:"1px solid "+pfVColor+"50",borderRadius:0,overflow:"hidden"}}>
-   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} role="button" tabIndex={0} aria-expanded={pfIsPfOpen} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}));}}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
+   <div onClick={()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen}))} role="button" tabIndex={0} aria-expanded={pfIsPfOpen} onKeyDown={keyActivate(()=>setPfOpen(p=>({...p,[pfSym]:!pfIsPfOpen})))} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:pfVColor+"15",cursor:"pointer"}}>
     <div style={{display:"flex",alignItems:"center",gap:10}}>
-    <span style={{fontSize:12,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
-    <span style={{fontSize:9,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
-    {pfVerdict==="GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
-    {pfVerdict==="CAUTION"&&<span style={{fontSize:8,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>Review open gates</span>}
-    {pfVerdict==="NO-GO"&&<span style={{fontSize:8,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose}}>Do not enter</span>}
+    <span style={{fontSize:FS.lg,fontWeight:700,color:pfVColor,letterSpacing:"0.08em",fontFamily:FD}}>{pfVerdict}</span>
+    <span style={{fontSize:FS.sm,color:T.textSec}}>{pfPassing}/{pfTotal} pre-flight gates</span>
+    {pfVerdict==="GO"&&<span style={{fontSize:FS.xs,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage,letterSpacing:"0.06em"}}>Ready to execute</span>}
+    {pfVerdict==="CAUTION"&&<span style={{fontSize:FS.xs,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"40",borderRadius:0,color:T.gold}}>Review open gates</span>}
+    {pfVerdict==="NO-GO"&&<span style={{fontSize:FS.xs,padding:"1px 6px",background:T.rose+"20",border:"1px solid "+T.rose+"40",borderRadius:0,color:T.rose}}>Do not enter</span>}
     </div>
     <div style={{display:"flex",alignItems:"center",gap:5}}>
-    <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
-    <span style={{fontSize:8,color:T.textDim}}>{pfIsPfOpen?"▲":"▼"}</span>
+    <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Pre-Flight</span>
+    <span style={{fontSize:FS.xs,color:T.textDim}}>{pfIsPfOpen?"▲":"▼"}</span>
     </div>
    </div>
    {pfIsPfOpen&&(
    <div style={{padding:"10px 12px"}}>
-    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Auto-Detected</div>
+    <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Auto-Detected</div>
     {[
      {id:"g_mtf",label:"MTF Aligned (4+ timeframes)",ok:pfMtfOk,note:pfMtfRows.length===0?"No MTF data — populate Multi-TF tab":pfMtfCount+"/"+pfMtfRows.length+" timeframes aligned "+pfDirBias},
      {id:"g_sess",label:"NY Session Active (09:30–16:00 EST)",ok:pfSessOk,note:sessionProfile.profile},
@@ -1054,27 +1064,27 @@ const WORKER = window.location.hostname === "localhost"
      {id:"g_swing_auto",label:"Protected swing intact",ok:pfSwingOk,note:pfSwingOk?"Price clear of protected swing $"+(pfSwing||0).toFixed(2):"⚠ Price "+(pfDir==="call"?"below":"above")+" protected swing $"+(pfSwing||0).toFixed(2)},
     ].map(g=>(
     <div key={g.id} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:g.ok?T.sage+"08":T.rose+"06",border:"1px solid "+(g.ok?T.sage+"25":T.rose+"20")}}>
-     <span style={{color:g.ok?T.sage:T.rose,fontSize:10,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
+     <span style={{color:g.ok?T.sage:T.rose,fontSize:FS.base,flexShrink:0,marginTop:1}}>{g.ok?"✓":"✕"}</span>
      <div style={{flex:1}}>
-      <div style={{fontSize:9,color:g.ok?T.sage:T.textSec,fontWeight:g.ok?600:400}}>{g.label}</div>
-      <div style={{fontSize:8,color:T.textDim,lineHeight:1.5}}>{g.note}</div>
+      <div style={{fontSize:FS.sm,color:g.ok?T.sage:T.textSec,fontWeight:g.ok?600:400}}>{g.label}</div>
+      <div style={{fontSize:FS.xs,color:T.textDim,lineHeight:1.5}}>{g.note}</div>
      </div>
     </div>
     ))}
-    <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6,marginTop:10}}>Manual Confirmation</div>
+    <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6,marginTop:10}}>Manual Confirmation</div>
     {[
      {id:"g_oi",label:"OI > 500 on target strike",desc:"Check options chain before entry. Low OI = wide spreads."},
      {id:"g_cal",label:"Economic calendar clear",desc:"No red folder events in next 2 hrs (FOMC, NFP, CPI, PPI, JOLTS)"},
     ].map(g=>{
      const ck2=pfChecks2.includes(g.id);
      return(
-     <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}}} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
+     <div key={g.id} onClick={()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);}} role="button" tabIndex={0} onKeyDown={keyActivate(()=>{const cur=pfChecks[pfSym]||[];const nxt={...pfChecks,[pfSym]:cur.includes(g.id)?cur.filter(x=>x!==g.id):[...cur,g.id]};setPfChecks(nxt);ss("of_preflight",nxt);})} style={{display:"flex",gap:8,marginBottom:4,padding:"5px 8px",borderRadius:0,background:ck2?T.teal+"08":T.bg,border:"1px solid "+(ck2?T.teal+"25":T.border),cursor:"pointer"}}>
       <div style={{width:12,height:12,borderRadius:0,flexShrink:0,marginTop:1,background:ck2?T.teal:"transparent",border:"1.5px solid "+(ck2?T.teal:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-       {ck2&&<span style={{color:T.bg,fontSize:7,fontWeight:900}}>✓</span>}
+       {ck2&&<span style={{color:T.bg,fontSize:FS.xxs,fontWeight:900}}>✓</span>}
       </div>
       <div style={{flex:1}}>
-       <div style={{fontSize:9,color:ck2?T.teal:T.textSec,fontWeight:ck2?600:400}}>{g.label}</div>
-       <div style={{fontSize:8,color:T.textDim,lineHeight:1.5}}>{g.desc}</div>
+       <div style={{fontSize:FS.sm,color:ck2?T.teal:T.textSec,fontWeight:ck2?600:400}}>{g.label}</div>
+       <div style={{fontSize:FS.xs,color:T.textDim,lineHeight:1.5}}>{g.desc}</div>
       </div>
      </div>
      );
@@ -1166,33 +1176,33 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  if (phase!=="all" && s.phase!==phase) return false;
  return true;
  }).sort((a,b)=>alignmentScore(b)-alignmentScore(a));
- const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:11,borderRadius:0,fontFamily:FM,outline:"none",cursor:"pointer"};
- const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:10,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
- const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:0,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
+ const sel = {background:T.surface,border:"1px solid "+T.border,color:T.textPri,padding:"6px 10px",fontSize:FS.lg,borderRadius:0,fontFamily:FM,outline:"none",cursor:"pointer"};
+ const tbtn = (active,color) => ({flexShrink:0,padding:"8px 12px",fontSize:FS.base,background:"transparent",border:"none",borderBottom:active?"2px solid "+(color||T.sage):"2px solid transparent",color:active?(color||T.sage):T.textDim,cursor:"pointer",fontFamily:FM,whiteSpace:"nowrap"});
+ const pill = (color) => ({display:"inline-flex",alignItems:"center",fontSize:FS.sm,fontWeight:700,padding:"2px 8px",borderRadius:0,background:color+"22",border:"1px solid "+color+"44",color:color,fontFamily:FM,whiteSpace:"nowrap",letterSpacing:"0.02em"});
  return (
  <div style={{background:T.bg,minHeight:"100vh",color:T.textPri,fontFamily:FM}}>
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"14px 20px 12px"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
  <div>
- <div style={{fontFamily:FM,fontStyle:"normal",fontSize:22,fontWeight:700,color:T.gold,lineHeight:1,letterSpacing:"-0.02em"}}>Option Flow</div>
- <div style={{fontSize:9,color:T.textDim,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:3}}>Proprietary Options Intelligence</div>
+ <div style={{fontFamily:FM,fontStyle:"normal",fontSize:FS.price,fontWeight:700,color:T.gold,lineHeight:1,letterSpacing:"-0.02em"}}>Option Flow</div>
+ <div style={{fontSize:FS.sm,color:T.textDim,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:3}}>Proprietary Options Intelligence</div>
  </div>
  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>
  <div style={{display:"flex",gap:6,alignItems:"center"}}>
- <button onClick={doRefresh} disabled={refreshing} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",background:hint?T.sage+"18":"transparent",border:"1px solid "+(hint?T.sage:T.border2),borderRadius:0,cursor:refreshing?"not-allowed":"pointer",color:hint?T.sage:T.textSec,fontSize:11,fontFamily:FM,transition:"all 0.2s"}}>
- <span style={{display:"inline-block",animation:refreshing?"spin 0.8s linear infinite":"none",fontSize:13}}>↻</span>
+ <button onClick={doRefresh} disabled={refreshing} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",background:hint?T.sage+"18":"transparent",border:"1px solid "+(hint?T.sage:T.border2),borderRadius:0,cursor:refreshing?"not-allowed":"pointer",color:hint?T.sage:T.textSec,fontSize:FS.lg,fontFamily:FM,transition:"all 0.2s"}}>
+ <span style={{display:"inline-block",animation:refreshing?"spin 0.8s linear infinite":"none",fontSize:FS.lg}}>↻</span>
  {refreshing?(refreshStatus||"Fetching…"):hint?"✓ Live Updated":"Refresh Data"}
  </button>
  </div>
- <span style={{fontSize:9,color:T.textDim,fontFamily:FD,letterSpacing:"0.04em"}}>{ts||AS_OF}</span>
+ <span style={{fontSize:FS.sm,color:T.textDim,fontFamily:FD,letterSpacing:"0.04em"}}>{ts||AS_OF}</span>
  </div>
  </div>
  </div>
  {(liveTs||liveError||kvSyncError)&&(
  <div style={{background:T.bg,borderBottom:"1px solid "+T.border,padding:"5px 20px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
- {liveTs&&!liveError&&<span style={{fontSize:9,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
- {liveError&&<span title={liveErrorDetail||""} style={{fontSize:9,color:T.amber,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.amber}}>{liveError}</span>}
- {kvSyncError&&<span title="Your favorites, checklist, and notes are safe locally and will sync once this succeeds." style={{fontSize:9,color:T.rose,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.rose}}>{kvSyncError}</span>}
+ {liveTs&&!liveError&&<span style={{fontSize:FS.sm,color:T.teal,fontFamily:FD}}>⚡ Live · {liveTs} · {Object.keys(liveData).length} symbols · 15-min delay</span>}
+ {liveError&&<span title={liveErrorDetail||""} style={{fontSize:FS.sm,color:T.amber,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.amber}}>{liveError}</span>}
+ {kvSyncError&&<span title="Your favorites, checklist, and notes are safe locally and will sync once this succeeds." style={{fontSize:FS.sm,color:T.rose,fontFamily:FD,cursor:"help",borderBottom:"1px dotted "+T.rose}}>{kvSyncError}</span>}
  {(()=>{
  const all=[...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
  const near=getNearKeyLevels(all,liveData);
@@ -1200,15 +1210,15 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const rest=near.length-shown.length;
  return <>
  {shown.map(({sym,price})=>(
- <span key={sym} style={{fontSize:9,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"50",borderRadius:0,color:T.gold}}>
+ <span key={sym} style={{fontSize:FS.sm,padding:"1px 6px",background:T.gold+"20",border:"1px solid "+T.gold+"50",borderRadius:0,color:T.gold}}>
  ⚠ {sym} ${price} near key level
  </span>
  ))}
- {rest>0&&<span style={{fontSize:9,padding:"1px 6px",background:T.border+"40",border:"1px solid "+T.border2,borderRadius:0,color:T.textDim}}>+{rest} more</span>}
+ {rest>0&&<span style={{fontSize:FS.sm,padding:"1px 6px",background:T.border+"40",border:"1px solid "+T.border2,borderRadius:0,color:T.textDim}}>+{rest} more</span>}
  </>;
  })()}
  {Object.entries(liveData).filter(([,d])=>d.marketState==="PRE"&&d.preMarket&&Math.abs(d.preMarketChg||0)>2).map(([sym,d])=>(
- <span key={sym} style={{fontSize:9,padding:"1px 6px",background:(d.preMarketChg>0?T.blue:T.rose)+"20",border:"1px solid "+(d.preMarketChg>0?T.blue:T.rose)+"50",borderRadius:0,color:d.preMarketChg>0?T.blue:T.rose}}>
+ <span key={sym} style={{fontSize:FS.sm,padding:"1px 6px",background:(d.preMarketChg>0?T.blue:T.rose)+"20",border:"1px solid "+(d.preMarketChg>0?T.blue:T.rose)+"50",borderRadius:0,color:d.preMarketChg>0?T.blue:T.rose}}>
  {sym} PM ${d.preMarket} ({d.preMarketChg>0?"+":""}{d.preMarketChg}%)
  </span>
  ))}
@@ -1223,22 +1233,22 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const regime = avg>0.5?{l:"RISK-ON",c:T.sage}:avg<-0.5?{l:"RISK-OFF",c:T.rose}:{l:"NEUTRAL",c:T.gold};
  const smallCapLead = iwm - ((spy+qqq)/2);
  const chip=(lbl,v)=>(
- <span style={{fontSize:9,fontFamily:FD,color:v>0?T.sage:v<0?T.rose:T.textSec}}>
+ <span style={{fontSize:FS.sm,fontFamily:FD,color:v>0?T.sage:v<0?T.rose:T.textSec}}>
  {lbl} {v>0?"+":""}{(v||0).toFixed(2)}%
  </span>
  );
  return (
  <div style={{position:"sticky",top:0,zIndex:50,background:T.bg,borderBottom:"1px solid "+T.border,padding:"6px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
- <span style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:0,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
+ <span style={{fontSize:FS.sm,fontWeight:700,letterSpacing:"0.1em",padding:"2px 8px",borderRadius:0,background:regime.c+"18",border:"1px solid "+regime.c+"50",color:regime.c}}>{regime.l}</span>
  {chip("SPY",spy)}
  {chip("QQQ",qqq)}
  {chip("IWM",iwm)}
  {Math.abs(smallCapLead)>0.75&&(
- <span style={{fontSize:9,color:smallCapLead>0?T.teal:T.amber}}>
+ <span style={{fontSize:FS.sm,color:smallCapLead>0?T.teal:T.amber}}>
  {smallCapLead>0?"↑ Small-caps leading (rotation)":"↓ Small-caps lagging (mega-cap led)"}
  </span>
  )}
- <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
+ <span style={{fontSize:FS.xs,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
  </div>
  );
 
@@ -1252,16 +1262,16 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const _inv=allSetups.filter(s=>{const _h=memoryData[s.symbol]||[];const _l=_h[_h.length-1];return _l&&_l.invalidated;}).length;
  const _cell=(lbl,val,col,sub)=>(
   <div style={{padding:"6px 10px",borderRight:"1px solid "+T.border,flex:"1 0 auto",minWidth:75}}>
-   <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{lbl}</div>
-   <div style={{fontSize:11,fontWeight:700,color:col||T.textPri,fontFamily:FD,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{val}</div>
-   {sub&&<div style={{fontSize:7,color:T.textDim,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{sub}</div>}
+   <div style={{fontSize:FS.xxs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{lbl}</div>
+   <div style={{fontSize:FS.lg,fontWeight:700,color:col||T.textPri,fontFamily:FD,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{val}</div>
+   {sub&&<div style={{fontSize:FS.xxs,color:T.textDim,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{sub}</div>}
   </div>
  );
  return(
   <div style={{background:T.bg,borderBottom:"1px solid "+T.border,display:"flex",overflowX:"auto"}}>
    {_cell("Ready / Watch",`${_readyT.length+_readyS.length}`,_readyT.length+_readyS.length>0?T.sage:T.textDim,`${_readyT.length} tracked · ${_readyS.length} screener`)}
    {_cell("Nearest Earnings",_ne?`${_ne.symbol} ${_nd}d`:"None",_nd!=null&&_nd<21?T.rose:T.textPri,_ne?.earningsLabel||"")}
-   <div onClick={()=>_inv>0&&setView("invalidated")} role={_inv>0?"button":undefined} tabIndex={_inv>0?0:undefined} onKeyDown={_inv>0?e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setView("invalidated");}}:undefined} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
+   <div onClick={()=>_inv>0&&setView("invalidated")} role={_inv>0?"button":undefined} tabIndex={_inv>0?0:undefined} onKeyDown={_inv>0?keyActivate(()=>setView("invalidated")):undefined} style={{cursor:_inv>0?"pointer":"default"}} title={_inv>0?"Click to review invalidated setups":""}>
    {_cell("Invalidated",_inv>0?`${_inv} ⚠`:"✓ Clear",_inv>0?T.rose:T.sage,_inv>0?"Review setups":"")}
   </div>
   </div>
@@ -1277,12 +1287,12 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {(isEverything||view==="favorites")&&(
  <div style={{padding:"10px 20px",borderBottom:"1px solid "+T.border,display:"flex",gap:8,alignItems:"flex-end",flexWrap:"wrap",background:T.bg}}>
  <div>
- <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>Asset Class</div>
  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
  {[["favorites","★ Favorites"],["all","Everything"],["options","Options"],["crypto","Crypto"],["commodities","Commodities"],["indices","Indices"]].map(([v,l])=>{
  const active=v==="favorites"?view==="favorites":(isEverything&&evAsset===v);
  return(
- <button key={v} onClick={()=>{if(v==="favorites"){setView("favorites");}else{setEvAsset(v);setView("everything");}}} style={{padding:"5px 10px",fontSize:9,fontFamily:FM,background:active?(v==="favorites"?T.gold+"20":T.teal+"20"):T.bg,border:"1px solid "+(active?(v==="favorites"?T.gold:T.teal):T.border),borderRadius:0,color:active?(v==="favorites"?T.gold:T.teal):(v==="favorites"&&favs.length>0?T.goldDim:T.textDim),cursor:"pointer",whiteSpace:"nowrap"}}>{l}{v==="favorites"&&favs.length>0&&<span style={{marginLeft:4}}>{favs.length}</span>}</button>
+ <button key={v} onClick={()=>{if(v==="favorites"){setView("favorites");}else{setEvAsset(v);setView("everything");}}} style={{padding:"5px 10px",fontSize:FS.sm,fontFamily:FM,background:active?(v==="favorites"?T.gold+"20":T.teal+"20"):T.bg,border:"1px solid "+(active?(v==="favorites"?T.gold:T.teal):T.border),borderRadius:0,color:active?(v==="favorites"?T.gold:T.teal):(v==="favorites"&&favs.length>0?T.goldDim:T.textDim),cursor:"pointer",whiteSpace:"nowrap"}}>{l}{v==="favorites"&&favs.length>0&&<span style={{marginLeft:4}}>{favs.length}</span>}</button>
  );
  })}
  </div>
@@ -1294,13 +1304,13 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  ["Sort By",evSort,setEvSort,[["align","⚡ Alignment"],["phase","Phase"],["chg","% Move"],["symbol","Symbol A–Z"],["asset","Asset Class"]]],
  ].map(([label,val,setter,opts])=>(
  <div key={label}>
- <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>{label}</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4,fontFamily:FM}}>{label}</div>
  <select value={val} onChange={e=>setter(e.target.value)} aria-label={label} style={sel}>
  {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
  </select>
  </div>
  ))}
- <div style={{marginLeft:"auto",fontSize:9,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
+ <div style={{marginLeft:"auto",fontSize:FS.sm,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
  </>)}
  </div>
  )}
@@ -1311,18 +1321,18 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  ["Phase",phase,setPhase,[["all","All Phases"],["READY","Ready to Enter"],["RETRACEMENT","Retracing"],["CONSOLIDATION","Consolidating"],["EXPANSION","Exp."],["WATCH_REVERSAL","Watch Reversal"]]]
  ].map(([label,val,setter,opts])=>(
  <div key={label}>
- <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4}}>{label}</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4}}>{label}</div>
  <select value={val} onChange={e=>setter(e.target.value)} aria-label={label} style={sel}>
  {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
  </select>
  </div>
  ))}
- <div style={{marginLeft:"auto",fontSize:9,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
+ <div style={{marginLeft:"auto",fontSize:FS.sm,color:T.textDim,alignSelf:"center",fontFamily:FD}}>{visible.length} results</div>
  </div>
  )}
 
- {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:13,color:T.textSec}}>No saved setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
- {view==="invalidated"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:32,color:T.sage,marginBottom:10}}>✓</div><div style={{fontSize:13,color:T.textSec}}>No invalidated setups</div><div style={{fontSize:10,color:T.textDim,marginTop:4}}>All tracked setups are currently intact</div></div>)}
+ {view==="favorites"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:FS.giant,color:T.border2,marginBottom:10}}>★</div><div style={{fontSize:FS.lg,color:T.textSec}}>No saved setups</div><div style={{fontSize:FS.base,color:T.textDim,marginTop:4}}>Tap ★ on any setup to save it here</div></div>)}
+ {view==="invalidated"&&visible.length===0&&(<div style={{padding:"60px 20px",textAlign:"center"}}><div style={{fontSize:FS.giant,color:T.sage,marginBottom:10}}>✓</div><div style={{fontSize:FS.lg,color:T.textSec}}>No invalidated setups</div><div style={{fontSize:FS.base,color:T.textDim,marginTop:4}}>All tracked setups are currently intact</div></div>)}
  {isEverything&&aqAll.length>0&&(()=>{
  const focusData=[...aqAll].map(s=>{
  const hist=memoryData[s.symbol]||[];
@@ -1364,21 +1374,21 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const NUMS=["①","②","③"];
  return(
  <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
- <div onClick={()=>setAqOpen(p=>!p)} role="button" tabIndex={0} aria-expanded={aqOpen} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setAqOpen(p=>!p);}}} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
+ <div onClick={()=>setAqOpen(p=>!p)} role="button" tabIndex={0} aria-expanded={aqOpen} onKeyDown={keyActivate(()=>setAqOpen(p=>!p))} style={{padding:"9px 16px",borderBottom:aqOpen?"1px solid "+T.border:"none",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",cursor:"pointer"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
- <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
- <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
+ <span style={{fontSize:FS.xs,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
+ <span style={{fontSize:FS.xs,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
  </div>
  <div style={{width:"1px",height:28,background:T.border,flexShrink:0}}/>
  <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
- <span style={{fontSize:8,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
- <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
- <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
+ <span style={{fontSize:FS.xs,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
+ <span style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
+ <span style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
  </div>
- <span style={{marginLeft:"auto",fontSize:9,color:T.textDim,flexShrink:0}}>{aqOpen?"▲":"▼"}</span>
+ <span style={{marginLeft:"auto",fontSize:FS.sm,color:T.textDim,flexShrink:0}}>{aqOpen?"▲":"▼"}</span>
  </div>
  {aqOpen&&(focusData.length===0?(
- <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
+ <div style={{padding:"14px 16px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
  ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
  const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
  const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
@@ -1393,19 +1403,19 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  style={{padding:"11px 16px",borderBottom:qi<focusData.length-1?"1px solid "+T.border:"none",display:"flex",gap:12,alignItems:"flex-start",cursor:"pointer",transition:"background 0.15s"}}
  onMouseEnter={e=>e.currentTarget.style.background=T.border+"30"}
  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
- <span style={{fontSize:14,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
+ <span style={{fontSize:FS.hero,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
  <div style={{flex:1,minWidth:0}}>
  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
- <span style={{fontFamily:FD,fontSize:15,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
- <span style={{fontSize:12,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
- <span style={{fontSize:8,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
- <span style={{fontSize:8,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:FS.lg,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
+ <span style={{fontSize:FS.xs,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
+ <span style={{fontSize:FS.xs,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
  </div>
  {reasons.slice(0,3).map((w,wi)=>(
- <div key={wi} style={{fontSize:8,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
+ <div key={wi} style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
  ))}
  </div>
- <span style={{fontSize:10,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
+ <span style={{fontSize:FS.base,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
  </div>
  );
  }))}
@@ -1442,9 +1452,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
- <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
- <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
- <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
+ <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:FS.hero,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:FS.base,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  </div>
  <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0,flexWrap:"wrap"}}>
  {(()=>{
@@ -1454,9 +1464,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const dc=ms==="PRE"&&ld?.preMarketChg!=null?ld.preMarketChg:(ld?.chg!=null?ld.chg:s.chg);
  const fmt=v=>v>999?v.toLocaleString(undefined,{maximumFractionDigits:2}):v>10?v.toFixed(2):v.toFixed(3);
  return(<>
- <span style={{fontFamily:FD,fontSize:15,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
- <span style={{fontFamily:FD,fontSize:11,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
- {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
+ <span style={{fontFamily:FD,fontSize:FS.lg,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
+ {ld&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
  </>);
  })()}
  </div>
@@ -1468,24 +1478,24 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {invAlert&&<span style={pill(T.rose)}>⚠ INVALIDATED</span>}
  </div>
  {invAlert&&(
- <div style={{marginTop:6,padding:"7px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:10,color:T.rose}}>
+ <div style={{marginTop:6,padding:"7px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:FS.base,color:T.rose}}>
  {invAlert}
  </div>
  )}
- <div style={{fontSize:9,color:T.textDim,marginTop:6,paddingBottom:10}}>Vol {s.vol}</div>
+ <div style={{fontSize:FS.sm,color:T.textDim,marginTop:6,paddingBottom:10}}>Vol {s.vol}</div>
  </div>
  {ai.alert&&(
  <div style={{padding:"5px 14px",background:ai.alertLevel==="critical"?T.rose+"18":ai.alertLevel==="warning"?T.gold+"18":T.teal+"18",borderTop:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40"}}>
- <span style={{fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal,fontFamily:FM}}>
+ <span style={{fontSize:FS.sm,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal,fontFamily:FM}}>
  {ai.alertLevel==="critical"?"⚠ ":ai.alertLevel==="warning"?"⚡ ":"→ "}{ai.alert}
  </span>
  </div>
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
- <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
- {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
- <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
- {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:FS.sm,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
+ {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:FS.sm,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
+ <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:FS.sm,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+ {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:FS.xxs}}>{isOpen?"▲":"▼"}</span>
  </button>
  </div>
  {isOpen&&(
@@ -1495,58 +1505,58 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction||s.dir);}} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
- <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
+ <div style={{padding:"14px 16px",fontSize:FS.base,color:T.textSec,lineHeight:1.8}}>
+ <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(
  <div>
  {memNarrative&&(
  <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
- <div style={{fontSize:10,color:T.textSec}}>{memNarrative}</div>
+ <div style={{fontSize:FS.xs,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
+ <div style={{fontSize:FS.base,color:T.textSec}}>{memNarrative}</div>
  </div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
- <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
- <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
+ <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:FS.lg,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
  </div>
  )}
  {tab==="phase"&&(
  <div>
  <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
- <div style={{fontSize:8,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
- <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:11,marginBottom:3}}>{weeklyProfile.name}</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
+ <div style={{fontSize:FS.xs,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
+ <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:FS.lg,marginBottom:3}}>{weeklyProfile.name}</div>
+ <div style={{fontSize:FS.sm,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
  </div>
  <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
- <div style={{fontSize:8,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
- {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
+ <div style={{fontSize:FS.xs,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
+ {sessionProfile.actionable&&<span style={{fontSize:FS.xs,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
  </div>
- <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:4}}>{sessionProfile.profile}</div>
+ <div style={{fontWeight:600,color:sessionProfile.color,fontSize:FS.lg,marginBottom:4}}>{sessionProfile.profile}</div>
  </div>
- <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
+ <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:FS.xs,color:ac,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{ph.label}</div><div style={{color:T.textSec}}>{s.phaseNote}</div></div>
  </div>
  )}
  {tab==="checklist"&&renderChecklistTab(s, allCk, ck, pct, effectiveAutoChecks)}
  {tab==="entry"&&(
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
  {renderEntryPreFlight(pf)}
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
- <div style={{fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
- <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.textDim}}>Same framework as Options tab: C2 failure swing + C3 CISD body close. No options params (no delta/DTE/IV) shown here — directional bias only, applies to spot/ETF/futures positioning. Pre-flight gates above use the same auto-detection as tracked Options setups.</div>
+ <div style={{fontSize:FS.sm,color:T.rose}}>Invalidation:{s.invalidation}</div>
+ <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:FS.sm,color:T.textDim}}>Same framework as Options tab: C2 failure swing + C3 CISD body close. No options params (no delta/DTE/IV) shown here — directional bias only, applies to spot/ETF/futures positioning. Pre-flight gates above use the same auto-detection as tracked Options setups.</div>
  </div>
  </div>
  )}
  {tab==="levels"&&(
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Levels</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Levels</div>
  {renderKeyLevelsList(s.keyLevels||s.levels, 70)}
  <div style={{borderTop:"1px solid "+T.border,paddingTop:10,marginTop:6}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
  {renderCatalystsList(s.catalysts||s.cats)}
  </div>
  </div>
@@ -1606,18 +1616,18 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{marginBottom:12,background:T.surface,border:"1px solid "+T.border2,borderRadius:0,overflow:"hidden",borderTop:"2px solid "+T.gold}}>
  <div style={{padding:"9px 16px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
  <div style={{display:"flex",flexDirection:"column",gap:1}}>
- <span style={{fontSize:8,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
- <span style={{fontSize:8,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
+ <span style={{fontSize:FS.xs,fontWeight:700,letterSpacing:"0.14em",color:T.gold,textTransform:"uppercase",fontFamily:FM}}>Action Queue</span>
+ <span style={{fontSize:FS.xs,color:T.textDim,fontFamily:FM}}>{focusData.length} setup{focusData.length!==1?"s":""} queued</span>
  </div>
  <div style={{width:"1px",height:28,background:T.border,flexShrink:0}}/>
  <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
- <span style={{fontSize:8,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
- <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
- <span style={{fontSize:8,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
+ <span style={{fontSize:FS.xs,fontWeight:600,color:regime.c,fontFamily:FM}}>{regime.l}</span>
+ <span style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM}}>Ready <span style={{color:T.sage,fontWeight:700}}>{readyCount}</span></span>
+ <span style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM}}>Watching <span style={{color:T.gold,fontWeight:700}}>{watchCount}</span></span>
  </div>
  </div>
  {focusData.length===0?(
- <div style={{padding:"14px 16px",fontSize:9,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
+ <div style={{padding:"14px 16px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>{"No setups queued. All candidates in monitoring phases."}</div>
  ):focusData.map(({s,al,pScore,earnD,reasons},qi)=>{
  const ph=PHASES[s.phase]||PHASES["CONSOLIDATION"];
  const ckItems=[...new Set([...(checks[s.symbol]||[]),...(s.autoChecks||[])])];
@@ -1632,19 +1642,19 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  style={{padding:"11px 16px",borderBottom:qi<focusData.length-1?"1px solid "+T.border:"none",display:"flex",gap:12,alignItems:"flex-start",cursor:"pointer",transition:"background 0.15s"}}
  onMouseEnter={e=>e.currentTarget.style.background=T.border+"30"}
  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
- <span style={{fontSize:14,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
+ <span style={{fontSize:FS.hero,color:T.textDim,fontFamily:FD,paddingTop:2,flexShrink:0}}>{NUMS[qi]}</span>
  <div style={{flex:1,minWidth:0}}>
  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
- <span style={{fontFamily:FD,fontSize:15,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
- <span style={{fontSize:12,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
- <span style={{fontSize:8,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
- <span style={{fontSize:8,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:FS.lg,letterSpacing:1}}><span style={{color:T.gold}}>{filledS}</span><span style={{color:T.goldDim}}>{emptyS}</span></span>
+ <span style={{fontSize:FS.xs,padding:"2px 6px",borderRadius:0,background:ph.color+"18",border:"1px solid "+ph.color+"40",color:ph.color,fontFamily:FM,whiteSpace:"nowrap"}}>{ph.icon} {ph.label}</span>
+ <span style={{fontSize:FS.xs,color:sens.c,fontFamily:FM,fontStyle:"italic"}}>{sens.l}</span>
  </div>
  {reasons.slice(0,3).map((w,wi)=>(
- <div key={wi} style={{fontSize:8,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
+ <div key={wi} style={{fontSize:FS.xs,color:T.textSec,fontFamily:FM,lineHeight:1.7}}><span style={{color:T.sage,marginRight:4}}>✓</span>{w}</div>
  ))}
  </div>
- <span style={{fontSize:10,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
+ <span style={{fontSize:FS.base,color:T.textDim,alignSelf:"center",flexShrink:0}}>›</span>
  </div>
  );
  })}
@@ -1686,9 +1696,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{padding:"10px 14px 0"}}>
  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
  <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
- <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:15,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
- <span style={{fontFamily:FD,fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
- <span style={{fontSize:10,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
+ <button onClick={()=>toggleFav(s.symbol)} style={{background:"none",border:"none",cursor:"pointer",padding:0,fontSize:FS.hero,color:isFav?T.gold:T.border2,lineHeight:1}}>★</button>
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:700,fontVariantNumeric:"tabular-nums",color:T.textPri,letterSpacing:-0.5}}>{s.symbol}</span>
+ <span style={{fontSize:FS.base,color:T.textSec,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.company}</span>
  </div>
  <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0,flexWrap:"wrap"}}>
  {(()=>{
@@ -1698,9 +1708,9 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const dc=ms==="PRE"&&ld?.preMarketChg!=null?ld.preMarketChg:(ld?.chg!=null?ld.chg:s.chg);
  const fmt=v=>v>999?v.toLocaleString(undefined,{maximumFractionDigits:2}):v>10?v.toFixed(2):v.toFixed(3);
  return(<>
- <span style={{fontFamily:FD,fontSize:15,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
- <span style={{fontFamily:FD,fontSize:11,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
- {ld&&<span style={{fontSize:7,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
+ <span style={{fontFamily:FD,fontSize:FS.hero,fontWeight:600,color:ld?T.textPri:T.textSec}}>${fmt(dp)}</span>
+ <span style={{fontFamily:FD,fontSize:FS.lg,color:dc>0?T.blue:dc<0?T.rose:T.textSec}}>{dc>0?"+":""}{typeof dc==="number"?Math.abs(dc)>99?Math.round(dc):dc.toFixed(1):s.chg.toFixed(1)}%</span>
+ {ld&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:ms==="PRE"?T.amber+"20":ms==="POST"||ms==="POSTPOST"?T.purple+"20":T.teal+"20",border:"1px solid "+(ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal)+"50",borderRadius:0,color:ms==="PRE"?T.amber:ms==="POST"||ms==="POSTPOST"?T.purple:T.teal,fontFamily:FM,whiteSpace:"nowrap"}}>{ms==="PRE"?"PRE-MKT":ms==="POST"||ms==="POSTPOST"?"AFTER-HRS":"● LIVE"}</span>}
  </>);
  })()}
  </div>
@@ -1714,33 +1724,33 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  {(earnD!=null||dteD!=null||allCk.length>0)&&(
  <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:4,alignItems:"center"}}>
- {allCk.length>0&&<span style={{fontSize:9,color:T.sage,fontFamily:FD}}>✓ {allCk.length}/{CHECKLIST.length} checks</span>}
- {earnD!=null&&<span style={{fontSize:9,color:earnC,fontFamily:FD}}>Earnings {s.earningsLabel} · {earnD}d</span>}
- {dteD!=null&&<span style={{fontSize:9,color:dteD<=7?T.rose:T.textDim,fontFamily:FD}}>Exp {dteD}d</span>}
+ {allCk.length>0&&<span style={{fontSize:FS.sm,color:T.sage,fontFamily:FD}}>✓ {allCk.length}/{CHECKLIST.length} checks</span>}
+ {earnD!=null&&<span style={{fontSize:FS.sm,color:earnC,fontFamily:FD}}>Earnings {s.earningsLabel} · {earnD}d</span>}
+ {dteD!=null&&<span style={{fontSize:FS.sm,color:dteD<=7?T.rose:T.textDim,fontFamily:FD}}>Exp {dteD}d</span>}
  </div>
  )}
  {invAlert&&(
- <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:10,color:T.rose}}>
+ <div style={{marginTop:8,padding:"8px 10px",background:T.rose+"15",border:"1px solid "+T.rose+"50",borderRadius:0,fontSize:FS.base,color:T.rose}}>
  {invAlert}
  </div>
  )}
  <div style={{display:"flex",gap:6,marginTop:6,paddingBottom:8,flexWrap:"wrap",alignItems:"center"}}>
- <span style={{fontSize:9,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
- <span style={{fontSize:9,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
+ <span style={{fontSize:FS.sm,color:T.textDim,fontFamily:FD}}>Vol {dispVol}</span>
+ <span style={{fontSize:FS.sm,color:CAP_COLORS[s.capSize]||T.textDim,fontFamily:FD}}>{s.capSize} · {s.mcap}</span>
  </div>
  </div>
  {ai.alert&&(
  <div style={{padding:"5px 14px",background:ai.alertLevel==="critical"?T.rose+"18":ai.alertLevel==="warning"?T.gold+"18":T.teal+"18",borderTop:"1px solid "+(ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal)+"40"}}>
- <span style={{fontSize:9,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal,fontFamily:FM}}>
+ <span style={{fontSize:FS.sm,color:ai.alertLevel==="critical"?T.rose:ai.alertLevel==="warning"?T.gold:T.teal,fontFamily:FM}}>
  {ai.alertLevel==="critical"?"⚠ ":ai.alertLevel==="warning"?"⚡ ":"→ "}{ai.alert}
  </span>
  </div>
  )}
  <div style={{display:"flex",borderTop:"1px solid "+T.border}}>
- <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
- {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:9,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
- <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:9,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
- {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:7}}>{isOpen?"▲":"▼"}</span>
+ <button onClick={()=>regenCard(s)} disabled={!!analyzing[s.symbol]} title="Regenerate analysis with today's data" style={{padding:"5px 12px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:analyzing[s.symbol]?"wait":"pointer",color:T.gold,fontSize:FS.sm,fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[s.symbol]?"\u23f3":"\u21bb Regen"+(aiCards[s.symbol]?.analysisHistory?.length>0?" ("+(aiCards[s.symbol].analysisHistory.length)+")":"")}</button>
+ {aiCards[s.symbol]&&<button onClick={()=>{if(window.confirm("Remove "+s.symbol+" from Options tab?"))removeCard(s);}} title="Remove from Options tab" style={{padding:"5px 10px",background:T.bg,border:"none",borderRight:"1px solid "+T.border,cursor:"pointer",color:T.rose,fontSize:FS.sm,fontFamily:FM,whiteSpace:"nowrap"}}>✕ Remove</button>}
+ <button onClick={()=>tog(s.symbol)} style={{flex:1,padding:"5px 16px",background:T.bg,border:"none",cursor:"pointer",color:T.textDim,fontSize:FS.sm,fontFamily:FM,letterSpacing:"0.08em",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+ {isOpen?"COLLAPSE":"VIEW ANALYSIS"} <span style={{fontSize:FS.xxs}}>{isOpen?"▲":"▼"}</span>
  </button>
  </div>
  {isOpen&&(
@@ -1750,32 +1760,32 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <button key={t} onClick={()=>{setTab(s.symbol,t);if(t==="entry"||t==="checklist")fetchCandleAnalysis(s.symbol,s.direction);}} style={tbtn(tab===t,ac)}>{l}</button>
  ))}
  </div>
- <div style={{padding:"14px 16px",fontSize:10,color:T.textSec,lineHeight:1.8}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
+ <div style={{padding:"14px 16px",fontSize:FS.base,color:T.textSec,lineHeight:1.8}}>
+ <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:10}}>DATA AS OF {(s.dataAsOf||s.logEntry?.ts||AS_OF).toUpperCase()}</div>
  {tab==="narrative"&&(()=>{
  return(
  <div>
  {memNarrative&&(
  <div style={{background:T.teal+"0c",border:"1px solid "+T.teal+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
- <div style={{fontSize:8,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em"}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
+ <div style={{fontSize:FS.xs,color:T.teal,textTransform:"uppercase",letterSpacing:"0.1em"}}>📅 Market Memory · {memHistory.length} session{memHistory.length===1?"":"s"} tracked</div>
  </div>
- <div style={{fontSize:10,color:T.textSec}}>{memNarrative}</div>
+ <div style={{fontSize:FS.base,color:T.textSec}}>{memNarrative}</div>
  </div>
  )}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
- <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div>
+ <div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div>
  </div>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div>
- <div style={{fontFamily:FP,fontSize:12,color:T.textSec,lineHeight:1.5}}>{s.structure}</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div>
+ <div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.structure}</div>
  </div>
  </div>
  <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
- <div style={{color:T.purple,fontFamily:FP,fontSize:12,lineHeight:1.5}}>{s.divergence}</div>
+ <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
+ <div style={{color:T.purple,fontFamily:FP,fontSize:FS.lg,lineHeight:1.5}}>{s.divergence}</div>
  </div>
  {(()=>{
  const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
@@ -1784,33 +1794,33 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  return(<div>
  {corrGroup&&corrMembers.length>=2&&(
  <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
+ <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
  {[...corrMembers].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map(m=>(
  <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
- <span style={{fontSize:9,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
+ <span style={{fontSize:FS.sm,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
  <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
  <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:0}}/>
  </div>
- <span style={{fontSize:9,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
+ <span style={{fontSize:FS.sm,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
  </div>
  ))}
- {corrDiv&&<div style={{marginTop:6,fontSize:9,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
+ {corrDiv&&<div style={{marginTop:6,fontSize:FS.sm,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
  </div>
  )}
  </div>);
  })()}
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
  {ai.logEntry&&(
  <div style={{padding:"9px 11px",background:T.teal+"08",borderRadius:0,borderLeft:"2px solid "+T.teal,marginBottom:5}}>
- <div style={{fontSize:8,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0}}>🤖 AI</span></div>
- <div style={{color:T.textSec,fontSize:10}}>{ai.logEntry}</div>
+ <div style={{fontSize:FS.xs,color:T.teal,fontFamily:FD,marginBottom:3}}>{aiUpdates._ts||"Today"} <span style={{marginLeft:6,fontSize:FS.xxs,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0}}>🤖 AI</span></div>
+ <div style={{color:T.textSec,fontSize:FS.base}}>{ai.logEntry}</div>
  </div>
  )}
  {s.logEntry&&(
  <div style={{padding:"9px 11px",background:T.bg,borderRadius:0,borderLeft:"2px solid "+T.border2}}>
- <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:4}}>{s.logEntry.ts} <span style={{color:T.sage,marginLeft:6}}>● base</span></div>
- <div style={{color:T.textSec,fontSize:10}}>{s.logEntry.note}</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:4}}>{s.logEntry.ts} <span style={{color:T.sage,marginLeft:6}}>● base</span></div>
+ <div style={{color:T.textSec,fontSize:FS.base}}>{s.logEntry.note}</div>
  </div>
  )}
  </div>
@@ -1823,11 +1833,11 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div>
  <div style={{background:sessionProfile.color+"10",border:"1px solid "+sessionProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
- <div style={{fontSize:8,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
- {sessionProfile.actionable&&<span style={{fontSize:8,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
+ <div style={{fontSize:FS.xs,color:sessionProfile.color,textTransform:"uppercase",letterSpacing:"0.1em"}}>Session Profile · {sessionProfile.session}</div>
+ {sessionProfile.actionable&&<span style={{fontSize:FS.xs,padding:"1px 6px",background:T.sage+"20",border:"1px solid "+T.sage+"40",borderRadius:0,color:T.sage}}>✓ Entry Window</span>}
  </div>
- <div style={{fontWeight:600,color:sessionProfile.color,fontSize:11,marginBottom:3}}>{sessionProfile.profile}</div>
- <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+sessionProfile.color+"20",fontSize:9,color:T.textDim}}>
+ <div style={{fontWeight:600,color:sessionProfile.color,fontSize:FS.lg,marginBottom:3}}>{sessionProfile.profile}</div>
+ <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+sessionProfile.color+"20",fontSize:FS.sm,color:T.textDim}}>
  <span style={{color:sessionProfile.color,fontWeight:600}}>9:30 Rule: </span>
  {s.direction==="call"
  ? "If 9:30 opens above "+( s.keyLevels[s.keyLevels.length-2]?.p||"key level")+", continuation confirmed. If 9:30 creates a manipulation (spike down then closes back up), intraday reversal in play — hold entry."
@@ -1835,25 +1845,25 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  </div>
  <div style={{background:weeklyProfile.color+"10",border:"1px solid "+weeklyProfile.color+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
- <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:11,marginBottom:3}}>{weeklyProfile.name}</div>
- <div style={{fontSize:9,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
+ <div style={{fontSize:FS.xs,color:weeklyProfile.color,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:3}}>Weekly Profile · {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}</div>
+ <div style={{fontWeight:600,color:weeklyProfile.color,fontSize:FS.lg,marginBottom:3}}>{weeklyProfile.name}</div>
+ <div style={{fontSize:FS.sm,color:T.textSec,lineHeight:1.6}}>{weeklyProfile.desc}</div>
  </div>
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>AMD Phase (Power of 3)</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>AMD Phase (Power of 3)</div>
  <div style={{display:"flex",gap:4}}>
  {[["Accumulation","Asia · consolidation · smart money builds","#4A90D9",!sessionProfile.actionable&&sessionProfile.session==="Asia"],
  ["Manipulation","London/Pre-mkt · fake move · retail trapped","#C9A84C",!sessionProfile.actionable&&sessionProfile.session!=="Asia"&&sessionProfile.session!=="New York"],
  ["Distribution","NY · true directional move begins · your entry","#3D8B6E",sessionProfile.actionable]
  ].map(([label,desc,color,active])=>(
  <div key={label} style={{flex:1,padding:"6px 7px",borderRadius:0,background:active?color+"18":T.bg,border:"1px solid "+(active?color+"40":T.border),transition:"all 0.2s"}}>
- <div style={{fontSize:8,fontWeight:active?700:400,color:active?color:T.textDim,marginBottom:2}}>{label}</div>
- <div style={{fontSize:7,color:T.textDim,lineHeight:1.4}}>{desc}</div>
+ <div style={{fontSize:FS.xs,fontWeight:active?700:400,color:active?color:T.textDim,marginBottom:2}}>{label}</div>
+ <div style={{fontSize:FS.xxs,color:T.textDim,lineHeight:1.4}}>{desc}</div>
  </div>
  ))}
  </div>
  </div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:10}}>Market Structure Cycle</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:10}}>Market Structure Cycle</div>
  <div style={{display:"flex",alignItems:"flex-start",marginBottom:14}}>
  {TL_STEPS.map((k,i)=>{
  const isA=k===s.phase, isP=i<ci;
@@ -1863,10 +1873,10 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div key={k} style={{display:"flex",alignItems:"center",flex:1}}>
  <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
  <div style={{width:isA?16:11,height:isA?16:11,borderRadius:"50%",border:"2px solid "+c,background:isA?pc:isP?pc+"22":"transparent",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:isA?"0 0 8px "+pc+"44":"none"}}>
- {isA&&<span style={{fontSize:5,color:T.bg,fontWeight:900}}>●</span>}
- {isP&&<span style={{fontSize:6,color:pc}}>✓</span>}
+ {isA&&<span style={{fontSize:FS.micro,color:T.bg,fontWeight:900}}>●</span>}
+ {isP&&<span style={{fontSize:FS.tiny,color:pc}}>✓</span>}
  </div>
- <div style={{fontSize:7,color:isA?pc:isP?pc+"88":T.border,textAlign:"center",fontWeight:isA?700:400}}>{["Exp","Cons","Ret","Ready","Mgmt"][i]}</div>
+ <div style={{fontSize:FS.xxs,color:isA?pc:isP?pc+"88":T.border,textAlign:"center",fontWeight:isA?700:400}}>{["Exp","Cons","Ret","Ready","Mgmt"][i]}</div>
  </div>
  {i<TL_STEPS.length-1&&<div style={{width:5,height:1,background:isP?T.border2:T.border,flexShrink:0,marginBottom:12}}/>}
  </div>
@@ -1875,40 +1885,40 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </div>
  <div style={{background:T.bg,border:"1px solid "+ac+"30",borderRadius:0,padding:"9px 11px",marginBottom:8}}>
  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
- <div style={{fontSize:8,color:ac,textTransform:"uppercase",letterSpacing:"0.1em"}}>{ph.label}{ai.phase&&ai.phase!==s.phase?" (updated)":""}</div>
- {ai.phaseNote&&<span style={{fontSize:7,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0,color:T.teal}}>🤖 AI</span>}
+ <div style={{fontSize:FS.xs,color:ac,textTransform:"uppercase",letterSpacing:"0.1em"}}>{ph.label}{ai.phase&&ai.phase!==s.phase?" (updated)":""}</div>
+ {ai.phaseNote&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:T.teal+"20",border:"1px solid "+T.teal+"40",borderRadius:0,color:T.teal}}>🤖 AI</span>}
  </div>
  <div style={{color:T.textSec}}>{ai.phaseNote||s.phaseNote}</div>
  </div>
- {s.nestedFib&&<div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Nested Fib · OB Mean Threshold</div><div style={{color:T.gold}}>{s.nestedFib}</div></div>}
+ {s.nestedFib&&<div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Nested Fib · OB Mean Threshold</div><div style={{color:T.gold}}>{s.nestedFib}</div></div>}
  </div>
  );
  })()}
  {tab==="checklist"&&renderChecklistTab(s, allCk, ck, pct, effectiveAutoChecks)}
  {tab==="entry"&&(
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Entry — 3-Candle Swing · 4pm Close</div>
  <div style={{marginBottom:10}}>{s.entryNote}</div>
  {renderEntryPreFlight(pf)}
  <div style={{background:T.bg,border:"1px solid "+T.border,borderRadius:0,padding:"10px 12px"}}>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Parameters</div>
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
  {[["Delta","0.35–0.45"],["DTE","Farthest affordable"],["IV Rank","< 30"],["Stop","-40% on premium"]].map(([k,v])=>(
- <div key={k}><div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{k}</div><div style={{fontSize:10,color:T.textPri,fontFamily:FD}}>{v}</div></div>
+ <div key={k}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{k}</div><div style={{fontSize:FS.base,color:T.textPri,fontFamily:FD}}>{v}</div></div>
  ))}
  </div>
- <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation} — body close only (wick through = manipulation, not invalidation)</div>
+ <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid "+T.border,fontSize:FS.sm,color:T.rose}}>Invalidation:{s.invalidation} — body close only (wick through = manipulation, not invalidation)</div>
  </div>
  </div>
  )}
  {tab==="levels"&&(
  <div>
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Price Levels</div>
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Key Price Levels</div>
  {renderKeyLevelsList(s.keyLevels, 50)}
- <div style={{padding:"5px 9px",background:T.rose+"0a",border:"1px solid "+T.rose+"20",borderRadius:0,marginBottom:12,fontSize:9,color:T.rose}}>Invalidation:{s.invalidation}</div>
+ <div style={{padding:"5px 9px",background:T.rose+"0a",border:"1px solid "+T.rose+"20",borderRadius:0,marginBottom:12,fontSize:FS.sm,color:T.rose}}>Invalidation:{s.invalidation}</div>
  <div style={{borderTop:"1px solid "+T.border,paddingTop:12}}>
- {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:0}}><div style={{fontSize:8,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:9,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
- <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
+ {earnD!=null&&<div style={{marginBottom:8,padding:"7px 10px",background:earnC+"0a",border:"1px solid "+earnC+"30",borderRadius:0}}><div style={{fontSize:FS.xs,color:earnC,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Earnings</div><div style={{color:earnC,fontWeight:600,fontFamily:FD}}>{s.earningsLabel} · {earnD} days</div>{dteD!=null&&<div style={{fontSize:FS.sm,color:T.textDim,marginTop:2}}>{earnD>dteD?"After expiry — consider rolling":"Within contract window"}</div>}</div>}
+ <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Catalysts</div>
  {renderCatalystsList(s.catalysts)}
  </div>
  </div>
@@ -1924,43 +1934,43 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {view==="screener"&&(
  <div style={{padding:16}}>
   {screenerLoading&&(
-   <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:13,fontFamily:FM}}>Loading screener data...</div>
+   <div style={{textAlign:"center",padding:32,color:T.textSec,fontSize:FS.lg,fontFamily:FM}}>Loading screener data...</div>
   )}
   {!screenerLoading&&screenerHits.length===0&&(
    <div style={{textAlign:"center",padding:32}}>
-    <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
-    <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
-    <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Retry</button>
+    <div style={{fontSize:FS.lg,color:T.textSec,fontFamily:FM}}>No screener data found</div>
+    <div style={{fontSize:FS.base,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
+    <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{marginTop:12,fontSize:FS.sm,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Retry</button>
    </div>
   )}
   {!screenerLoading&&screenerHits.length>0&&(
    <>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
      <div>
-      <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
-      <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4{screenerMeta.generated_at&&" · ran "+new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})+" ET"}</div>
+      <div style={{fontSize:FS.lg,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
+      <div style={{fontSize:FS.sm,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4{screenerMeta.generated_at&&" · ran "+new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})+" ET"}</div>
      </div>
-     <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
+     <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{fontSize:FS.sm,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
-     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." aria-label="Search ticker" style={{fontSize:9,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
+     <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." aria-label="Search ticker" style={{fontSize:FS.sm,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
-      <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
-      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} aria-label="Sort screener results" style={{fontSize:9,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
+      <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Sort</span>
+      <select value={scrSort} onChange={e=>setScrSort(e.target.value)} aria-label="Sort screener results" style={{fontSize:FS.sm,padding:"2px 6px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,cursor:"pointer"}}>
        <option value="score">Score ↓</option>
        <option value="retr">Retracement %</option>
        <option value="ticker">Ticker A–Z</option>
       </select>
      </div>
      <div style={{display:"flex",alignItems:"center",gap:5}}>
-      <span style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
+      <span style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",fontFamily:FM}}>Bias</span>
       <div style={{display:"flex",gap:3}}>
        {[["all","All"],["BULL","▲ Calls"],["BEAR","▼ Puts"]].map(([v,l])=>(
-        <button key={v} onClick={()=>setScrBias(v)} style={{padding:"3px 8px",fontSize:9,fontFamily:FM,background:scrBias===v?T.teal+"20":T.bg,border:"1px solid "+(scrBias===v?T.teal:T.border),borderRadius:0,color:scrBias===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
+        <button key={v} onClick={()=>setScrBias(v)} style={{padding:"3px 8px",fontSize:FS.sm,fontFamily:FM,background:scrBias===v?T.teal+"20":T.bg,border:"1px solid "+(scrBias===v?T.teal:T.border),borderRadius:0,color:scrBias===v?T.teal:T.textDim,cursor:"pointer",whiteSpace:"nowrap"}}>{l}</button>
        ))}
       </div>
      </div>
-     <span style={{fontSize:8,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).filter(h=>!scrSearch.trim()||h.ticker.toLowerCase().includes(scrSearch.trim().toLowerCase())).length} shown</span>
+     <span style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginLeft:"auto"}}>{(scrBias==="all"?screenerHits:screenerHits.filter(h=>h.bias===scrBias)).filter(h=>!scrSearch.trim()||h.ticker.toLowerCase().includes(scrSearch.trim().toLowerCase())).length} shown</span>
     </div>
     {(()=>{ try{
      const allSyms=new Set([...allSetups,...(CRYPTO||[]),...(COMMODITIES||[]),...(INDICES||[])].map(s=>s.symbol));
@@ -2006,17 +2016,17 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
         <div style={{padding:"12px 14px"}}>
          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
           <div>
-           <span style={{fontSize:14,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
-           <span style={{fontSize:10,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
+           <span style={{fontSize:FS.hero,fontWeight:700,color:T.textPri,fontFamily:FM}}>{h.ticker}</span>
+           <span style={{fontSize:FS.base,color:T.textDim,fontFamily:FD,marginLeft:6}}>${Number(h.price||0).toFixed(2)}</span>
           </div>
-          <div style={{background:bc+"22",color:bc,fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:0,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
-          {h.weekly_conflict&&<div title={`Weekly bias (${h.weekly_bias}) conflicts with daily setup direction`} style={{background:T.amber+"22",color:T.amber,fontSize:8,fontWeight:700,padding:"2px 6px",borderRadius:0,border:"1px solid "+T.amber+"44",letterSpacing:"0.06em"}}>⚠ WKLY {h.weekly_bias}</div>}
-          {isTracked&&urgency&&<div style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
+          <div style={{background:bc+"22",color:bc,fontSize:FS.sm,fontWeight:700,padding:"2px 8px",borderRadius:0,border:"1px solid "+bc+"44",letterSpacing:"0.08em"}}>{h.bias==="BULL"?"▲ CALL":"▼ PUT"}</div>
+          {h.weekly_conflict&&<div title={`Weekly bias (${h.weekly_bias}) conflicts with daily setup direction`} style={{background:T.amber+"22",color:T.amber,fontSize:FS.xs,fontWeight:700,padding:"2px 6px",borderRadius:0,border:"1px solid "+T.amber+"44",letterSpacing:"0.06em"}}>⚠ WKLY {h.weekly_bias}</div>}
+          {isTracked&&urgency&&<div style={{fontSize:FS.xs,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</div>}
           <div style={{marginLeft:"auto",display:"flex",gap:2,alignItems:"center"}}>
            {["topdown_bias","expansion","in_zone","vol_confirm","liquid"].map(k=>(
             <div key={k} title={k} style={{width:8,height:8,borderRadius:0,background:h.conditions?.[k]?T.sage:T.border2}}/>
            ))}
-           <span style={{fontSize:10,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
+           <span style={{fontSize:FS.base,fontWeight:700,color:h.met===5?T.sage:h.met>=4?T.gold:T.textDim,marginLeft:5,fontFamily:FM}}>{h.met}/5</span>
           </div>
          </div>
          <div style={{marginBottom:6,display:"flex",alignItems:"center",gap:10}}>
@@ -2027,31 +2037,31 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
             <circle cx="22" cy="22" r="18" fill="none" stroke={retrColor} strokeWidth="2"
              strokeDasharray={(Math.min(retrPct,100)/100*113.1).toFixed(1)+" 113.1"} transform="rotate(-90 22 22)"/>
            </svg>
-           <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(0)}%</div>
+           <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:FS.xs,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(0)}%</div>
           </div>
           <div>
-           <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:2}}>RETRACEMENT — 0–50% OTE ZONE</div>
-           <div style={{fontSize:9,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓ inside zone":" — outside zone"}</div>
+           <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:2}}>RETRACEMENT — 0–50% OTE ZONE</div>
+           <div style={{fontSize:FS.sm,color:retrColor,fontFamily:FD,fontWeight:700}}>{retrPct.toFixed(1)}%{retrPct<=50?" ✓ inside zone":" — outside zone"}</div>
           </div>
          </div>
          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
-          <div style={{fontSize:9,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
+          <div style={{fontSize:FS.sm,color:T.textSec,fontFamily:FD,fontStyle:"italic"}}>
            {h.bias==="BULL"?"Watching for C2 bullish entry":"Watching for C2 bearish entry"}. Retr {retrPct.toFixed(1)}%{retrPct<=50?" — inside 0–50% zone ✓":" — outside zone, wait"}.
           </div>
           {isTracked?(
-           match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>
+           match&&<button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:FS.xs,padding:"3px 10px",background:expanded?T.sage+"20":"transparent",border:"1px solid "+(expanded?T.sage:T.border),color:expanded?T.sage:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,marginLeft:8}}>{expanded?"▲ Hide":"View Analysis"}</button>
           ):(
            <>
-            {!aiCards[h.ticker]&&<button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:8,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:0,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"⏳ Analyzing…":"★ Analyze + Save"}</button>}
-            {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:8,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>★ SAVED</span>}
-            <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:8,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
+            {!aiCards[h.ticker]&&<button onClick={()=>analyzeHit(h)} disabled={!!analyzing[h.ticker]} style={{flexShrink:0,fontSize:FS.xs,fontWeight:700,padding:"3px 10px",background:analyzing[h.ticker]?T.bg:T.gold+"18",border:"1px solid "+T.gold+"55",color:T.gold,borderRadius:0,cursor:analyzing[h.ticker]?"wait":"pointer",fontFamily:FM,whiteSpace:"nowrap"}}>{analyzing[h.ticker]?"⏳ Analyzing…":"★ Analyze + Save"}</button>}
+            {aiCards[h.ticker]&&<span style={{flexShrink:0,fontSize:FS.xs,color:T.gold,letterSpacing:"0.06em",fontFamily:FM,whiteSpace:"nowrap"}}>★ SAVED</span>}
+            <button onClick={()=>{const w=!scrExpand[h.ticker];setScrExpand(p=>({...p,[h.ticker]:w}));if(w)fetchCandleAnalysis(h.ticker,h.bias==="BULL"?"call":"put");}} style={{flexShrink:0,fontSize:FS.xs,padding:"3px 10px",background:expanded?bc+"18":"transparent",border:"1px solid "+(expanded?bc:T.border),color:expanded?bc:T.textDim,borderRadius:0,cursor:"pointer",fontFamily:FM,transition:"all 0.15s"}}>{expanded?"▲ Hide":"Analysis ↗"}</button>
            </>
           )}
          </div>
         </div>
         {!isTracked&&h.am_projection&&(
          <div style={{margin:"0 14px 10px",padding:"8px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center"}}>
-          <div style={{fontSize:9,color:T.textSec,fontFamily:FD}}>
+          <div style={{fontSize:FS.sm,color:T.textSec,fontFamily:FD}}>
            <span>📍</span>{" "}
            <span style={{color:h.am_projection.reaction_swing?.type==="low"?T.sage:T.rose,fontWeight:700}}>
             {h.am_projection.reaction_swing?.type==="low"?"Swing Low":"Swing High"}{" "}${h.am_projection.reaction_swing?.price}
@@ -2064,8 +2074,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
             </span>
            )}
           </div>
-          <div style={{fontSize:9,color:T.textDim,fontFamily:FD}}>📅 {h.am_projection.profile?.label}</div>
-          <div style={{fontSize:8,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",padding:"2px 7px",borderRadius:0,fontFamily:FM,marginLeft:"auto",background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",color:h.am_projection.both_gates?T.sage:T.gold,border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"}}>
+          <div style={{fontSize:FS.sm,color:T.textDim,fontFamily:FD}}>📅 {h.am_projection.profile?.label}</div>
+          <div style={{fontSize:FS.xs,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",padding:"2px 7px",borderRadius:0,fontFamily:FM,marginLeft:"auto",background:h.am_projection.both_gates?T.sage+"22":T.gold+"22",color:h.am_projection.both_gates?T.sage:T.gold,border:"1px solid "+(h.am_projection.both_gates?T.sage:T.gold)+"55"}}>
            {h.am_projection.both_gates?"✅ Both Gates":"⚠ Hold"}
           </div>
          </div>
@@ -2075,26 +2085,26 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
           <div style={{background:T.bg,borderTop:"1px solid "+T.border}}>
            <div style={{display:"flex",borderBottom:"1px solid "+T.border}}>
             {[["analysis","Analysis"],["checklist","Checklist"],["chart","Chart ↗"]].map(([t,l])=>(
-             <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:9,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
+             <button key={t} onClick={e=>{e.stopPropagation();setScrTab(p=>({...p,[h.ticker]:t}));}} style={{padding:"6px 14px",fontSize:FS.sm,background:"transparent",border:"none",borderBottom:activeTab===t?"2px solid "+bc:"2px solid transparent",color:activeTab===t?bc:T.textDim,cursor:"pointer",fontFamily:FM,transition:"color 0.15s"}}>{l}</button>
             ))}
            </div>
            {activeTab==="analysis"&&(isTracked?(
             <div style={{padding:"10px 14px 14px"}}>
              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-              <span style={{fontSize:9,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match?.phase}</span>
-              {urgency&&<span style={{fontSize:8,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</span>}
-              {match?.signal&&<span style={{fontSize:9,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
+              <span style={{fontSize:FS.sm,fontWeight:700,color:mPh?.color||T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:FM}}>{mPh?.label||match?.phase}</span>
+              {urgency&&<span style={{fontSize:FS.xs,color:match.phase==="READY"?T.rose:match.phase==="RETRACEMENT"?T.gold:T.textDim,fontFamily:FD}}>{urgency}</span>}
+              {match?.signal&&<span style={{fontSize:FS.sm,color:T.textSec,fontFamily:FD,flex:1}}>{match.signal}</span>}
              </div>
              {(match?.thesis||match?.structure)&&(
-              <div style={{fontSize:10,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border}}>
+              <div style={{fontSize:FS.base,color:T.textSec,lineHeight:1.7,fontFamily:FD,marginBottom:10,padding:"8px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border}}>
                {(match.thesis||match.structure).slice(0,260)}{(match.thesis||match.structure).length>260?"…":""}
               </div>
              )}
              {match?.keyLevels&&match.keyLevels.length>0&&(
               <div>
-               <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
+               <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:5}}>Key Levels</div>
                {match.keyLevels.slice(0,4).map((kl,ki)=>(
-                <div key={ki} style={{display:"flex",gap:8,fontSize:9,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
+                <div key={ki} style={{display:"flex",gap:8,fontSize:FS.sm,color:T.textDim,fontFamily:FD,marginTop:4,padding:"4px 0",borderBottom:ki<Math.min(match.keyLevels.length,4)-1?"1px solid "+T.border:"none"}}>
                  <span style={{color:kl.type==="support"?T.sage:kl.type==="resistance"?T.rose:T.gold,minWidth:80,flexShrink:0,fontWeight:600}}>{kl.label||kl.type}</span>
                  <span style={{color:T.textSec,minWidth:60}}>{kl.p}</span>
                  {kl.note&&<span style={{color:T.textDim}}>{String(kl.note).slice(0,60)}</span>}
@@ -2103,21 +2113,21 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
               </div>
              )}
              {match?.invalidation&&(
-              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:0,fontSize:9,color:T.rose,fontFamily:FD}}>
+              <div style={{marginTop:8,padding:"6px 10px",background:T.rose+"10",border:"1px solid "+T.rose+"30",borderRadius:0,fontSize:FS.sm,color:T.rose,fontFamily:FD}}>
                <span style={{fontWeight:700}}>Invalidation: </span>{match.invalidation}
               </div>
              )}
             </div>
            ):(
             <div style={{padding:"10px 14px 14px"}}>
-             <div style={{fontSize:8,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:8}}>Screener Conditions</div>
+             <div style={{fontSize:FS.xs,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM,marginBottom:8}}>Screener Conditions</div>
              {[["topdown_bias","Top-down Bias Aligned"],["expansion","In Expansion Phase"],["in_zone","Price in 0–50% Retracement Zone"],["vol_confirm","Volume Confirmation"],["liquid","Liquid (>500K avg vol)"]].map(([k,label])=>(
               <div key={k} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",borderBottom:"1px solid "+T.border}}>
-               <span style={{fontSize:11,color:h.conditions?.[k]?T.sage:T.rose}}>{h.conditions?.[k]?"✓":"✗"}</span>
-               <span style={{fontSize:9,color:h.conditions?.[k]?T.textSec:T.textDim,fontFamily:FD}}>{label}</span>
+               <span style={{fontSize:FS.lg,color:h.conditions?.[k]?T.sage:T.rose}}>{h.conditions?.[k]?"✓":"✗"}</span>
+               <span style={{fontSize:FS.sm,color:h.conditions?.[k]?T.textSec:T.textDim,fontFamily:FD}}>{label}</span>
               </div>
              ))}
-             <div style={{marginTop:10,padding:"7px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border,fontSize:9,color:T.textDim,fontFamily:FD,fontStyle:"italic"}}>
+             <div style={{marginTop:10,padding:"7px 10px",background:T.surface,borderRadius:0,border:"1px solid "+T.border,fontSize:FS.sm,color:T.textDim,fontFamily:FD,fontStyle:"italic"}}>
               Algorithm-only hit — no manual narrative written. Add to scanner to track with full analysis.
              </div>
             </div>
@@ -2125,45 +2135,45 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
            {activeTab==="checklist"&&(
             <div style={{padding:"10px 14px 14px"}}>
              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-              <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
-              <span style={{fontSize:8,color:T.textDim}}>🤖 auto</span>
+              <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em"}}>Entry Criteria — {allCk.length}/{CHECKLIST.length}</div>
+              <span style={{fontSize:FS.xs,color:T.textDim}}>🤖 auto</span>
              </div>
              <div style={{width:"100%",height:3,background:T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
               <div style={{height:"100%",borderRadius:0,background:pct===100?T.sage:pct>=50?T.gold:T.rose,width:pct+"%",transition:"width 0.3s"}}/>
              </div>
              <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,padding:"9px 11px",marginBottom:10}}>
-              <div style={{fontSize:8,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
+              <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>🤖 Candle Detection{pre&&!dr&&<span style={{color:T.amber}}> · CI data</span>}{dr&&<span style={{color:T.sage}}> · Live</span>}{cd?.loading&&" · Loading..."}</div>
               {sd?(
                <div>
                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-                 <span style={{fontSize:9,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
-                 {sd.confidence&&<span style={{fontSize:7,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:0,color:cc[sd.confidence]}}>{sd.confidence}</span>}
+                 <span style={{fontSize:FS.sm,fontWeight:600,color:sc}}>{sd.stage?.replace(/_/g," ")}</span>
+                 {sd.confidence&&<span style={{fontSize:FS.xxs,padding:"1px 5px",background:(cc[sd.confidence]||T.textDim)+"20",border:"1px solid "+(cc[sd.confidence]||T.textDim)+"40",borderRadius:0,color:cc[sd.confidence]}}>{sd.confidence}</span>}
                 </div>
-                {sd.reason&&<div style={{fontSize:9,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
+                {sd.reason&&<div style={{fontSize:FS.sm,color:T.textSec,marginBottom:4}}>{sd.reason}</div>}
                 {sd.ob_mean!=null&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginTop:4}}>
                  {[["OB Mean","$"+(sd.ob_mean||0).toFixed(2)],["Prot. Swing","$"+(sd.protected_swing||0).toFixed(2)],["OTE","$"+(sd.ote_low||0).toFixed(2)+"–$"+(sd.ote_high||0).toFixed(2)]].map(([k,v])=>(
                   <div key={k} style={{background:T.bg,borderRadius:0,padding:"4px 6px"}}>
-                   <div style={{fontSize:7,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
-                   <div style={{fontSize:9,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
+                   <div style={{fontSize:FS.xxs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{k}</div>
+                   <div style={{fontSize:FS.sm,color:T.textPri,fontFamily:FD,fontWeight:600}}>{v}</div>
                   </div>
                  ))}
                 </div>}
-                <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:8,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
+                <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid "+T.border,fontSize:FS.xs,color:T.textDim}}>5-min IC-CISD: <span style={{color:T.gold}}>manual</span> · confirm on TradingView 5-min chart</div>
                </div>
-              ):(<div style={{fontSize:9,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
+              ):(<div style={{fontSize:FS.sm,color:T.textDim}}>{cd?.loading?"Fetching live data...":cd?.error?"Error: "+cd.error:"Opening card to load detection data"}</div>)}
              </div>
              {CHECKLIST.map(item=>{
               const isAuto=allCk.includes(item.id);
               return(<div key={item.id} style={{display:"flex",gap:8,marginBottom:5,padding:"7px 9px",borderRadius:0,background:isAuto?T.sage+"08":T.bg,border:"1px solid "+(isAuto?T.sage+"25":T.border)}}>
                <div style={{width:13,height:13,borderRadius:0,flexShrink:0,marginTop:1,background:isAuto?T.sage:"transparent",border:"1.5px solid "+(isAuto?T.sage:T.border2),display:"flex",alignItems:"center",justifyContent:"center"}}>
-                {isAuto&&<span style={{color:T.bg,fontSize:8,fontWeight:900}}>✓</span>}
+                {isAuto&&<span style={{color:T.bg,fontSize:FS.xs,fontWeight:900}}>✓</span>}
                </div>
                <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:1}}>
-                 <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:10}}>{item.label}</span>
-                 {isAuto&&<span style={{fontSize:7,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
+                 <span style={{color:isAuto?T.sage:T.textSec,fontWeight:isAuto?600:400,fontSize:FS.base}}>{item.label}</span>
+                 {isAuto&&<span style={{fontSize:FS.xxs,padding:"1px 4px",background:T.sage+"15",border:"1px solid "+T.sage+"30",borderRadius:0,color:T.sage}}>auto</span>}
                 </div>
-                <div style={{color:T.textDim,fontSize:9}}>{item.desc}</div>
+                <div style={{color:T.textDim,fontSize:FS.sm}}>{item.desc}</div>
                </div>
               </div>);
              })}
@@ -2171,7 +2181,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
            )}
            {activeTab==="chart"&&(
             <div style={{padding:"8px 10px 10px"}}>
-             <div style={{fontSize:8,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+             <div style={{fontSize:FS.xs,color:T.textDim,fontFamily:FD,marginBottom:5,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <span style={{color:T.textSec,fontWeight:600}}>{h.ticker} — Daily Chart (30d)</span>
               <span>TradingView</span>
              </div>
@@ -2194,12 +2204,12 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
         <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
          <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:T.sage,flexShrink:0}}/>
-          <span style={{fontSize:9,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
-          <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
+          <span style={{fontSize:FS.sm,fontWeight:700,color:T.sage,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>New Candidates</span>
+          <span style={{fontSize:FS.sm,color:T.textDim,marginLeft:"auto"}}>{newHits.length} not yet in scanner</span>
          </div>
          {(scrShowAll?newHits:newHits.slice(0,15)).map(h=>renderScreenerCard(h,false))}
          {newHits.length>15&&(
-          <button onClick={()=>setScrShowAll(p=>!p)} style={{width:"100%",padding:"8px 0",fontSize:9,fontFamily:FM,background:T.bg,border:"none",borderTop:"1px solid "+T.border,color:T.textDim,cursor:"pointer",letterSpacing:"0.05em"}}>
+          <button onClick={()=>setScrShowAll(p=>!p)} style={{width:"100%",padding:"8px 0",fontSize:FS.sm,fontFamily:FM,background:T.bg,border:"none",borderTop:"1px solid "+T.border,color:T.textDim,cursor:"pointer",letterSpacing:"0.05em"}}>
            {scrShowAll?"▲ Show fewer":`▼ Show all ${newHits.length} (${newHits.length-15} more)`}
           </button>
          )}
@@ -2209,15 +2219,15 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
         <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:10}}>
          <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",gap:6,background:T.bg}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
-          <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
-          <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
+          <span style={{fontSize:FS.sm,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Already Tracked</span>
+          <span style={{fontSize:FS.sm,color:T.textDim,marginLeft:"auto"}}>Screener confirms open setups</span>
          </div>
          {tracked.map(h=>renderScreenerCard(h,true))}
         </div>
        )}
       </>
      );
-    }catch(e){return(<div style={{color:"#ef4444",padding:"14px 16px",margin:"8px 0",background:"#1a0000",borderRadius:0,border:"1px solid #ef444440",fontFamily:"SF Mono,monospace",fontSize:11}}>⚠ Screener render error: {e.message}</div>);}
+    }catch(e){return(<div style={{color:"#ef4444",padding:"14px 16px",margin:"8px 0",background:"#1a0000",borderRadius:0,border:"1px solid #ef444440",fontFamily:"SF Mono,monospace",fontSize:FS.lg}}>⚠ Screener render error: {e.message}</div>);}
     })()}
    </>
   )}
@@ -2248,30 +2258,30 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
   const goToCard=(symbol)=>{setView("everything");setOpen(p=>({...p,[symbol]:true}));setTimeout(()=>{document.getElementById("ofc-"+symbol)?.scrollIntoView({behavior:"smooth",block:"start"});},120);};
   return(
   <div style={{padding:"10px 20px"}}>
-   <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em",marginBottom:2}}>🗞 NEWS</div>
-   <div style={{fontSize:9,color:T.textDim,marginBottom:14}}>Aggregated from nightly Tier 1/Tier 2 checks and live price data — not a real-time feed. "Since Last Session" reflects the most recent overnight snapshot per symbol. Click any row to jump to that card.</div>
+   <div style={{fontSize:FS.lg,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em",marginBottom:2}}>🗞 NEWS</div>
+   <div style={{fontSize:FS.sm,color:T.textDim,marginBottom:14}}>Aggregated from nightly Tier 1/Tier 2 checks and live price data — not a real-time feed. "Since Last Session" reflects the most recent overnight snapshot per symbol. Click any row to jump to that card.</div>
 
    <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:12}}>
     <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
      <div style={{width:6,height:6,borderRadius:"50%",background:T.teal,flexShrink:0}}/>
-     <span style={{fontSize:9,fontWeight:700,color:T.teal,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Since Last Session</span>
-     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{sinceLastSession.length} symbol{sinceLastSession.length!==1?"s":""} changed</span>
+     <span style={{fontSize:FS.sm,fontWeight:700,color:T.teal,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Since Last Session</span>
+     <span style={{fontSize:FS.sm,color:T.textDim,marginLeft:"auto"}}>{sinceLastSession.length} symbol{sinceLastSession.length!==1?"s":""} changed</span>
     </div>
     {sinceLastSession.length===0&&(
-     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
+     <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>No phase, invalidation, or key-level status changes since the last overnight check.</div>
     )}
     {sinceLastSession.map(({symbol,name,events,date,dataAsOf,isStale,analysisAge})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(symbol);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
+     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(symbol))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-       <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri}}>{symbol}</span>
-       <span style={{fontSize:9,color:T.textDim}}>{name}</span>
-       <span style={{fontSize:8,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>checked {date}</span>
+       <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri}}>{symbol}</span>
+       <span style={{fontSize:FS.sm,color:T.textDim}}>{name}</span>
+       <span style={{fontSize:FS.xs,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>checked {date}</span>
       </div>
       {events.map((ev,i)=>(
-       <div key={i} style={{fontSize:9,color:sevColor(ev.severity),marginTop:2}}>{sevIcon(ev.severity)} {ev.text}</div>
+       <div key={i} style={{fontSize:FS.sm,color:sevColor(ev.severity),marginTop:2}}>{sevIcon(ev.severity)} {ev.text}</div>
       ))}
       {isStale&&(
-       <div style={{fontSize:8,color:T.amber,marginTop:4,fontStyle:"italic"}}>⚠ Underlying analysis is {analysisAge}d old (as of {dataAsOf}) — this is today's live price checked against that stale thesis, not a fresh review. Consider Regen.</div>
+       <div style={{fontSize:FS.xs,color:T.amber,marginTop:4,fontStyle:"italic"}}>⚠ Underlying analysis is {analysisAge}d old (as of {dataAsOf}) — this is today's live price checked against that stale thesis, not a fresh review. Consider Regen.</div>
       )}
      </div>
     ))}
@@ -2280,16 +2290,16 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
    <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden",marginBottom:12}}>
     <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
      <div style={{width:6,height:6,borderRadius:"50%",background:T.gold,flexShrink:0}}/>
-     <span style={{fontSize:9,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Active Alerts</span>
-     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{activeAlerts.length} active</span>
+     <span style={{fontSize:FS.sm,fontWeight:700,color:T.gold,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Active Alerts</span>
+     <span style={{fontSize:FS.sm,color:T.textDim,marginLeft:"auto"}}>{activeAlerts.length} active</span>
     </div>
     {activeAlerts.length===0&&(
-     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
+     <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>No active alerts right now.</div>
     )}
     {activeAlerts.map(({symbol,alert,alertLevel})=>(
-     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(symbol);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
-      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
-      <span style={{fontSize:9,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
+     <div key={symbol} onClick={()=>goToCard(symbol)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(symbol))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"flex-start",cursor:"pointer"}}>
+      <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{symbol}</span>
+      <span style={{fontSize:FS.sm,color:sevColor(alertLevel)}}>{sevIcon(alertLevel)} {alert}</span>
      </div>
     ))}
    </div>
@@ -2297,16 +2307,16 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
    <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
     <div style={{padding:"8px 14px",borderBottom:"1px solid "+T.border,background:T.bg,display:"flex",alignItems:"center",gap:6}}>
      <div style={{width:6,height:6,borderRadius:"50%",background:T.blue,flexShrink:0}}/>
-     <span style={{fontSize:9,fontWeight:700,color:T.blue,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Near Key Level Now</span>
-     <span style={{fontSize:9,color:T.textDim,marginLeft:"auto"}}>{nearNow.length} symbol{nearNow.length!==1?"s":""} · live · active phases only</span>
+     <span style={{fontSize:FS.sm,fontWeight:700,color:T.blue,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Near Key Level Now</span>
+     <span style={{fontSize:FS.sm,color:T.textDim,marginLeft:"auto"}}>{nearNow.length} symbol{nearNow.length!==1?"s":""} · live · active phases only</span>
     </div>
     {nearNow.length===0&&(
-     <div style={{padding:"14px",fontSize:9,color:T.textDim,fontFamily:FM}}>Nothing in an active phase is currently within 0.8% of a tracked key level.</div>
+     <div style={{padding:"14px",fontSize:FS.sm,color:T.textDim,fontFamily:FM}}>Nothing in an active phase is currently within 0.8% of a tracked key level.</div>
     )}
     {nearNow.map(({sym,price,label})=>(
-     <div key={sym} onClick={()=>goToCard(sym)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToCard(sym);}}} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
-      <span style={{fontFamily:FD,fontSize:12,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
-      <span style={{fontSize:9,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
+     <div key={sym} onClick={()=>goToCard(sym)} role="button" tabIndex={0} onKeyDown={keyActivate(()=>goToCard(sym))} style={{padding:"9px 14px",borderBottom:"1px solid "+T.border,display:"flex",gap:10,alignItems:"center",cursor:"pointer"}}>
+      <span style={{fontFamily:FD,fontSize:FS.lg,fontWeight:700,color:T.textPri,minWidth:44,flexShrink:0}}>{sym}</span>
+      <span style={{fontSize:FS.sm,color:T.gold}}>⚠ ${price} near {label||"key level"}</span>
      </div>
     ))}
    </div>
@@ -2317,11 +2327,11 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {(view==="all"||view==="everything")&&(
  <div style={{marginTop:6,background:T.surface,border:"1px solid "+T.border,borderRadius:0,overflow:"hidden"}}>
  <button onClick={()=>setFwOpen(p=>!p)} style={{width:"100%",padding:"10px 16px",background:"transparent",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
- <span style={{fontSize:9,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology{!fwOpen?" — Private":""}</span>
- <span style={{fontSize:9,color:T.textDim}}>{fwOpen?"▲":"🔒"}</span>
+ <span style={{fontSize:FS.sm,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:FM}}>Methodology{!fwOpen?" — Private":""}</span>
+ <span style={{fontSize:FS.sm,color:T.textDim}}>{fwOpen?"▲":"🔒"}</span>
  </button>
  {fwOpen&&(
- <div style={{padding:"0 16px 12px",fontSize:10,color:T.textSec,lineHeight:2,borderTop:"1px solid "+T.border}}>
+ <div style={{padding:"0 16px 12px",fontSize:FS.base,color:T.textSec,lineHeight:2,borderTop:"1px solid "+T.border}}>
  <div style={{marginTop:8}}>Top-down:12M→6M→3M→Monthly→Weekly→Daily · 30-candle lookback</div>
  <div>Opposing candle open = range floor/ceiling · 3-candle swing at 4pm = entry trigger · 9:30 open confirms directional framework</div>
  <div style={{color:T.teal,marginTop:2}}>Weekly profiles: Classic Expansion · Midweek Reversal · Consolidation Reversal · Intraweek Reversal · TGIF · Thursday Counter</div>
@@ -2335,7 +2345,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  )}
  </div>
  )}
- <div style={{marginTop:8,textAlign:"center",fontSize:8,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
+ <div style={{marginTop:8,textAlign:"center",fontSize:FS.xs,color:T.textDim,letterSpacing:"0.08em"}}>★ SAVED SETUPS + CHECKLISTS PERSIST ACROSS SESSIONS</div>
  </div>
  )}
  <style>{"@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} [role=\"button\"]:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #4A6D92;outline-offset:2px}"}</style>

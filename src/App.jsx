@@ -952,6 +952,33 @@ const WORKER = window.location.hostname === "localhost"
  // rendering itself is shared. The Options copy previously mapped s.keyLevels/
  // s.catalysts with no fallback (would throw if either were ever undefined) - both
  // now defensively fall back to [] like alt-view already did.
+ // Shared SMT correlated-group divergence panel — self-guarded, so calling
+ // it for a symbol outside CORR_GROUPS (any real equity options position)
+ // simply renders nothing. Previously only present in the "Everything"
+ // mixed-view Narrative tab; ported here so the dedicated Crypto/
+ // Commodities/Indices tab shows it too, since that's the view where
+ // seeing a symbol's correlated peers is actually most useful.
+ const renderSmtCorrGroup = (s) => {
+ const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
+ const corrMembers=corrGroup?corrGroup.map(m=>({sym:m,chg:liveData[m]?.chg})).filter(m=>typeof m.chg==="number"):[];
+ if(!corrGroup||corrMembers.length<2) return null;
+ const corrDiv=computeLiveDivergence(s.symbol);
+ return(
+ <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
+ <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
+ {[...corrMembers].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map(m=>(
+ <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
+ <span style={{fontSize:FS.sm,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
+ <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
+ <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:0}}/>
+ </div>
+ <span style={{fontSize:FS.sm,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
+ </div>
+ ))}
+ {corrDiv&&<div style={{marginTop:6,fontSize:FS.sm,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
+ </div>
+ );
+ };
  const renderKeyLevelsList = (levels, minWidth) => (levels||[]).map((l,i)=>(
   <div key={i} style={{display:"flex",gap:10,marginBottom:5,padding:"5px 9px",background:T.bg,borderRadius:0,border:"1px solid "+T.border}}>
    <span style={{fontWeight:700,color:l.c,fontSize:FS.lg,minWidth,flexShrink:0,fontFamily:FD}}>{l.p}</span>
@@ -1573,7 +1600,8 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Narrative</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.narrative}</div></div>
  <div style={{background:T.bg,borderRadius:0,padding:"9px 11px",border:"1px solid "+T.border}}><div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Structure</div><div style={{fontFamily:FP,fontSize:FS.lg,color:T.textSec,lineHeight:1.5}}>{s.structure}</div></div>
  </div>
- <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px"}}><div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:FS.lg,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
+ <div style={{background:T.purple+"10",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}><div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence</div><div style={{color:T.purple,fontFamily:FP,fontSize:FS.lg,lineHeight:1.5}}>{computeLiveDivergence(s.symbol) || s.divergence}</div></div>
+ {renderSmtCorrGroup(s)}
  </div>
  )}
  {tab==="phase"&&(
@@ -1841,28 +1869,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>🪤 Divergence — Your Edge</div>
  <div style={{color:T.purple,fontFamily:FP,fontSize:FS.lg,lineHeight:1.5}}>{s.divergence}</div>
  </div>
- {(()=>{
- const corrGroup=CORR_GROUPS.find(g=>g.includes(s.symbol));
- const corrMembers=corrGroup?corrGroup.map(m=>({sym:m,chg:liveData[m]?.chg})).filter(m=>typeof m.chg==="number"):[];
- const corrDiv=computeLiveDivergence(s.symbol);
- return(<div>
- {corrGroup&&corrMembers.length>=2&&(
- <div style={{background:T.purple+"08",border:"1px solid "+T.purple+"30",borderRadius:0,padding:"9px 11px",marginBottom:10}}>
- <div style={{fontSize:FS.xs,color:T.purple,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>⚡ SMT — Correlated Group ({corrGroup.join(" / ")})</div>
- {[...corrMembers].sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0)).map(m=>(
- <div key={m.sym} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,padding:"4px 6px",borderRadius:0,background:m.sym===s.symbol?T.purple+"10":"transparent",border:m.sym===s.symbol?"1px solid "+T.purple+"30":"1px solid transparent"}}>
- <span style={{fontSize:FS.sm,fontWeight:700,color:m.sym===s.symbol?T.purple:T.textSec,fontFamily:FD,minWidth:44}}>{m.sym}</span>
- <div style={{flex:1,height:3,background:T.border,borderRadius:0,overflow:"hidden"}}>
- <div style={{height:"100%",background:m.sym===s.symbol?T.purple:T.border2,width:Math.min(100,Math.abs(m.chg||0)*5)+"%",borderRadius:0}}/>
- </div>
- <span style={{fontSize:FS.sm,color:(m.chg||0)>0?T.blue:T.rose,fontFamily:FD,minWidth:38,textAlign:"right"}}>{(m.chg||0)>0?"+":""}{typeof m.chg==="number"?m.chg.toFixed(1):"—"}%</span>
- </div>
- ))}
- {corrDiv&&<div style={{marginTop:6,fontSize:FS.sm,color:T.purple,lineHeight:1.6}}>{corrDiv}</div>}
- </div>
- )}
- </div>);
- })()}
+ {renderSmtCorrGroup(s)}
  <div>
  <div style={{fontSize:FS.xs,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6}}>Update Log</div>
  {ai.logEntry&&(

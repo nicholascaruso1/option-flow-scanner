@@ -674,6 +674,16 @@ setInitDone(true);
 const lastKvPayloadRef = useRef(null);
 const kvRetryRef = useRef(null);
 const [kvSyncError, setKvSyncError] = useState(null);
+// Guards against overlapping syncToKv calls: if a sync is already in flight
+// (past the debounce, awaiting its GET/POST round trip) when a newer one
+// would fire, the newer one is parked here instead of running concurrently.
+// Two concurrent GET-merge-POSTs can each merge against a base that's
+// already stale by the time they POST, and whichever POST lands last wins —
+// silently discarding the other's merge. Once the in-flight call finishes,
+// it drains this slot and runs the latest queued payload, so no update is
+// ever lost, just deferred.
+const kvSyncInFlightRef = useRef(false);
+const kvSyncPendingRef = useRef(null);
 // GET-merge-POST instead of a blind POST: fetches the freshest KV document
 // immediately before writing so this sync can't stomp fields the nightly
 // Tier 1 script (or another open tab/device) wrote in between, and only
@@ -682,6 +692,13 @@ const [kvSyncError, setKvSyncError] = useState(null);
 // write — a save that fails on a network blip previously vanished with no
 // indication and no way to retry it.
 const syncToKv = useCallback(async (payload, serialized, attempt=0) => {
+  if (kvSyncInFlightRef.current) {
+    // Something is already mid-flight — queue this as the latest desired
+    // state rather than starting a second overlapping GET-merge-POST.
+    kvSyncPendingRef.current = { payload, serialized };
+    return;
+  }
+  kvSyncInFlightRef.current = true;
   try {
     let base = {};
     try {
@@ -703,6 +720,18 @@ const syncToKv = useCallback(async (payload, serialized, attempt=0) => {
     setKvSyncError(`⚠ Save failed — retrying in ${Math.round(delay/1000)}s`);
     clearTimeout(kvRetryRef.current);
     kvRetryRef.current = setTimeout(()=>syncToKv(payload, serialized, attempt+1), delay);
+  } finally {
+    kvSyncInFlightRef.current = false;
+    // Drain exactly one queued sync, if a newer state arrived while this
+    // one was running. It may itself queue again, so this naturally chains
+    // to whatever the latest state is without ever running two at once.
+    if (kvSyncPendingRef.current) {
+      const next = kvSyncPendingRef.current;
+      kvSyncPendingRef.current = null;
+      if (next.serialized !== lastKvPayloadRef.current) {
+        syncToKv(next.payload, next.serialized, 0);
+      }
+    }
   }
 }, []);
 useEffect(()=>{

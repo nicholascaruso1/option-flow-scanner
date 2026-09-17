@@ -1263,6 +1263,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  </span>
  )}
  <span style={{fontSize:FS.xs,color:T.textDim,marginLeft:"auto",fontFamily:FD}}>{sessionProfile.session} · {weeklyProfile.name}</span>
+ <span style={{fontSize:FS.sm,color:"#FF00FF",fontFamily:FD,fontWeight:900,padding:"2px 8px",background:"#000",border:"2px solid #FF00FF"}}>DEBUG view="{view}" isEverything={String(isEverything)} isAltView={String(isAltView)} fwOpen={String(fwOpen)}</span>
  </div>
  );
 

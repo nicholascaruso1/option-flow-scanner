@@ -40,12 +40,12 @@ const STAGE_RANK = {
   C3_CISD_CONFIRMED: 5,
 };
 
-function rank(stage) {
+export function rank(stage) {
   return STAGE_RANK[stage] ?? -1;
 }
 
 const CONFIDENCE_DOWNGRADE = { HIGH: "MEDIUM", MEDIUM: "LOW", LOW: "LOW" };
-function downgradeConfidence(confidence) {
+export function downgradeConfidence(confidence) {
   if (!confidence) return confidence;
   return CONFIDENCE_DOWNGRADE[confidence] || confidence;
 }
@@ -55,7 +55,7 @@ function downgradeConfidence(confidence) {
 // a card sits untouched. This forces a refresh floor independent of the
 // stage/invalidation/confidence triggers below.
 const STALE_ANALYSIS_DAYS = 14;
-function daysSinceAnalysis(dataAsOf) {
+export function daysSinceAnalysis(dataAsOf) {
   if (!dataAsOf) return Infinity; // no dataAsOf at all = treat as maximally stale
   const parsed = Date.parse(dataAsOf);
   if (Number.isNaN(parsed)) return Infinity;
@@ -104,7 +104,7 @@ async function fetchWeeklyCandles(symbol) {
 // A daily C2/C3 confirming against opposing weekly structure is weaker evidence
 // than one confirming with the weekly trend, especially when the daily move
 // was gap-driven mid-week (which weekly candles absorb and smooth out).
-function computeWeeklyBias(weeklyCandles) {
+export function computeWeeklyBias(weeklyCandles) {
   if (!weeklyCandles || weeklyCandles.length < 8) return null;
   const recent = weeklyCandles[weeklyCandles.length - 1];
   const lookback = weeklyCandles[weeklyCandles.length - 8];
@@ -138,7 +138,7 @@ async function triggerTier2(symbol, card, price) {
   return json.analysis;
 }
 
-function meaningfulChange(prev, next) {
+export function meaningfulChange(prev, next) {
   if (!prev) return { changed: true, reason: "no prior state (first check)" };
 
   const prevRank = rank(prev.stage);
@@ -327,7 +327,12 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error("Tier 1: fatal error:", e);
-  process.exitCode = 1;
-});
+// Only auto-run when this file is executed directly (`node tier1_check.mjs`),
+// not when imported — e.g. by tier1_check.test.mjs, which imports the pure
+// functions above without wanting to trigger a live nightly run.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((e) => {
+    console.error("Tier 1: fatal error:", e);
+    process.exitCode = 1;
+  });
+}

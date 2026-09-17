@@ -14,10 +14,16 @@ return thresholds.length ? thresholds : null;
 
 export function checkInvalidation(setup, price) {
 const thresholds = parseInvalidation(setup.invalidation);
-if (!thresholds || price==null) return {breached:false, thresholds:null};
+// Always return the same shape: `threshold` is the single breached one (or
+// null), `thresholds` is always the full parsed array (or null). Previously
+// the no-breach branches returned only `thresholds` and the breach branch
+// returned only `threshold` — harmless today since every call site reads
+// `.threshold` guarded by `.breached===true`, but a landmine for the next
+// caller that doesn't know which branch sets which key.
+if (!thresholds || price==null) return {breached:false, threshold:null, thresholds:null};
 for (const t of thresholds) {
-if (t.direction==="below" && price < t.price) return {breached:true, threshold:t};
-if (t.direction==="above" && price > t.price) return {breached:true, threshold:t};
+if (t.direction==="below" && price < t.price) return {breached:true, threshold:t, thresholds};
+if (t.direction==="above" && price > t.price) return {breached:true, threshold:t, thresholds};
 }
-return {breached:false, thresholds};
+return {breached:false, threshold:null, thresholds};
 }

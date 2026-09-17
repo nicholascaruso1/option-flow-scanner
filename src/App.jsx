@@ -508,12 +508,17 @@ try {
 setInitDone(true);
  })();
  }, []);
+ // Shared screener-data loader — was duplicated verbatim in two button
+ // handlers (Retry/Refresh) plus a near-identical copy in the mount effect.
+ const reloadScreenerData = useCallback(() => {
+  fetch("./data/stocks.json?_="+Date.now())
+   .then(r=>r.json())
+   .then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);})
+   .catch(()=>setScreenerLoading(false));
+ }, []);
  useEffect(()=>{
- fetch("./data/stocks.json?_="+Date.now())
- .then(r=>r.json())
- .then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);})
- .catch(()=>setScreenerLoading(false));
- },[]);
+ reloadScreenerData();
+ },[reloadScreenerData]);
  
  const updateMarketMemory = useCallback(async (freshPrices) => {
  const all = [...allSetups,...CRYPTO,...COMMODITIES,...INDICES];
@@ -894,6 +899,18 @@ const WORKER = window.location.hostname === "localhost"
    <span style={{color:c.startsWith("⚠")?T.gold:T.textSec,fontSize:10}}>{c.startsWith("⚠")?c.slice(2):c}</span>
   </div>
  ));
+ // Invalidation-alert text — was recomputed identically (_invP/_invCk/invAlert,
+ // three lines) in both the alt-view and Options per-card render scopes.
+ const computeInvAlert = (s, memHistory) => {
+  // Body-close rule: while the NY session is live the daily candle is still forming,
+  // so a live tick through the level is a wick (manipulation), not invalidation.
+  // Use the last confirmed close during the session; use live price when closed.
+  const invP = (sessionProfile.actionable&&liveData[s.symbol]?.prevClose)||liveData[s.symbol]?.price||s.price;
+  const invCk = checkInvalidation(s, invP);
+  return invCk.breached
+   ? `Invalidation level breached at $${invCk.threshold.price}. Current price $${typeof invP==="number"?invP.toFixed(2):invP}.`
+   : (parseInvalidation(s.invalidation) ? null : getInvalidationAlert(memHistory));
+ };
  // Shared Journal tab — was two byte-identical JSX blocks (options used local var
  // name `cd` where alt-view used `cd2` to dodge an outer-scope collision; purely
  // cosmetic, function-scoped here either way). Closes over c123/setC123,
@@ -1402,12 +1419,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- // Body-close rule: while the NY session is live the daily candle is still forming,
- // so a live tick through the level is a wick (manipulation), not invalidation.
- // Use the last confirmed close during the session; use live price when closed.
- const _invP=(sessionProfile.actionable&&liveData[s.symbol]?.prevClose)||liveData[s.symbol]?.price||s.price;
- const _invCk=checkInvalidation(s,_invP);
- const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:(parseInvalidation(s.invalidation)?null:getInvalidationAlert(memHistory));
+ const invAlert=computeInvAlert(s, memHistory);
  const isOpen=open[s.symbol];
  const isFav=favs.includes(s.symbol);
  const tab=getTab(s.symbol);
@@ -1642,12 +1654,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
  {view!=="screener"&&view!=="news"&&visible.map((s,vIdx)=>{const ai=aiUpdates[s.symbol]||{};
  const memHistory=memoryData[s.symbol]||[];
  const memNarrative=getMemoryNarrative(memHistory);
- // Body-close rule: while the NY session is live the daily candle is still forming,
- // so a live tick through the level is a wick (manipulation), not invalidation.
- // Use the last confirmed close during the session; use live price when closed.
- const _invP=(sessionProfile.actionable&&liveData[s.symbol]?.prevClose)||liveData[s.symbol]?.price||s.price;
- const _invCk=checkInvalidation(s,_invP);
- const invAlert=_invCk.breached?`Invalidation level breached at $${_invCk.threshold.price}. Current price $${typeof _invP==="number"?_invP.toFixed(2):_invP}.`:(parseInvalidation(s.invalidation)?null:getInvalidationAlert(memHistory));
+ const invAlert=computeInvAlert(s, memHistory);
  const ld=liveData[s.symbol];
  const ms=ld?.marketState;
  const dispPrice=ms==="PRE"&&ld?.preMarket?ld.preMarket:(ld?.price||s.price);
@@ -1923,7 +1930,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
    <div style={{textAlign:"center",padding:32}}>
     <div style={{fontSize:13,color:T.textSec,fontFamily:FM}}>No screener data found</div>
     <div style={{fontSize:10,color:T.textDim,marginTop:4}}>Run CI workflow from GitHub Actions to populate</div>
-    <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Retry</button>
+    <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{marginTop:12,fontSize:9,padding:"5px 14px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Retry</button>
    </div>
   )}
   {!screenerLoading&&screenerHits.length>0&&(
@@ -1933,7 +1940,7 @@ const ASSET_MAP={"options":optionsOnly,"crypto":CRYPTO.map(ovl),"commodities":CO
       <div style={{fontSize:11,fontWeight:700,color:T.textPri,fontFamily:FM,letterSpacing:"0.05em"}}>📡 SCREENER HITS</div>
       <div style={{fontSize:9,color:T.textDim,marginTop:3}}>{screenerMeta.universe_size||0} screened · {screenerHits.length} candidates · score ≥4{screenerMeta.generated_at&&" · ran "+new Date(screenerMeta.generated_at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})+" ET"}</div>
      </div>
-     <button onClick={()=>{setScreenerLoading(true);fetch("./data/stocks.json?_="+Date.now()).then(r=>r.json()).then(d=>{setScreenerHits(d.candidates||[]);setScreenerMeta({generated_at:d.generated_at,universe_size:d.universe_size||0});setScreenerLoading(false);}).catch(()=>setScreenerLoading(false));}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
+     <button onClick={()=>{setScreenerLoading(true);reloadScreenerData();}} style={{fontSize:9,padding:"4px 10px",background:T.surface,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,cursor:"pointer",fontFamily:FM}}>Refresh</button>
     </div>
     <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:12,padding:"8px 10px",background:T.surface,border:"1px solid "+T.border,borderRadius:0}}>
      <input value={scrSearch} onChange={e=>setScrSearch(e.target.value)} placeholder="Search ticker..." style={{fontSize:9,padding:"3px 8px",background:T.bg,border:"1px solid "+T.border,color:T.textSec,borderRadius:0,fontFamily:FM,outline:"none",width:120}}/>

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T08:36:05.866304+00:00",
+  "generated_at": "2026-09-18T00:47:01.826032+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -97,7 +97,7 @@
         "sma20": 489.46,
         "sma50": 457.13,
         "sma200": 267.44,
-        "avg_vol_m": 9.69,
+        "avg_vol_m": 9.7,
         "retr_pct": 8.9,
         "exp_date": "2026-09-11",
         "exp_dir": "BULL"
@@ -297,7 +297,7 @@
         "sma20": 210.21,
         "sma50": 217.3,
         "sma200": 221.1,
-        "avg_vol_m": 5.5,
+        "avg_vol_m": 5.51,
         "retr_pct": 32.5,
         "exp_date": "2026-09-16",
         "exp_dir": "BEAR"
@@ -747,7 +747,7 @@
         "sma20": 266.02,
         "sma50": 273.7,
         "sma200": 240.28,
-        "avg_vol_m": 0.98,
+        "avg_vol_m": 0.99,
         "retr_pct": 10.6,
         "exp_date": "2026-09-16",
         "exp_dir": "BEAR"
@@ -775,6 +775,31 @@
         "avg_vol_m": 0.83,
         "retr_pct": 5.7,
         "exp_date": "2026-09-10",
+        "exp_dir": "BEAR"
+      }
+    },
+    {
+      "ticker": "SPY",
+      "price": 754.05,
+      "bias": "MIXED",
+      "direction": "BEAR",
+      "met": 4,
+      "weekly_bias": "NEUTRAL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": false,
+        "expansion": true,
+        "in_zone": true,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 764.67,
+        "sma50": 759.19,
+        "sma200": 713.39,
+        "avg_vol_m": 39.36,
+        "retr_pct": 36.9,
+        "exp_date": "2026-09-16",
         "exp_dir": "BEAR"
       }
     },
@@ -897,7 +922,7 @@
         "sma20": 5.77,
         "sma50": 5.48,
         "sma200": 6.38,
-        "avg_vol_m": 24.33,
+        "avg_vol_m": 24.34,
         "retr_pct": 25.7,
         "exp_date": "2026-09-16",
         "exp_dir": "BEAR"
@@ -1047,7 +1072,7 @@
         "sma20": 36.72,
         "sma50": 35.11,
         "sma200": 34.99,
-        "avg_vol_m": 13.08,
+        "avg_vol_m": 13.09,
         "retr_pct": -33.2,
         "exp_date": "2026-09-15",
         "exp_dir": "BEAR"
@@ -1872,7 +1897,7 @@
         "sma20": 529.35,
         "sma50": 528.38,
         "sma200": 498.33,
-        "avg_vol_m": 3.26,
+        "avg_vol_m": 3.27,
         "retr_pct": 29.3,
         "exp_date": "2026-09-16",
         "exp_dir": "BEAR"

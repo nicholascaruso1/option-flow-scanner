@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T07:59:25.157592+00:00",
+  "generated_at": "2026-09-22T01:09:31.307636+00:00",
   "universe_size": 548,
   "min_met": 4,
   "candidates": [
@@ -1029,31 +1029,6 @@
       }
     },
     {
-      "ticker": "ATAI",
-      "price": 7.35,
-      "bias": "BULL",
-      "direction": "BULL",
-      "met": 4,
-      "weekly_bias": "BULL",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 7.34,
-        "sma50": 6.9,
-        "sma200": 4.74,
-        "avg_vol_m": 13.59,
-        "retr_pct": 70.6,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "CMG",
       "price": 33.43,
       "bias": "BEAR",
@@ -1504,31 +1479,6 @@
       }
     },
     {
-      "ticker": "TAP",
-      "price": 37.53,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": false,
-        "vol_confirm": true,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 40.03,
-        "sma50": 40.61,
-        "sma200": 42.79,
-        "avg_vol_m": 5.22,
-        "retr_pct": -41.1,
-        "exp_date": "2026-09-08",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "EBAY",
       "price": 111.84,
       "bias": "BULL",
@@ -1754,31 +1704,6 @@
       }
     },
     {
-      "ticker": "BLDR",
-      "price": 58.12,
-      "bias": "BEAR",
-      "direction": "BEAR",
-      "met": 4,
-      "weekly_bias": "BEAR",
-      "weekly_conflict": false,
-      "conditions": {
-        "topdown_bias": true,
-        "expansion": true,
-        "in_zone": true,
-        "vol_confirm": false,
-        "liquid": true
-      },
-      "details": {
-        "sma20": 63.74,
-        "sma50": 68.97,
-        "sma200": 88.13,
-        "avg_vol_m": 3.64,
-        "retr_pct": 18.0,
-        "exp_date": "2026-09-17",
-        "exp_dir": "BEAR"
-      }
-    },
-    {
       "ticker": "ADI",
       "price": 375.72,
       "bias": "BULL",
@@ -1800,6 +1725,31 @@
         "avg_vol_m": 3.62,
         "retr_pct": 30.9,
         "exp_date": "2026-09-11",
+        "exp_dir": "BULL"
+      }
+    },
+    {
+      "ticker": "ILMN",
+      "price": 239.62,
+      "bias": "BULL",
+      "direction": "BULL",
+      "met": 4,
+      "weekly_bias": "BULL",
+      "weekly_conflict": false,
+      "conditions": {
+        "topdown_bias": true,
+        "expansion": true,
+        "in_zone": false,
+        "vol_confirm": true,
+        "liquid": true
+      },
+      "details": {
+        "sma20": 218.88,
+        "sma50": 204.06,
+        "sma200": 156.06,
+        "avg_vol_m": 3.62,
+        "retr_pct": -68.2,
+        "exp_date": "2026-09-15",
         "exp_dir": "BULL"
       }
     },
